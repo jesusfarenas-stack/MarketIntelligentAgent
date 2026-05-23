@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AUD/USD Agent</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      padding: 30px;
+    }
+
+    .card {
+      background: #1f2937;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+
+    .signal {
+      font-size: 32px;
+      font-weight: bold;
+      color: #facc15;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .small {
+      color: #d1d5db;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>AUD/USD AI Agent</h1>
+  <p class="small">Dashboard inicial para análisis de tendencia, entrada, SL y TP.</p>
+
+  <div class="card">
+    <h2>Señal actual</h2>
+    <div class="signal">ESPERAR</div>
+    <p>El agente todavía no detecta una entrada de alta probabilidad.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Precio actual</h3>
+      <p>0.66420</p>
+    </div>
+
+    <div class="card">
+      <h3>Tendencia H1</h3>
+      <p>Bajista</p>
+    </div>
+
+    <div class="card">
+      <h3>Tendencia M15</h3>
+      <p>Retroceso alcista</p>
+    </div>
+
+    <div class="card">
+      <h3>Confianza</h3>
+      <p>68%</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Zona de operación</h2>
+    <p><strong>Entrada ideal:</strong> 0.66480 - 0.66530</p>
+    <p><strong>Stop Loss:</strong> 0.66640</p>
+    <p><strong>Take Profit 1:</strong> 0.66290</p>
+    <p><strong>Take Profit 2:</strong> 0.66120</p>
+  </div>
+
+  <div class="card">
+    <h2>Motivo del análisis</h2>
+    <p>
+      La tendencia principal en H1 sigue bajista. El precio está haciendo un retroceso
+      hacia una zona de resistencia. El agente recomienda esperar confirmación antes de vender.
+    </p>
+  </div>
+
+</body>
+</html>
