@@ -153,6 +153,9 @@
     .button-red { background: #dc2626; }
     .button-red:hover { background: #b91c1c; }
 
+    .button-blue { background: #0284c7; }
+    .button-blue:hover { background: #0369a1; }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -279,11 +282,11 @@
     <div class="header">
       <div class="title">
         <h1>Market AI Agent</h1>
-        <p>Scanner automático dividido en Forex, Crypto y Stocks.</p>
+        <p>Scanner inteligente dividido en Forex, Crypto y Stocks.</p>
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Multi-mercado v5</strong>
+        Modo actual: <strong>Smart Confluence Scanner v6</strong>
       </div>
     </div>
 
@@ -291,14 +294,14 @@
       <h2>Mejor señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Selecciona una categoría, pega tu API Key y escanea oportunidades.
+        Usa el Smart Scanner para analizar categoría completa y confirmar los 3 mejores en M15, M30, H1 y H4.
       </p>
     </div>
 
     <div class="section">
       <h2>Panel de análisis automático</h2>
       <p class="note">
-        Puedes analizar un activo individual o escanear una categoría completa.
+        Puedes analizar un activo individual, escanear una categoría o usar el Smart Scanner con confirmación multi-timeframe.
       </p>
 
       <div class="input-group">
@@ -325,7 +328,7 @@
         </div>
 
         <div class="input-group">
-          <label>Temporalidad para cálculo</label>
+          <label>Temporalidad simple</label>
           <select id="inputInterval">
             <option value="15min">M15</option>
             <option value="30min">M30</option>
@@ -341,8 +344,12 @@
         </div>
       </div>
 
+      <button class="button button-blue" onclick="smartConfluenceScanner()">
+        Smart Scanner multi-timeframe
+      </button>
+
       <button class="button button-red" onclick="escanearOportunidades()">
-        Escanear categoría completa
+        Escanear categoría simple
       </button>
 
       <button class="button button-purple" onclick="obtenerIndicadoresAutomaticos()">
@@ -393,7 +400,7 @@
     <div class="section">
       <h2>Scanner de oportunidades</h2>
       <p class="note">
-        El scanner analiza los activos de la categoría seleccionada, calcula confianza y ordena de mayor a menor oportunidad.
+        El scanner ordena los activos por confianza. El Smart Scanner primero filtra en H1 y después confirma el Top 3 con M15, M30, H1 y H4.
       </p>
 
       <div class="best-box" id="bestOpportunityBox">
@@ -412,7 +419,29 @@
         </tr>
         <tbody id="scannerResults">
           <tr>
-            <td colspan="7">Presiona “Escanear categoría completa”.</td>
+            <td colspan="7">Presiona “Smart Scanner multi-timeframe”.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Confirmación multi-timeframe</h2>
+      <p class="note">
+        Aquí verás la lectura M15, M30, H1 y H4 del mejor activo detectado.
+      </p>
+
+      <table>
+        <tr>
+          <th>Timeframe</th>
+          <th>Tendencia</th>
+          <th>RSI</th>
+          <th>Señal base</th>
+          <th>Confianza base</th>
+        </tr>
+        <tbody id="multiTfResults">
+          <tr>
+            <td colspan="5">Pendiente de Smart Scanner.</td>
           </tr>
         </tbody>
       </table>
@@ -533,7 +562,7 @@
     </div>
 
     <div class="footer">
-      Market AI Agent · Multi-mercado v5 · Forex · Crypto · Stocks
+      Market AI Agent · Smart Confluence Scanner v6 · Forex · Crypto · Stocks
     </div>
 
   </div>
@@ -542,37 +571,18 @@
     let confidence = 68;
 
     const markets = {
-      forex: [
-        "AUD/USD",
-        "EUR/USD",
-        "USD/JPY",
-        "GBP/USD"
-      ],
+      forex: ["AUD/USD", "EUR/USD", "USD/JPY", "GBP/USD"],
       crypto: [
-        "BTC/USD",
-        "ETH/USD",
-        "BNB/USD",
-        "XRP/USD",
-        "SOL/USD",
-        "TRX/USD",
-        "DOGE/USD",
-        "ADA/USD",
-        "LINK/USD",
-        "AVAX/USD"
+        "BTC/USD", "ETH/USD", "BNB/USD", "XRP/USD", "SOL/USD",
+        "TRX/USD", "DOGE/USD", "ADA/USD", "LINK/USD", "AVAX/USD"
       ],
       stocks: [
-        "NVDA",
-        "TSLA",
-        "AMD",
-        "AAPL",
-        "MSFT",
-        "AMZN",
-        "META",
-        "GOOGL",
-        "NFLX",
-        "AVGO"
+        "NVDA", "TSLA", "AMD", "AAPL", "MSFT",
+        "AMZN", "META", "GOOGL", "NFLX", "AVGO"
       ]
     };
+
+    const deepTimeframes = ["15min", "30min", "1h", "4h"];
 
     function getCategory() {
       return document.getElementById("inputCategory").value;
@@ -586,22 +596,6 @@
       return markets[getCategory()];
     }
 
-    function getPipSize(symbol) {
-      const category = getCategory();
-
-      if (category === "forex") {
-        if (symbol.includes("JPY")) return 0.010;
-        return 0.00010;
-      }
-
-      const price = parseFloat(document.getElementById("inputPrice").value);
-      if (!isNaN(price) && price > 0) {
-        return price * 0.001;
-      }
-
-      return 0.01;
-    }
-
     function getStepForSymbol(symbol) {
       const category = getCategory();
 
@@ -610,8 +604,7 @@
         return 0.00010;
       }
 
-      if (category === "crypto") return 0.001;
-      return 0.01;
+      return 0.001;
     }
 
     function getDecimalsBySymbol(symbol) {
@@ -623,7 +616,13 @@
       }
 
       if (category === "crypto") {
-        if (symbol.includes("BTC") || symbol.includes("ETH") || symbol.includes("BNB") || symbol.includes("SOL") || symbol.includes("AVAX")) {
+        if (
+          symbol.includes("BTC") ||
+          symbol.includes("ETH") ||
+          symbol.includes("BNB") ||
+          symbol.includes("SOL") ||
+          symbol.includes("AVAX")
+        ) {
           return 2;
         }
         return 4;
@@ -661,7 +660,7 @@
       document.getElementById("symbolValue").textContent = symbol;
       document.getElementById("historyPair").textContent = symbol;
       document.getElementById("signalNote").textContent =
-        "Activo cambiado a " + symbol + ". Presiona Obtener indicadores o Escanear categoría.";
+        "Activo cambiado a " + symbol + ". Puedes analizarlo o escanear la categoría.";
     }
 
     function getGaugeColor(value) {
@@ -770,7 +769,6 @@
       const step = getStepForSymbol(symbol);
       const bullishTrend = price > ema200 && ema50 > ema200;
       const bearishTrend = price < ema200 && ema50 < ema200;
-
       const nearResistance = price >= resistance - (15 * step);
       const nearSupport = price <= support + (15 * step);
 
@@ -797,8 +795,7 @@
         tp1 = formatPriceForSymbol(support, symbol);
         tp2 = formatPriceForSymbol(support - (15 * step), symbol);
 
-        reason =
-          symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo.";
+        reason = symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo.";
       }
       else if (bullishTrend && rsi >= 30 && rsi <= 50) {
         signal = "COMPRA";
@@ -813,13 +810,11 @@
         tp1 = formatPriceForSymbol(resistance, symbol);
         tp2 = formatPriceForSymbol(resistance + (15 * step), symbol);
 
-        reason =
-          symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable.";
+        reason = symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable.";
       }
       else {
         confidenceScore -= 5;
-        reason =
-          symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar.";
+        reason = symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar.";
       }
 
       if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
@@ -830,24 +825,9 @@
       confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
 
       return {
-        symbol,
-        price,
-        ema50,
-        ema200,
-        rsi,
-        support,
-        resistance,
-        signal,
-        signalColor,
-        tradeType,
-        confidenceScore,
-        entry,
-        sl,
-        tp1,
-        tp2,
-        trend,
-        trendClass,
-        reason
+        symbol, price, ema50, ema200, rsi, support, resistance,
+        signal, signalColor, tradeType, confidenceScore,
+        entry, sl, tp1, tp2, trend, trendClass, reason
       };
     }
 
@@ -857,11 +837,11 @@
       const data = await response.json();
 
       if (data.status === "error") {
-        throw new Error(symbol + ": " + data.message);
+        throw new Error(symbol + " " + interval + ": " + data.message);
       }
 
       if (!data.values || data.values.length < 210) {
-        throw new Error(symbol + ": no llegaron suficientes velas.");
+        throw new Error(symbol + " " + interval + ": no llegaron suficientes velas.");
       }
 
       const closes = data.values
@@ -877,10 +857,13 @@
       const resistance = calculateResistance(closes, 50);
 
       if (!ema50 || !ema200 || !rsi) {
-        throw new Error(symbol + ": no se pudieron calcular indicadores.");
+        throw new Error(symbol + " " + interval + ": no se pudieron calcular indicadores.");
       }
 
-      return analyzeData(symbol, price, ema50, ema200, rsi, support, resistance);
+      const result = analyzeData(symbol, price, ema50, ema200, rsi, support, resistance);
+      result.interval = interval;
+
+      return result;
     }
 
     function applyResultToDashboard(result) {
@@ -902,8 +885,9 @@
 
       document.getElementById("signalText").textContent = result.signal;
       document.getElementById("signalText").style.color = result.signalColor;
+
       document.getElementById("signalNote").textContent =
-        "Mejor oportunidad detectada: " + result.symbol + " · " + result.tradeType + " · Confianza " + result.confidenceScore + "%.";
+        result.symbol + " · " + result.tradeType + " · Confianza " + result.confidenceScore + "%.";
 
       const trendElement = document.getElementById("trendH1");
       trendElement.textContent = result.trend;
@@ -921,7 +905,7 @@
 
       document.getElementById("m30State").textContent = result.trend;
       document.getElementById("m30State").className = result.trendClass;
-      document.getElementById("m30Read").textContent = "Lectura basada en precio, EMA 50, EMA 200 y RSI.";
+      document.getElementById("m30Read").textContent = "Confirmación basada en EMA 50, EMA 200 y RSI.";
 
       document.getElementById("h1State").textContent = result.trend;
       document.getElementById("h1State").className = result.trendClass;
@@ -934,7 +918,7 @@
 
       document.getElementById("h4State").textContent = "Contexto";
       document.getElementById("h4State").className = "yellow";
-      document.getElementById("h4Read").textContent = "Para contexto mayor, usa temporalidad 4h o 1day.";
+      document.getElementById("h4Read").textContent = "Contexto usado dentro del Smart Scanner.";
 
       document.getElementById("tradeType").textContent = result.tradeType;
       document.getElementById("entryZone").textContent = result.entry;
@@ -942,7 +926,8 @@
       document.getElementById("takeProfit1").textContent = result.tp1;
       document.getElementById("takeProfit2").textContent = result.tp2;
       document.getElementById("riskLevel").textContent =
-        result.confidenceScore >= 75 ? "Medio / favorable" :
+        result.confidenceScore >= 80 ? "Favorable / fuerte" :
+        result.confidenceScore >= 66 ? "Medio / válido" :
         result.confidenceScore >= 55 ? "Medio" : "Alto";
 
       document.getElementById("analysisReason").textContent = result.reason;
@@ -957,6 +942,106 @@
 
       confidence = result.confidenceScore;
       updateGauge(confidence);
+    }
+
+    function buildMultiTfRows(results) {
+      let rows = "";
+
+      results.forEach(r => {
+        const signalClass =
+          r.signal === "COMPRA" ? "green" :
+          r.signal === "VENTA" ? "red" : "yellow";
+
+        rows += `
+          <tr>
+            <td>${r.interval}</td>
+            <td class="${r.trendClass}">${r.trend}</td>
+            <td>${r.rsi.toFixed(1)}</td>
+            <td class="${signalClass}">${r.tradeType}</td>
+            <td>${r.confidenceScore}%</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("multiTfResults").innerHTML = rows;
+    }
+
+    function buildConfluenceResult(symbol, tfResults) {
+      const h4 = tfResults.find(r => r.interval === "4h");
+      const h1 = tfResults.find(r => r.interval === "1h");
+      const m30 = tfResults.find(r => r.interval === "30min");
+      const m15 = tfResults.find(r => r.interval === "15min");
+
+      let buyScore = 0;
+      let sellScore = 0;
+
+      function addTrendScore(result, buyPoints, sellPoints) {
+        if (!result) return;
+
+        if (result.trend === "Alcista") buyScore += buyPoints;
+        if (result.trend === "Bajista") sellScore += sellPoints;
+      }
+
+      addTrendScore(h4, 20, 20);
+      addTrendScore(h1, 25, 25);
+      addTrendScore(m30, 15, 15);
+      addTrendScore(m15, 10, 10);
+
+      if (h1 && h1.rsi >= 30 && h1.rsi <= 50) buyScore += 10;
+      if (h1 && h1.rsi >= 50 && h1.rsi <= 70) sellScore += 10;
+
+      if (m15 && m15.signal === "COMPRA") buyScore += 10;
+      if (m15 && m15.signal === "VENTA") sellScore += 10;
+
+      const direction = buyScore > sellScore ? "COMPRA" : sellScore > buyScore ? "VENTA" : "ESPERAR";
+      const finalScore = Math.max(buyScore, sellScore);
+
+      let base = h1 || tfResults[0];
+
+      let result = { ...base };
+
+      result.symbol = symbol;
+      result.confidenceScore = Math.max(20, Math.min(95, finalScore));
+
+      if (direction === "COMPRA") {
+        result.signal = "COMPRA";
+        result.signalColor = "#22c55e";
+        result.tradeType = "Compra / Long";
+        result.reason =
+          symbol + " tiene confluencia alcista multi-timeframe. H4/H1/M30/M15 favorecen compra o retroceso saludable.";
+      } else if (direction === "VENTA") {
+        result.signal = "VENTA";
+        result.signalColor = "#ef4444";
+        result.tradeType = "Venta / Short";
+        result.reason =
+          symbol + " tiene confluencia bajista multi-timeframe. H4/H1/M30/M15 favorecen venta o rechazo desde resistencia.";
+      } else {
+        result.signal = "ESPERAR";
+        result.signalColor = "#facc15";
+        result.tradeType = "Esperar";
+        result.entry = "No recomendado";
+        result.sl = "No aplica";
+        result.tp1 = "No aplica";
+        result.tp2 = "No aplica";
+        result.reason =
+          symbol + " no tiene confluencia clara entre M15, M30, H1 y H4. Mejor esperar.";
+      }
+
+      return result;
+    }
+
+    async function loadMultiTimeframe(symbol, apiKey, candles) {
+      const results = [];
+
+      for (const tf of deepTimeframes) {
+        const data = await loadSymbolData(symbol, apiKey, tf, candles);
+        results.push(data);
+      }
+
+      const confluence = buildConfluenceResult(symbol, results);
+      confluence.multiTf = results;
+
+      return confluence;
     }
 
     async function obtenerPrecioReal() {
@@ -1104,10 +1189,17 @@
         }
       }
 
-      results.sort((a, b) => b.confidenceScore - a.confidenceScore);
+      showScannerResults(results);
 
       const actionable = results.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
-      const best = actionable.length > 0 ? actionable[0] : results[0];
+      const best = actionable.length > 0 ? actionable.sort((a, b) => b.confidenceScore - a.confidenceScore)[0] : results.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
+
+      showBestBox(best);
+      applyResultToDashboard(best);
+    }
+
+    function showScannerResults(results) {
+      results.sort((a, b) => b.confidenceScore - a.confidenceScore);
 
       let rows = "";
 
@@ -1134,6 +1226,10 @@
       });
 
       document.getElementById("scannerResults").innerHTML = rows;
+    }
+
+    function showBestBox(best) {
+      if (!best) return;
 
       if (best.signal === "COMPRA" || best.signal === "VENTA") {
         document.getElementById("bestOpportunityBox").innerHTML = `
@@ -1152,8 +1248,97 @@
           pero el agente recomienda esperar.
         `;
       }
+    }
 
+    async function smartConfluenceScanner() {
+      const apiKey = document.getElementById("apiKey").value.trim();
+      const candles = parseInt(document.getElementById("inputCandles").value);
+      const symbols = getSymbolsForCategory();
+      const category = getCategory();
+
+      if (!apiKey) {
+        alert("Primero pega tu API Key de Twelve Data.");
+        return;
+      }
+
+      if (candles < 210) {
+        alert("Usa mínimo 210 velas para calcular EMA 200 correctamente.");
+        return;
+      }
+
+      document.getElementById("scannerResults").innerHTML =
+        `<tr><td colspan="7">Fase 1: escaneando ${category} en H1...</td></tr>`;
+
+      document.getElementById("bestOpportunityBox").textContent =
+        "Smart Scanner iniciado. Fase 1: escaneo rápido en H1.";
+
+      document.getElementById("multiTfResults").innerHTML =
+        `<tr><td colspan="5">Esperando confirmación multi-timeframe...</td></tr>`;
+
+      document.getElementById("signalNote").textContent =
+        "Smart Scanner: analizando categoría completa en H1...";
+
+      const phaseOneResults = [];
+
+      for (const symbol of symbols) {
+        try {
+          const result = await loadSymbolData(symbol, apiKey, "1h", candles);
+          phaseOneResults.push(result);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      if (phaseOneResults.length === 0) {
+        alert("No se pudo obtener información suficiente para la categoría.");
+        return;
+      }
+
+      phaseOneResults.sort((a, b) => b.confidenceScore - a.confidenceScore);
+
+      const topThree = phaseOneResults.slice(0, 3);
+
+      document.getElementById("scannerResults").innerHTML =
+        `<tr><td colspan="7">Fase 2: confirmando Top 3 en M15, M30, H1 y H4...</td></tr>`;
+
+      document.getElementById("bestOpportunityBox").innerHTML =
+        `<strong>Top 3 para confirmar:</strong><br>
+        ${topThree.map((r, i) => `${i + 1}. ${r.symbol} · ${r.tradeType} · ${r.confidenceScore}%`).join("<br>")}`;
+
+      document.getElementById("signalNote").textContent =
+        "Smart Scanner: confirmando Top 3 con multi-timeframe...";
+
+      const deepResults = [];
+
+      for (const item of topThree) {
+        try {
+          const deepResult = await loadMultiTimeframe(item.symbol, apiKey, candles);
+          deepResults.push(deepResult);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+
+      if (deepResults.length === 0) {
+        alert("No se pudo completar la confirmación multi-timeframe.");
+        return;
+      }
+
+      deepResults.sort((a, b) => b.confidenceScore - a.confidenceScore);
+
+      const actionable = deepResults.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
+      const best = actionable.length > 0 ? actionable[0] : deepResults[0];
+
+      showScannerResults(deepResults);
+      showBestBox(best);
       applyResultToDashboard(best);
+
+      if (best.multiTf) {
+        buildMultiTfRows(best.multiTf);
+      }
+
+      document.getElementById("signalNote").textContent =
+        "Smart Scanner completado. Mejor señal: " + best.symbol + " · " + best.tradeType + " · " + best.confidenceScore + "%.";
     }
 
     actualizarListaActivos();
