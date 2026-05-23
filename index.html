@@ -6,9 +6,7 @@
   <title>AUD/USD AI Agent</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -65,9 +63,17 @@
       margin: 10px 0;
     }
 
+    .section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 18px;
       margin-bottom: 24px;
     }
@@ -89,28 +95,59 @@
       font-weight: bold;
     }
 
-    .yellow {
-      color: #facc15;
+    .yellow { color: #facc15; }
+    .red { color: #ef4444; }
+    .green { color: #22c55e; }
+    .blue { color: #38bdf8; }
+
+    .note {
+      color: #cbd5e1;
+      line-height: 1.6;
     }
 
-    .red {
-      color: #ef4444;
-    }
-
-    .green {
-      color: #22c55e;
-    }
-
-    .blue {
-      color: #38bdf8;
-    }
-
-    .section {
-      background: #1e293b;
+    input {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
       border: 1px solid #334155;
-      border-radius: 18px;
-      padding: 24px;
-      margin-bottom: 24px;
+      background: #0f172a;
+      color: white;
+      font-size: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+      font-weight: bold;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    .button:hover {
+      background: #1d4ed8;
+    }
+
+    .button-green {
+      background: #16a34a;
+    }
+
+    .button-green:hover {
+      background: #15803d;
     }
 
     table {
@@ -127,33 +164,6 @@
 
     th {
       color: #cbd5e1;
-    }
-
-    .button {
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .button:hover {
-      background: #1d4ed8;
-    }
-
-    .note {
-      color: #cbd5e1;
-      line-height: 1.6;
-    }
-
-    .footer {
-      text-align: center;
-      color: #94a3b8;
-      font-size: 14px;
-      margin-top: 30px;
     }
 
     .confidence-card {
@@ -213,24 +223,21 @@
       margin-top: 8px;
     }
 
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+
     @media (max-width: 600px) {
-      body {
-        padding: 14px;
-      }
-
-      .signal-text {
-        font-size: 36px;
-      }
-
-      .title h1 {
-        font-size: 28px;
-      }
-
+      body { padding: 14px; }
+      .signal-text { font-size: 36px; }
+      .title h1 { font-size: 28px; }
       .gauge {
         width: 130px;
         height: 130px;
       }
-
       .gauge-inner {
         width: 92px;
         height: 92px;
@@ -249,7 +256,7 @@
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Asistente</strong>
+        Modo actual: <strong>Asistente manual</strong>
       </div>
     </div>
 
@@ -257,10 +264,49 @@
       <h2>Señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        El agente todavía no detecta una entrada de alta probabilidad.
-        Esperar confirmación antes de comprar o vender.
+        Ingresa los datos del mercado en el panel manual y presiona Analizar AUD/USD.
       </p>
-      <button class="button" onclick="actualizarAnalisis()">Actualizar análisis</button>
+    </div>
+
+    <div class="section">
+      <h2>Panel de análisis manual</h2>
+      <p class="note">
+        Coloca los valores actuales de AUD/USD. El agente calculará si conviene comprar, vender o esperar.
+      </p>
+
+      <div class="grid">
+        <div class="input-group">
+          <label>Precio actual</label>
+          <input type="number" step="0.00001" id="inputPrice" value="0.66420">
+        </div>
+
+        <div class="input-group">
+          <label>EMA 50</label>
+          <input type="number" step="0.00001" id="inputEma50" value="0.66380">
+        </div>
+
+        <div class="input-group">
+          <label>EMA 200</label>
+          <input type="number" step="0.00001" id="inputEma200" value="0.66550">
+        </div>
+
+        <div class="input-group">
+          <label>RSI</label>
+          <input type="number" step="0.1" id="inputRsi" value="58">
+        </div>
+
+        <div class="input-group">
+          <label>Soporte</label>
+          <input type="number" step="0.00001" id="inputSupport" value="0.66250">
+        </div>
+
+        <div class="input-group">
+          <label>Resistencia</label>
+          <input type="number" step="0.00001" id="inputResistance" value="0.66500">
+        </div>
+      </div>
+
+      <button class="button button-green" onclick="analizarManual()">Analizar AUD/USD</button>
     </div>
 
     <div class="grid">
@@ -271,7 +317,7 @@
 
       <div class="card">
         <h3>Tendencia H4</h3>
-        <div class="value red" id="trendH4">Bajista débil</div>
+        <div class="value yellow" id="trendH4">Pendiente</div>
       </div>
 
       <div class="card">
@@ -291,7 +337,7 @@
         </div>
         <div class="confidence-status" id="confidenceStatus">Verde moderado</div>
         <div class="confidence-legend">
-          0% - 50% = Rojo · 51% - 100% = Verde
+          0% - 50% = Rojo · 51% - 100% = Verde más intenso
         </div>
       </div>
     </div>
@@ -306,43 +352,41 @@
         </tr>
         <tr>
           <td>M15</td>
-          <td class="yellow" id="m15State">Retroceso</td>
-          <td id="m15Read">El precio sube hacia resistencia.</td>
+          <td class="yellow" id="m15State">Esperando datos</td>
+          <td id="m15Read">El agente usará los datos manuales para generar lectura.</td>
         </tr>
         <tr>
           <td>M30</td>
-          <td class="red" id="m30State">Bajista</td>
-          <td id="m30Read">Presión vendedora dominante.</td>
+          <td class="yellow" id="m30State">Esperando datos</td>
+          <td id="m30Read">Pendiente de confirmación.</td>
         </tr>
         <tr>
           <td>H1</td>
-          <td class="red" id="h1State">Bajista</td>
-          <td id="h1Read">Precio debajo de EMA 200.</td>
+          <td class="yellow" id="h1State">Esperando datos</td>
+          <td id="h1Read">Pendiente de analizar EMA 50, EMA 200 y RSI.</td>
         </tr>
         <tr>
           <td>H4</td>
-          <td class="yellow" id="h4State">Bajista débil</td>
-          <td id="h4Read">Tendencia general con posible consolidación.</td>
+          <td class="yellow" id="h4State">Manual</td>
+          <td id="h4Read">En esta versión H4 se mantiene como referencia manual.</td>
         </tr>
       </table>
     </div>
 
     <div class="section">
       <h2>Zona de operación</h2>
-      <p><strong>Tipo de operación:</strong> <span id="tradeType">Esperar venta / Short</span></p>
-      <p><strong>Entrada ideal:</strong> <span id="entryZone">0.66480 - 0.66530</span></p>
-      <p><strong>Stop Loss:</strong> <span id="stopLoss">0.66640</span></p>
-      <p><strong>Take Profit 1:</strong> <span id="takeProfit1">0.66290</span></p>
-      <p><strong>Take Profit 2:</strong> <span id="takeProfit2">0.66120</span></p>
+      <p><strong>Tipo de operación:</strong> <span id="tradeType">Esperar</span></p>
+      <p><strong>Entrada ideal:</strong> <span id="entryZone">Pendiente</span></p>
+      <p><strong>Stop Loss:</strong> <span id="stopLoss">Pendiente</span></p>
+      <p><strong>Take Profit 1:</strong> <span id="takeProfit1">Pendiente</span></p>
+      <p><strong>Take Profit 2:</strong> <span id="takeProfit2">Pendiente</span></p>
       <p><strong>Riesgo:</strong> <span id="riskLevel">Medio</span></p>
     </div>
 
     <div class="section">
       <h2>Motivo del análisis</h2>
       <p class="note" id="analysisReason">
-        La tendencia principal en H1 sigue bajista. El precio está haciendo un retroceso
-        hacia una zona de resistencia. El RSI todavía no confirma fuerza compradora.
-        El agente recomienda esperar rechazo bajista antes de buscar venta.
+        El agente todavía no ha procesado los datos manuales.
       </p>
     </div>
 
@@ -357,15 +401,15 @@
         </tr>
         <tr>
           <td>AUD/USD</td>
-          <td id="historySignal" class="yellow">Esperar venta</td>
-          <td id="historyEntry">0.66480</td>
+          <td id="historySignal" class="yellow">Esperar</td>
+          <td id="historyEntry">Pendiente</td>
           <td>Pendiente</td>
         </tr>
       </table>
     </div>
 
     <div class="footer">
-      AUD/USD AI Agent · Versión inicial web · Datos manuales por ahora
+      AUD/USD AI Agent · Cerebro manual v1 · Próximo paso: conectar datos reales
     </div>
 
   </div>
@@ -406,57 +450,140 @@
       statusText.style.color = color;
     }
 
-    function actualizarAnalisis() {
-      const escenarios = [
-        {
-          confidence: 42,
-          signal: "ESPERAR",
-          signalColor: "#facc15",
-          note: "La señal todavía es débil. Hay incertidumbre y no conviene entrar todavía.",
-          tradeType: "Esperar",
-          reason: "La confianza está por debajo del 50%. Hay poca confirmación en tendencia e impulso.",
-          historySignal: "Esperar"
-        },
-        {
-          confidence: 58,
-          signal: "ESPERAR",
-          signalColor: "#facc15",
-          note: "Hay algo de mejora, pero todavía no es una entrada clara.",
-          tradeType: "Esperar confirmación",
-          reason: "La confianza ya superó el 50%, pero la probabilidad aún no es lo bastante fuerte.",
-          historySignal: "Esperar confirmación"
-        },
-        {
-          confidence: 74,
-          signal: "VENTA",
-          signalColor: "#ef4444",
-          note: "El agente detecta una mejor oportunidad de venta.",
-          tradeType: "Venta / Short",
-          reason: "La confianza subió y la tendencia bajista está mejor alineada con la zona de entrada.",
-          historySignal: "Venta"
-        },
-        {
-          confidence: 91,
-          signal: "VENTA FUERTE",
-          signalColor: "#22c55e",
-          note: "La señal es fuerte y la confianza es alta.",
-          tradeType: "Venta fuerte / Short",
-          reason: "La confianza está muy alta y el gráfico circular muestra verde intenso por arriba del 90%.",
-          historySignal: "Venta fuerte"
-        }
-      ];
+    function formatPrice(value) {
+      return Number(value).toFixed(5);
+    }
 
-      const escenario = escenarios[Math.floor(Math.random() * escenarios.length)];
+    function analizarManual() {
+      const price = parseFloat(document.getElementById("inputPrice").value);
+      const ema50 = parseFloat(document.getElementById("inputEma50").value);
+      const ema200 = parseFloat(document.getElementById("inputEma200").value);
+      const rsi = parseFloat(document.getElementById("inputRsi").value);
+      const support = parseFloat(document.getElementById("inputSupport").value);
+      const resistance = parseFloat(document.getElementById("inputResistance").value);
 
-      confidence = escenario.confidence;
+      let signal = "ESPERAR";
+      let signalColor = "#facc15";
+      let tradeType = "Esperar";
+      let reason = "";
+      let confidenceScore = 40;
+      let entry = "Pendiente";
+      let sl = "Pendiente";
+      let tp1 = "Pendiente";
+      let tp2 = "Pendiente";
+      let trendH1 = "Lateral";
+      let trendClass = "yellow";
+
+      const pip = 0.00010;
+
+      const bullishTrend = price > ema200 && ema50 > ema200;
+      const bearishTrend = price < ema200 && ema50 < ema200;
+
+      if (bullishTrend) {
+        trendH1 = "Alcista";
+        trendClass = "green";
+        confidenceScore += 20;
+      } else if (bearishTrend) {
+        trendH1 = "Bajista";
+        trendClass = "red";
+        confidenceScore += 20;
+      } else {
+        trendH1 = "Lateral / Mixta";
+        trendClass = "yellow";
+      }
+
+      if (bearishTrend && rsi >= 50 && rsi <= 70 && price < resistance) {
+        signal = "VENTA";
+        signalColor = "#ef4444";
+        tradeType = "Venta / Short";
+        confidenceScore += 25;
+
+        entry = formatPrice(price);
+        sl = formatPrice(resistance + (5 * pip));
+        tp1 = formatPrice(support);
+        tp2 = formatPrice(support - (15 * pip));
+
+        reason = "El precio está debajo de EMA 200, EMA 50 también está debajo de EMA 200 y el RSI está en zona de posible rechazo. El agente detecta oportunidad de venta si hay confirmación bajista.";
+      } 
+      else if (bullishTrend && rsi >= 30 && rsi <= 50 && price > support) {
+        signal = "COMPRA";
+        signalColor = "#22c55e";
+        tradeType = "Compra / Long";
+        confidenceScore += 25;
+
+        entry = formatPrice(price);
+        sl = formatPrice(support - (5 * pip));
+        tp1 = formatPrice(resistance);
+        tp2 = formatPrice(resistance + (15 * pip));
+
+        reason = "El precio está arriba de EMA 200, EMA 50 también está arriba de EMA 200 y el RSI está en zona de retroceso saludable. El agente detecta oportunidad de compra si hay confirmación alcista.";
+      } 
+      else {
+        signal = "ESPERAR";
+        signalColor = "#facc15";
+        tradeType = "Esperar";
+        confidenceScore -= 5;
+
+        entry = "No recomendado";
+        sl = "No aplica";
+        tp1 = "No aplica";
+        tp2 = "No aplica";
+
+        reason = "Las condiciones no están alineadas. El agente recomienda esperar porque la tendencia, EMA 50, EMA 200 y RSI no dan una señal suficientemente clara.";
+      }
+
+      if (rsi >= 45 && rsi <= 60) confidenceScore += 8;
+      if (Math.abs(price - ema200) < 0.00150) confidenceScore += 5;
+
+      confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
+
+      document.getElementById("signalText").textContent = signal;
+      document.getElementById("signalText").style.color = signalColor;
+      document.getElementById("signalNote").textContent = "Análisis calculado con los datos manuales ingresados.";
+
+      document.getElementById("priceValue").textContent = formatPrice(price);
+
+      const trendElement = document.getElementById("trendH1");
+      trendElement.textContent = trendH1;
+      trendElement.className = "value " + trendClass;
+
+      document.getElementById("trendH4").textContent = "Referencia manual";
+      document.getElementById("trendH4").className = "value yellow";
+
+      document.getElementById("m15State").textContent = signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
+      document.getElementById("m15State").className = signal === "COMPRA" ? "green" : signal === "VENTA" ? "red" : "yellow";
+
+      document.getElementById("m15Read").textContent = signal === "ESPERAR" ? 
+        "No hay alineación suficiente para entrar." : 
+        "M15 puede usarse para buscar confirmación de entrada.";
+
+      document.getElementById("m30State").textContent = trendH1;
+      document.getElementById("m30State").className = trendClass;
+      document.getElementById("m30Read").textContent = "Lectura basada en relación de precio, EMA 50 y EMA 200.";
+
+      document.getElementById("h1State").textContent = trendH1;
+      document.getElementById("h1State").className = trendClass;
+      document.getElementById("h1Read").textContent = bearishTrend ? 
+        "Precio y EMA 50 debajo de EMA 200." :
+        bullishTrend ? "Precio y EMA 50 arriba de EMA 200." :
+        "Estructura mixta o lateral.";
+
+      document.getElementById("tradeType").textContent = tradeType;
+      document.getElementById("entryZone").textContent = entry;
+      document.getElementById("stopLoss").textContent = sl;
+      document.getElementById("takeProfit1").textContent = tp1;
+      document.getElementById("takeProfit2").textContent = tp2;
+      document.getElementById("riskLevel").textContent = confidenceScore >= 75 ? "Medio / favorable" : confidenceScore >= 55 ? "Medio" : "Alto";
+
+      document.getElementById("analysisReason").textContent = reason;
+
+      const historySignal = document.getElementById("historySignal");
+      historySignal.textContent = tradeType;
+      historySignal.className = signal === "COMPRA" ? "green" : signal === "VENTA" ? "red" : "yellow";
+      document.getElementById("historyEntry").textContent = entry;
+
+      confidence = confidenceScore;
       updateGauge(confidence);
-
-      document.getElementById("signalText").textContent = escenario.signal;
-      document.getElementById("signalText").style.color = escenario.signalColor;
-      document.getElementById("signalNote").textContent = escenario.note;
-      document.getElementById("tradeType").textContent = escenario.tradeType;
-      document.getElementById("analysisReason").textContent = escenario.reason;
-      document.getElementById("historySignal").textContent = escenario.historySignal;
     }
 
     updateGauge(confidence);
