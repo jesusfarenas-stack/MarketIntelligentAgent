@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Forex AI Agent</title>
+  <title>Market AI Agent</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -236,6 +236,7 @@
       border-radius: 16px;
       padding: 18px;
       margin-top: 15px;
+      line-height: 1.7;
     }
 
     .footer {
@@ -277,12 +278,12 @@
 
     <div class="header">
       <div class="title">
-        <h1>Forex AI Agent</h1>
-        <p>Dashboard automático con scanner para AUD/USD, EUR/USD, USD/JPY y GBP/USD.</p>
+        <h1>Market AI Agent</h1>
+        <p>Scanner automático dividido en Forex, Crypto y Stocks.</p>
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Scanner multi-par v4</strong>
+        Modo actual: <strong>Multi-mercado v5</strong>
       </div>
     </div>
 
@@ -290,14 +291,14 @@
       <h2>Mejor señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Selecciona un par para analizarlo individualmente o usa el scanner para encontrar la mejor oportunidad.
+        Selecciona una categoría, pega tu API Key y escanea oportunidades.
       </p>
     </div>
 
     <div class="section">
       <h2>Panel de análisis automático</h2>
       <p class="note">
-        Puedes analizar un solo par o escanear todos para que el agente elija la oportunidad con mayor confianza.
+        Puedes analizar un activo individual o escanear una categoría completa.
       </p>
 
       <div class="input-group">
@@ -310,13 +311,17 @@
 
       <div class="grid">
         <div class="input-group">
-          <label>Par a analizar</label>
-          <select id="inputSymbol" onchange="actualizarNombrePar()">
-            <option value="AUD/USD" selected>AUD/USD</option>
-            <option value="EUR/USD">EUR/USD</option>
-            <option value="USD/JPY">USD/JPY</option>
-            <option value="GBP/USD">GBP/USD</option>
+          <label>Categoría</label>
+          <select id="inputCategory" onchange="actualizarListaActivos()">
+            <option value="forex" selected>Forex</option>
+            <option value="crypto">Crypto - Top 10</option>
+            <option value="stocks">Stocks</option>
           </select>
+        </div>
+
+        <div class="input-group">
+          <label>Activo a analizar</label>
+          <select id="inputSymbol" onchange="actualizarNombreActivo()"></select>
         </div>
 
         <div class="input-group">
@@ -326,6 +331,7 @@
             <option value="30min">M30</option>
             <option value="1h" selected>H1</option>
             <option value="4h">H4</option>
+            <option value="1day">D1</option>
           </select>
         </div>
 
@@ -336,11 +342,11 @@
       </div>
 
       <button class="button button-red" onclick="escanearOportunidades()">
-        Escanear mejores oportunidades
+        Escanear categoría completa
       </button>
 
       <button class="button button-purple" onclick="obtenerIndicadoresAutomaticos()">
-        Obtener indicadores del par seleccionado
+        Obtener indicadores del activo
       </button>
 
       <button class="button button-yellow" onclick="obtenerPrecioReal()">
@@ -380,14 +386,14 @@
       </div>
 
       <button class="button button-green" onclick="analizarManual()">
-        Analizar par seleccionado
+        Analizar activo seleccionado
       </button>
     </div>
 
     <div class="section">
-      <h2>Scanner de mejores oportunidades</h2>
+      <h2>Scanner de oportunidades</h2>
       <p class="note">
-        El scanner analiza los 4 pares, calcula confianza y ordena de mayor a menor oportunidad.
+        El scanner analiza los activos de la categoría seleccionada, calcula confianza y ordena de mayor a menor oportunidad.
       </p>
 
       <div class="best-box" id="bestOpportunityBox">
@@ -397,7 +403,7 @@
       <table>
         <tr>
           <th>#</th>
-          <th>Par</th>
+          <th>Activo</th>
           <th>Señal</th>
           <th>Confianza</th>
           <th>Precio</th>
@@ -406,7 +412,7 @@
         </tr>
         <tbody id="scannerResults">
           <tr>
-            <td colspan="7">Presiona “Escanear mejores oportunidades”.</td>
+            <td colspan="7">Presiona “Escanear categoría completa”.</td>
           </tr>
         </tbody>
       </table>
@@ -414,7 +420,7 @@
 
     <div class="grid">
       <div class="card">
-        <h3>Par actual</h3>
+        <h3>Activo actual</h3>
         <div class="value blue" id="symbolValue">AUD/USD</div>
       </div>
 
@@ -461,30 +467,30 @@
     </div>
 
     <div class="section">
-      <h2>Timeframes</h2>
+      <h2>Lectura técnica</h2>
       <table>
         <tr>
-          <th>Temporalidad</th>
+          <th>Marco</th>
           <th>Estado</th>
           <th>Lectura</th>
         </tr>
         <tr>
-          <td>M15 / Entrada</td>
+          <td>Entrada</td>
           <td class="yellow" id="m15State">Esperando datos</td>
           <td id="m15Read">El agente usará los datos automáticos o manuales.</td>
         </tr>
         <tr>
-          <td>M30 / Confirmación</td>
+          <td>Confirmación</td>
           <td class="yellow" id="m30State">Esperando datos</td>
           <td id="m30Read">Pendiente de confirmación.</td>
         </tr>
         <tr>
-          <td>H1 / Tendencia</td>
+          <td>Tendencia</td>
           <td class="yellow" id="h1State">Esperando datos</td>
           <td id="h1Read">Pendiente de analizar EMA 50, EMA 200 y RSI.</td>
         </tr>
         <tr>
-          <td>H4 / Contexto</td>
+          <td>Contexto</td>
           <td class="yellow" id="h4State">Referencia</td>
           <td id="h4Read">En esta versión el cálculo principal usa la temporalidad seleccionada.</td>
         </tr>
@@ -512,7 +518,7 @@
       <h2>Historial de señales</h2>
       <table>
         <tr>
-          <th>Par</th>
+          <th>Activo</th>
           <th>Señal</th>
           <th>Entrada</th>
           <th>Resultado</th>
@@ -527,31 +533,103 @@
     </div>
 
     <div class="footer">
-      Forex AI Agent · Scanner multi-par v4 · AUD/USD · EUR/USD · USD/JPY · GBP/USD
+      Market AI Agent · Multi-mercado v5 · Forex · Crypto · Stocks
     </div>
 
   </div>
 
   <script>
     let confidence = 68;
-    const forexPairs = ["AUD/USD", "EUR/USD", "USD/JPY", "GBP/USD"];
+
+    const markets = {
+      forex: [
+        "AUD/USD",
+        "EUR/USD",
+        "USD/JPY",
+        "GBP/USD"
+      ],
+      crypto: [
+        "BTC/USD",
+        "ETH/USD",
+        "BNB/USD",
+        "XRP/USD",
+        "SOL/USD",
+        "TRX/USD",
+        "DOGE/USD",
+        "ADA/USD",
+        "LINK/USD",
+        "AVAX/USD"
+      ],
+      stocks: [
+        "NVDA",
+        "TSLA",
+        "AMD",
+        "AAPL",
+        "MSFT",
+        "AMZN",
+        "META",
+        "GOOGL",
+        "NFLX",
+        "AVGO"
+      ]
+    };
+
+    function getCategory() {
+      return document.getElementById("inputCategory").value;
+    }
 
     function getSelectedSymbol() {
       return document.getElementById("inputSymbol").value;
     }
 
+    function getSymbolsForCategory() {
+      return markets[getCategory()];
+    }
+
     function getPipSize(symbol) {
-      if (symbol.includes("JPY")) return 0.010;
-      return 0.00010;
+      const category = getCategory();
+
+      if (category === "forex") {
+        if (symbol.includes("JPY")) return 0.010;
+        return 0.00010;
+      }
+
+      const price = parseFloat(document.getElementById("inputPrice").value);
+      if (!isNaN(price) && price > 0) {
+        return price * 0.001;
+      }
+
+      return 0.01;
+    }
+
+    function getStepForSymbol(symbol) {
+      const category = getCategory();
+
+      if (category === "forex") {
+        if (symbol.includes("JPY")) return 0.010;
+        return 0.00010;
+      }
+
+      if (category === "crypto") return 0.001;
+      return 0.01;
     }
 
     function getDecimalsBySymbol(symbol) {
-      if (symbol.includes("JPY")) return 3;
-      return 5;
-    }
+      const category = getCategory();
 
-    function getDecimals() {
-      return getDecimalsBySymbol(getSelectedSymbol());
+      if (category === "forex") {
+        if (symbol.includes("JPY")) return 3;
+        return 5;
+      }
+
+      if (category === "crypto") {
+        if (symbol.includes("BTC") || symbol.includes("ETH") || symbol.includes("BNB") || symbol.includes("SOL") || symbol.includes("AVAX")) {
+          return 2;
+        }
+        return 4;
+      }
+
+      return 2;
     }
 
     function formatPriceForSymbol(value, symbol) {
@@ -559,15 +637,31 @@
     }
 
     function formatPrice(value) {
-      return Number(value).toFixed(getDecimals());
+      return formatPriceForSymbol(value, getSelectedSymbol());
     }
 
-    function actualizarNombrePar() {
+    function actualizarListaActivos() {
+      const select = document.getElementById("inputSymbol");
+      const symbols = getSymbolsForCategory();
+
+      select.innerHTML = "";
+
+      symbols.forEach(symbol => {
+        const option = document.createElement("option");
+        option.value = symbol;
+        option.textContent = symbol;
+        select.appendChild(option);
+      });
+
+      actualizarNombreActivo();
+    }
+
+    function actualizarNombreActivo() {
       const symbol = getSelectedSymbol();
       document.getElementById("symbolValue").textContent = symbol;
       document.getElementById("historyPair").textContent = symbol;
       document.getElementById("signalNote").textContent =
-        "Par cambiado a " + symbol + ". Presiona Obtener indicadores automáticos.";
+        "Activo cambiado a " + symbol + ". Presiona Obtener indicadores o Escanear categoría.";
     }
 
     function getGaugeColor(value) {
@@ -673,11 +767,12 @@
       let trend = "Lateral / Mixta";
       let trendClass = "yellow";
 
-      const pip = getPipSize(symbol);
+      const step = getStepForSymbol(symbol);
       const bullishTrend = price > ema200 && ema50 > ema200;
       const bearishTrend = price < ema200 && ema50 < ema200;
-      const nearResistance = price >= resistance - (15 * pip);
-      const nearSupport = price <= support + (15 * pip);
+
+      const nearResistance = price >= resistance - (15 * step);
+      const nearSupport = price <= support + (15 * step);
 
       if (bullishTrend) {
         trend = "Alcista";
@@ -698,12 +793,12 @@
         if (nearResistance) confidenceScore += 10;
 
         entry = formatPriceForSymbol(price, symbol);
-        sl = formatPriceForSymbol(resistance + (5 * pip), symbol);
+        sl = formatPriceForSymbol(resistance + (5 * step), symbol);
         tp1 = formatPriceForSymbol(support, symbol);
-        tp2 = formatPriceForSymbol(support - (15 * pip), symbol);
+        tp2 = formatPriceForSymbol(support - (15 * step), symbol);
 
         reason =
-          symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo. La venta mejora si el precio está cerca de resistencia.";
+          symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo.";
       }
       else if (bullishTrend && rsi >= 30 && rsi <= 50) {
         signal = "COMPRA";
@@ -714,24 +809,23 @@
         if (nearSupport) confidenceScore += 10;
 
         entry = formatPriceForSymbol(price, symbol);
-        sl = formatPriceForSymbol(support - (5 * pip), symbol);
+        sl = formatPriceForSymbol(support - (5 * step), symbol);
         tp1 = formatPriceForSymbol(resistance, symbol);
-        tp2 = formatPriceForSymbol(resistance + (15 * pip), symbol);
+        tp2 = formatPriceForSymbol(resistance + (15 * step), symbol);
 
         reason =
-          symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable. La compra mejora si el precio está cerca de soporte.";
+          symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable.";
       }
       else {
         confidenceScore -= 5;
         reason =
-          symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar porque tendencia, EMA 50, EMA 200 y RSI no dan una señal clara.";
+          symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar.";
       }
 
       if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
 
-      const emaDistance = Math.abs(price - ema200);
-      const distanceLimit = symbol.includes("JPY") ? 0.150 : 0.00150;
-      if (emaDistance < distanceLimit) confidenceScore += 3;
+      const distancePercent = Math.abs(price - ema200) / price;
+      if (distancePercent < 0.003) confidenceScore += 3;
 
       confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
 
@@ -823,7 +917,7 @@
       document.getElementById("m15Read").textContent =
         result.signal === "ESPERAR"
           ? "No hay alineación suficiente para entrar."
-          : "Usar M15 para confirmar vela de rechazo o ruptura antes de entrar.";
+          : "Esperar confirmación de vela antes de entrar.";
 
       document.getElementById("m30State").textContent = result.trend;
       document.getElementById("m30State").className = result.trendClass;
@@ -840,7 +934,7 @@
 
       document.getElementById("h4State").textContent = "Contexto";
       document.getElementById("h4State").className = "yellow";
-      document.getElementById("h4Read").textContent = "Para H4 real, selecciona 4h y vuelve a obtener indicadores.";
+      document.getElementById("h4Read").textContent = "Para contexto mayor, usa temporalidad 4h o 1day.";
 
       document.getElementById("tradeType").textContent = result.tradeType;
       document.getElementById("entryZone").textContent = result.entry;
@@ -966,6 +1060,8 @@
       const apiKey = document.getElementById("apiKey").value.trim();
       const interval = document.getElementById("inputInterval").value;
       const candles = parseInt(document.getElementById("inputCandles").value);
+      const symbols = getSymbolsForCategory();
+      const category = getCategory();
 
       if (!apiKey) {
         alert("Primero pega tu API Key de Twelve Data.");
@@ -978,17 +1074,17 @@
       }
 
       document.getElementById("scannerResults").innerHTML =
-        `<tr><td colspan="7">Escaneando oportunidades... espera unos segundos.</td></tr>`;
+        `<tr><td colspan="7">Escaneando ${category}... espera unos segundos.</td></tr>`;
 
       document.getElementById("bestOpportunityBox").textContent =
-        "Escaneando AUD/USD, EUR/USD, USD/JPY y GBP/USD...";
+        "Escaneando categoría: " + category + "...";
 
       document.getElementById("signalNote").textContent =
-        "Escaneando mejores oportunidades en " + interval + "...";
+        "Escaneando mejores oportunidades en " + category + " con temporalidad " + interval + "...";
 
       const results = [];
 
-      for (const symbol of forexPairs) {
+      for (const symbol of symbols) {
         try {
           const result = await loadSymbolData(symbol, apiKey, interval, candles);
           results.push(result);
@@ -1060,7 +1156,7 @@
       applyResultToDashboard(best);
     }
 
-    actualizarNombrePar();
+    actualizarListaActivos();
     updateGauge(confidence);
   </script>
 </body>
