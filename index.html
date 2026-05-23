@@ -67,7 +67,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 18px;
       margin-bottom: 24px;
     }
@@ -156,6 +156,63 @@
       margin-top: 30px;
     }
 
+    .confidence-card {
+      text-align: center;
+    }
+
+    .gauge-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 16px 0;
+    }
+
+    .gauge {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: conic-gradient(#22c55e 0deg 244.8deg, #334155 244.8deg 360deg);
+      transition: all 0.4s ease;
+    }
+
+    .gauge-inner {
+      width: 105px;
+      height: 105px;
+      border-radius: 50%;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border: 2px solid #334155;
+    }
+
+    .gauge-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .gauge-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .confidence-status {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .confidence-legend {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 14px;
@@ -167,6 +224,16 @@
 
       .title h1 {
         font-size: 28px;
+      }
+
+      .gauge {
+        width: 130px;
+        height: 130px;
+      }
+
+      .gauge-inner {
+        width: 92px;
+        height: 92px;
       }
     }
   </style>
@@ -188,8 +255,8 @@
 
     <div class="main-signal">
       <h2>Señal actual</h2>
-      <div class="signal-text">ESPERAR</div>
-      <p class="note">
+      <div class="signal-text" id="signalText">ESPERAR</div>
+      <p class="note" id="signalNote">
         El agente todavía no detecta una entrada de alta probabilidad.
         Esperar confirmación antes de comprar o vender.
       </p>
@@ -199,22 +266,33 @@
     <div class="grid">
       <div class="card">
         <h3>Precio actual</h3>
-        <div class="value blue">0.66420</div>
+        <div class="value blue" id="priceValue">0.66420</div>
       </div>
 
       <div class="card">
         <h3>Tendencia H4</h3>
-        <div class="value red">Bajista débil</div>
+        <div class="value red" id="trendH4">Bajista débil</div>
       </div>
 
       <div class="card">
         <h3>Tendencia H1</h3>
-        <div class="value red">Bajista</div>
+        <div class="value red" id="trendH1">Bajista</div>
       </div>
 
-      <div class="card">
+      <div class="card confidence-card">
         <h3>Confianza</h3>
-        <div class="value yellow">68%</div>
+        <div class="gauge-wrapper">
+          <div class="gauge" id="confidenceGauge">
+            <div class="gauge-inner">
+              <div class="gauge-value" id="confidenceValue">68%</div>
+              <div class="gauge-label">Confianza</div>
+            </div>
+          </div>
+        </div>
+        <div class="confidence-status" id="confidenceStatus">Verde moderado</div>
+        <div class="confidence-legend">
+          0% - 50% = Rojo · 51% - 100% = Verde
+        </div>
       </div>
     </div>
 
@@ -228,40 +306,40 @@
         </tr>
         <tr>
           <td>M15</td>
-          <td class="yellow">Retroceso</td>
-          <td>El precio sube hacia resistencia.</td>
+          <td class="yellow" id="m15State">Retroceso</td>
+          <td id="m15Read">El precio sube hacia resistencia.</td>
         </tr>
         <tr>
           <td>M30</td>
-          <td class="red">Bajista</td>
-          <td>Presión vendedora dominante.</td>
+          <td class="red" id="m30State">Bajista</td>
+          <td id="m30Read">Presión vendedora dominante.</td>
         </tr>
         <tr>
           <td>H1</td>
-          <td class="red">Bajista</td>
-          <td>Precio debajo de EMA 200.</td>
+          <td class="red" id="h1State">Bajista</td>
+          <td id="h1Read">Precio debajo de EMA 200.</td>
         </tr>
         <tr>
           <td>H4</td>
-          <td class="yellow">Bajista débil</td>
-          <td>Tendencia general con posible consolidación.</td>
+          <td class="yellow" id="h4State">Bajista débil</td>
+          <td id="h4Read">Tendencia general con posible consolidación.</td>
         </tr>
       </table>
     </div>
 
     <div class="section">
       <h2>Zona de operación</h2>
-      <p><strong>Tipo de operación:</strong> Esperar venta / Short</p>
-      <p><strong>Entrada ideal:</strong> 0.66480 - 0.66530</p>
-      <p><strong>Stop Loss:</strong> 0.66640</p>
-      <p><strong>Take Profit 1:</strong> 0.66290</p>
-      <p><strong>Take Profit 2:</strong> 0.66120</p>
-      <p><strong>Riesgo:</strong> Medio</p>
+      <p><strong>Tipo de operación:</strong> <span id="tradeType">Esperar venta / Short</span></p>
+      <p><strong>Entrada ideal:</strong> <span id="entryZone">0.66480 - 0.66530</span></p>
+      <p><strong>Stop Loss:</strong> <span id="stopLoss">0.66640</span></p>
+      <p><strong>Take Profit 1:</strong> <span id="takeProfit1">0.66290</span></p>
+      <p><strong>Take Profit 2:</strong> <span id="takeProfit2">0.66120</span></p>
+      <p><strong>Riesgo:</strong> <span id="riskLevel">Medio</span></p>
     </div>
 
     <div class="section">
       <h2>Motivo del análisis</h2>
-      <p class="note">
+      <p class="note" id="analysisReason">
         La tendencia principal en H1 sigue bajista. El precio está haciendo un retroceso
         hacia una zona de resistencia. El RSI todavía no confirma fuerza compradora.
         El agente recomienda esperar rechazo bajista antes de buscar venta.
@@ -279,8 +357,8 @@
         </tr>
         <tr>
           <td>AUD/USD</td>
-          <td class="yellow">Esperar venta</td>
-          <td>0.66480</td>
+          <td id="historySignal" class="yellow">Esperar venta</td>
+          <td id="historyEntry">0.66480</td>
           <td>Pendiente</td>
         </tr>
       </table>
@@ -293,9 +371,95 @@
   </div>
 
   <script>
-    function actualizarAnalisis() {
-      alert("Próximo paso: conectar datos reales de AUD/USD. Por ahora esta versión usa datos manuales.");
+    let confidence = 68;
+
+    function getGaugeColor(value) {
+      if (value <= 50) {
+        return "#ef4444";
+      } else {
+        const ratio = (value - 51) / 49;
+        const saturation = 55 + (ratio * 35);
+        const lightness = 42 - (ratio * 12);
+        return `hsl(135, ${saturation}%, ${lightness}%)`;
+      }
     }
+
+    function getConfidenceStatus(value) {
+      if (value <= 50) return "Zona roja";
+      if (value <= 65) return "Verde inicial";
+      if (value <= 80) return "Verde moderado";
+      if (value <= 90) return "Verde fuerte";
+      return "Verde muy intenso";
+    }
+
+    function updateGauge(value) {
+      const gauge = document.getElementById("confidenceGauge");
+      const valueText = document.getElementById("confidenceValue");
+      const statusText = document.getElementById("confidenceStatus");
+
+      const degrees = (value / 100) * 360;
+      const color = getGaugeColor(value);
+
+      gauge.style.background = `conic-gradient(${color} 0deg ${degrees}deg, #334155 ${degrees}deg 360deg)`;
+      valueText.textContent = value + "%";
+      statusText.textContent = getConfidenceStatus(value);
+      statusText.style.color = color;
+    }
+
+    function actualizarAnalisis() {
+      const escenarios = [
+        {
+          confidence: 42,
+          signal: "ESPERAR",
+          signalColor: "#facc15",
+          note: "La señal todavía es débil. Hay incertidumbre y no conviene entrar todavía.",
+          tradeType: "Esperar",
+          reason: "La confianza está por debajo del 50%. Hay poca confirmación en tendencia e impulso.",
+          historySignal: "Esperar"
+        },
+        {
+          confidence: 58,
+          signal: "ESPERAR",
+          signalColor: "#facc15",
+          note: "Hay algo de mejora, pero todavía no es una entrada clara.",
+          tradeType: "Esperar confirmación",
+          reason: "La confianza ya superó el 50%, pero la probabilidad aún no es lo bastante fuerte.",
+          historySignal: "Esperar confirmación"
+        },
+        {
+          confidence: 74,
+          signal: "VENTA",
+          signalColor: "#ef4444",
+          note: "El agente detecta una mejor oportunidad de venta.",
+          tradeType: "Venta / Short",
+          reason: "La confianza subió y la tendencia bajista está mejor alineada con la zona de entrada.",
+          historySignal: "Venta"
+        },
+        {
+          confidence: 91,
+          signal: "VENTA FUERTE",
+          signalColor: "#22c55e",
+          note: "La señal es fuerte y la confianza es alta.",
+          tradeType: "Venta fuerte / Short",
+          reason: "La confianza está muy alta y el gráfico circular muestra verde intenso por arriba del 90%.",
+          historySignal: "Venta fuerte"
+        }
+      ];
+
+      const escenario = escenarios[Math.floor(Math.random() * escenarios.length)];
+
+      confidence = escenario.confidence;
+      updateGauge(confidence);
+
+      document.getElementById("signalText").textContent = escenario.signal;
+      document.getElementById("signalText").style.color = escenario.signalColor;
+      document.getElementById("signalNote").textContent = escenario.note;
+      document.getElementById("tradeType").textContent = escenario.tradeType;
+      document.getElementById("analysisReason").textContent = escenario.reason;
+      document.getElementById("historySignal").textContent = escenario.historySignal;
+    }
+
+    updateGauge(confidence);
   </script>
 </body>
 </html>
