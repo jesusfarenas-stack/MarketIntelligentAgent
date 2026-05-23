@@ -1,88 +1,301 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>AUD/USD Agent</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUD/USD AI Agent</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #111827;
+      background: #0f172a;
       color: white;
-      padding: 30px;
+      padding: 24px;
     }
 
-    .card {
-      background: #1f2937;
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 20px;
+    .container {
+      max-width: 1200px;
+      margin: auto;
     }
 
-    .signal {
-      font-size: 32px;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 34px;
+    }
+
+    .title p {
+      color: #cbd5e1;
+      margin-top: 8px;
+    }
+
+    .badge {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 12px 18px;
+      border-radius: 14px;
+      color: #cbd5e1;
+    }
+
+    .main-signal {
+      background: linear-gradient(135deg, #1e293b, #111827);
+      border: 1px solid #334155;
+      border-radius: 22px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .signal-text {
+      font-size: 46px;
       font-weight: bold;
       color: #facc15;
+      margin: 10px 0;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
+      gap: 18px;
+      margin-bottom: 24px;
     }
 
-    .small {
-      color: #d1d5db;
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 22px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #e2e8f0;
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .yellow {
+      color: #facc15;
+    }
+
+    .red {
+      color: #ef4444;
+    }
+
+    .green {
+      color: #22c55e;
+    }
+
+    .blue {
+      color: #38bdf8;
+    }
+
+    .section {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #334155;
+    }
+
+    th {
+      color: #cbd5e1;
+    }
+
+    .button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .button:hover {
+      background: #1d4ed8;
+    }
+
+    .note {
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .footer {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 14px;
+      }
+
+      .signal-text {
+        font-size: 36px;
+      }
+
+      .title h1 {
+        font-size: 28px;
+      }
     }
   </style>
 </head>
+
 <body>
+  <div class="container">
 
-  <h1>AUD/USD AI Agent</h1>
-  <p class="small">Dashboard inicial para análisis de tendencia, entrada, SL y TP.</p>
+    <div class="header">
+      <div class="title">
+        <h1>AUD/USD AI Agent</h1>
+        <p>Dashboard de análisis para tendencia, entrada, Stop Loss y Take Profit.</p>
+      </div>
 
-  <div class="card">
-    <h2>Señal actual</h2>
-    <div class="signal">ESPERAR</div>
-    <p>El agente todavía no detecta una entrada de alta probabilidad.</p>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <h3>Precio actual</h3>
-      <p>0.66420</p>
+      <div class="badge">
+        Modo actual: <strong>Asistente</strong>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Tendencia H1</h3>
-      <p>Bajista</p>
+    <div class="main-signal">
+      <h2>Señal actual</h2>
+      <div class="signal-text">ESPERAR</div>
+      <p class="note">
+        El agente todavía no detecta una entrada de alta probabilidad.
+        Esperar confirmación antes de comprar o vender.
+      </p>
+      <button class="button" onclick="actualizarAnalisis()">Actualizar análisis</button>
     </div>
 
-    <div class="card">
-      <h3>Tendencia M15</h3>
-      <p>Retroceso alcista</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Precio actual</h3>
+        <div class="value blue">0.66420</div>
+      </div>
+
+      <div class="card">
+        <h3>Tendencia H4</h3>
+        <div class="value red">Bajista débil</div>
+      </div>
+
+      <div class="card">
+        <h3>Tendencia H1</h3>
+        <div class="value red">Bajista</div>
+      </div>
+
+      <div class="card">
+        <h3>Confianza</h3>
+        <div class="value yellow">68%</div>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Confianza</h3>
-      <p>68%</p>
+    <div class="section">
+      <h2>Timeframes</h2>
+      <table>
+        <tr>
+          <th>Temporalidad</th>
+          <th>Estado</th>
+          <th>Lectura</th>
+        </tr>
+        <tr>
+          <td>M15</td>
+          <td class="yellow">Retroceso</td>
+          <td>El precio sube hacia resistencia.</td>
+        </tr>
+        <tr>
+          <td>M30</td>
+          <td class="red">Bajista</td>
+          <td>Presión vendedora dominante.</td>
+        </tr>
+        <tr>
+          <td>H1</td>
+          <td class="red">Bajista</td>
+          <td>Precio debajo de EMA 200.</td>
+        </tr>
+        <tr>
+          <td>H4</td>
+          <td class="yellow">Bajista débil</td>
+          <td>Tendencia general con posible consolidación.</td>
+        </tr>
+      </table>
     </div>
+
+    <div class="section">
+      <h2>Zona de operación</h2>
+      <p><strong>Tipo de operación:</strong> Esperar venta / Short</p>
+      <p><strong>Entrada ideal:</strong> 0.66480 - 0.66530</p>
+      <p><strong>Stop Loss:</strong> 0.66640</p>
+      <p><strong>Take Profit 1:</strong> 0.66290</p>
+      <p><strong>Take Profit 2:</strong> 0.66120</p>
+      <p><strong>Riesgo:</strong> Medio</p>
+    </div>
+
+    <div class="section">
+      <h2>Motivo del análisis</h2>
+      <p class="note">
+        La tendencia principal en H1 sigue bajista. El precio está haciendo un retroceso
+        hacia una zona de resistencia. El RSI todavía no confirma fuerza compradora.
+        El agente recomienda esperar rechazo bajista antes de buscar venta.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Historial de señales</h2>
+      <table>
+        <tr>
+          <th>Par</th>
+          <th>Señal</th>
+          <th>Entrada</th>
+          <th>Resultado</th>
+        </tr>
+        <tr>
+          <td>AUD/USD</td>
+          <td class="yellow">Esperar venta</td>
+          <td>0.66480</td>
+          <td>Pendiente</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="footer">
+      AUD/USD AI Agent · Versión inicial web · Datos manuales por ahora
+    </div>
+
   </div>
 
-  <div class="card">
-    <h2>Zona de operación</h2>
-    <p><strong>Entrada ideal:</strong> 0.66480 - 0.66530</p>
-    <p><strong>Stop Loss:</strong> 0.66640</p>
-    <p><strong>Take Profit 1:</strong> 0.66290</p>
-    <p><strong>Take Profit 2:</strong> 0.66120</p>
-  </div>
-
-  <div class="card">
-    <h2>Motivo del análisis</h2>
-    <p>
-      La tendencia principal en H1 sigue bajista. El precio está haciendo un retroceso
-      hacia una zona de resistencia. El agente recomienda esperar confirmación antes de vender.
-    </p>
-  </div>
-
+  <script>
+    function actualizarAnalisis() {
+      alert("Próximo paso: conectar datos reales de AUD/USD. Por ahora esta versión usa datos manuales.");
+    }
+  </script>
 </body>
 </html>
