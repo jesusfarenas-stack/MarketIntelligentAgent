@@ -1676,12 +1676,21 @@
 
       showScannerResults(results);
 
-      const actionable = results.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
+      const validResults = results.filter(r => r.signal !== "ERROR" && r.price && r.ema50 && r.ema200 && r.rsi);
+
+      if (validResults.length === 0) {
+        document.getElementById("bestOpportunityBox").innerHTML =
+          "<strong>Error:</strong> No se pudo obtener información válida para esta categoría.";
+        alert("No se pudo obtener información válida para esta categoría.");
+        return;
+      }
+
+      const actionable = validResults.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
 
       const best =
         actionable.length > 0
           ? actionable.sort((a, b) => b.confidenceScore - a.confidenceScore)[0]
-          : results.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
+          : validResults.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
 
       showBestBox(best);
       applyResultToDashboard(best);
