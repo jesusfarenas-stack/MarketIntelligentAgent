@@ -139,33 +139,19 @@
       margin-right: 8px;
     }
 
-    .button:hover {
-      background: #1d4ed8;
-    }
+    .button:hover { background: #1d4ed8; }
 
-    .button-green {
-      background: #16a34a;
-    }
+    .button-green { background: #16a34a; }
+    .button-green:hover { background: #15803d; }
 
-    .button-green:hover {
-      background: #15803d;
-    }
+    .button-yellow { background: #ca8a04; }
+    .button-yellow:hover { background: #a16207; }
 
-    .button-yellow {
-      background: #ca8a04;
-    }
+    .button-purple { background: #7c3aed; }
+    .button-purple:hover { background: #6d28d9; }
 
-    .button-yellow:hover {
-      background: #a16207;
-    }
-
-    .button-purple {
-      background: #7c3aed;
-    }
-
-    .button-purple:hover {
-      background: #6d28d9;
-    }
+    .button-red { background: #dc2626; }
+    .button-red:hover { background: #b91c1c; }
 
     table {
       width: 100%;
@@ -179,9 +165,7 @@
       border-bottom: 1px solid #334155;
     }
 
-    th {
-      color: #cbd5e1;
-    }
+    th { color: #cbd5e1; }
 
     .confidence-card {
       text-align: center;
@@ -246,6 +230,14 @@
       margin-top: 8px;
     }
 
+    .best-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 15px;
+    }
+
     .footer {
       text-align: center;
       color: #94a3b8;
@@ -272,6 +264,10 @@
         width: 100%;
         margin-bottom: 10px;
       }
+
+      table {
+        font-size: 13px;
+      }
     }
   </style>
 </head>
@@ -282,26 +278,26 @@
     <div class="header">
       <div class="title">
         <h1>Forex AI Agent</h1>
-        <p>Dashboard automático para AUD/USD, EUR/USD, USD/JPY y GBP/USD.</p>
+        <p>Dashboard automático con scanner para AUD/USD, EUR/USD, USD/JPY y GBP/USD.</p>
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Multi-par automático v3</strong>
+        Modo actual: <strong>Scanner multi-par v4</strong>
       </div>
     </div>
 
     <div class="main-signal">
-      <h2>Señal actual</h2>
+      <h2>Mejor señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Selecciona el par, pega tu API Key y presiona Obtener indicadores automáticos.
+        Selecciona un par para analizarlo individualmente o usa el scanner para encontrar la mejor oportunidad.
       </p>
     </div>
 
     <div class="section">
       <h2>Panel de análisis automático</h2>
       <p class="note">
-        Elige el par que quieres analizar. El agente descargará velas reales, calculará EMA 50, EMA 200, RSI 14, soporte y resistencia.
+        Puedes analizar un solo par o escanear todos para que el agente elija la oportunidad con mayor confianza.
       </p>
 
       <div class="input-group">
@@ -339,8 +335,12 @@
         </div>
       </div>
 
+      <button class="button button-red" onclick="escanearOportunidades()">
+        Escanear mejores oportunidades
+      </button>
+
       <button class="button button-purple" onclick="obtenerIndicadoresAutomaticos()">
-        Obtener indicadores automáticos
+        Obtener indicadores del par seleccionado
       </button>
 
       <button class="button button-yellow" onclick="obtenerPrecioReal()">
@@ -382,6 +382,34 @@
       <button class="button button-green" onclick="analizarManual()">
         Analizar par seleccionado
       </button>
+    </div>
+
+    <div class="section">
+      <h2>Scanner de mejores oportunidades</h2>
+      <p class="note">
+        El scanner analiza los 4 pares, calcula confianza y ordena de mayor a menor oportunidad.
+      </p>
+
+      <div class="best-box" id="bestOpportunityBox">
+        Mejor oportunidad: pendiente de escanear.
+      </div>
+
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Par</th>
+          <th>Señal</th>
+          <th>Confianza</th>
+          <th>Precio</th>
+          <th>RSI</th>
+          <th>Tendencia</th>
+        </tr>
+        <tbody id="scannerResults">
+          <tr>
+            <td colspan="7">Presiona “Escanear mejores oportunidades”.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="grid">
@@ -499,35 +527,39 @@
     </div>
 
     <div class="footer">
-      Forex AI Agent · Multi-par v3 · AUD/USD · EUR/USD · USD/JPY · GBP/USD
+      Forex AI Agent · Scanner multi-par v4 · AUD/USD · EUR/USD · USD/JPY · GBP/USD
     </div>
 
   </div>
 
   <script>
     let confidence = 68;
+    const forexPairs = ["AUD/USD", "EUR/USD", "USD/JPY", "GBP/USD"];
 
     function getSelectedSymbol() {
       return document.getElementById("inputSymbol").value;
     }
 
     function getPipSize(symbol) {
-      if (symbol.includes("JPY")) {
-        return 0.010;
-      }
+      if (symbol.includes("JPY")) return 0.010;
       return 0.00010;
     }
 
-    function getDecimals(symbol) {
-      if (symbol.includes("JPY")) {
-        return 3;
-      }
+    function getDecimalsBySymbol(symbol) {
+      if (symbol.includes("JPY")) return 3;
       return 5;
     }
 
+    function getDecimals() {
+      return getDecimalsBySymbol(getSelectedSymbol());
+    }
+
+    function formatPriceForSymbol(value, symbol) {
+      return Number(value).toFixed(getDecimalsBySymbol(symbol));
+    }
+
     function formatPrice(value) {
-      const symbol = getSelectedSymbol();
-      return Number(value).toFixed(getDecimals(symbol));
+      return Number(value).toFixed(getDecimals());
     }
 
     function actualizarNombrePar() {
@@ -539,14 +571,12 @@
     }
 
     function getGaugeColor(value) {
-      if (value <= 50) {
-        return "#ef4444";
-      } else {
-        const ratio = (value - 51) / 49;
-        const saturation = 55 + (ratio * 35);
-        const lightness = 42 - (ratio * 12);
-        return `hsl(135, ${saturation}%, ${lightness}%)`;
-      }
+      if (value <= 50) return "#ef4444";
+
+      const ratio = (value - 51) / 49;
+      const saturation = 55 + (ratio * 35);
+      const lightness = 42 - (ratio * 12);
+      return `hsl(135, ${saturation}%, ${lightness}%)`;
     }
 
     function getConfidenceStatus(value) {
@@ -575,11 +605,12 @@
       if (values.length < period) return null;
 
       const multiplier = 2 / (period + 1);
-
       let ema = 0;
+
       for (let i = 0; i < period; i++) {
         ema += values[i];
       }
+
       ema = ema / period;
 
       for (let i = period; i < values.length; i++) {
@@ -629,6 +660,211 @@
       return Math.max(...recent);
     }
 
+    function analyzeData(symbol, price, ema50, ema200, rsi, support, resistance) {
+      let signal = "ESPERAR";
+      let signalColor = "#facc15";
+      let tradeType = "Esperar";
+      let reason = "";
+      let confidenceScore = 40;
+      let entry = "No recomendado";
+      let sl = "No aplica";
+      let tp1 = "No aplica";
+      let tp2 = "No aplica";
+      let trend = "Lateral / Mixta";
+      let trendClass = "yellow";
+
+      const pip = getPipSize(symbol);
+      const bullishTrend = price > ema200 && ema50 > ema200;
+      const bearishTrend = price < ema200 && ema50 < ema200;
+      const nearResistance = price >= resistance - (15 * pip);
+      const nearSupport = price <= support + (15 * pip);
+
+      if (bullishTrend) {
+        trend = "Alcista";
+        trendClass = "green";
+        confidenceScore += 20;
+      } else if (bearishTrend) {
+        trend = "Bajista";
+        trendClass = "red";
+        confidenceScore += 20;
+      }
+
+      if (bearishTrend && rsi >= 50 && rsi <= 70) {
+        signal = "VENTA";
+        signalColor = "#ef4444";
+        tradeType = "Venta / Short";
+        confidenceScore += 25;
+
+        if (nearResistance) confidenceScore += 10;
+
+        entry = formatPriceForSymbol(price, symbol);
+        sl = formatPriceForSymbol(resistance + (5 * pip), symbol);
+        tp1 = formatPriceForSymbol(support, symbol);
+        tp2 = formatPriceForSymbol(support - (15 * pip), symbol);
+
+        reason =
+          symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo. La venta mejora si el precio está cerca de resistencia.";
+      }
+      else if (bullishTrend && rsi >= 30 && rsi <= 50) {
+        signal = "COMPRA";
+        signalColor = "#22c55e";
+        tradeType = "Compra / Long";
+        confidenceScore += 25;
+
+        if (nearSupport) confidenceScore += 10;
+
+        entry = formatPriceForSymbol(price, symbol);
+        sl = formatPriceForSymbol(support - (5 * pip), symbol);
+        tp1 = formatPriceForSymbol(resistance, symbol);
+        tp2 = formatPriceForSymbol(resistance + (15 * pip), symbol);
+
+        reason =
+          symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable. La compra mejora si el precio está cerca de soporte.";
+      }
+      else {
+        confidenceScore -= 5;
+        reason =
+          symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar porque tendencia, EMA 50, EMA 200 y RSI no dan una señal clara.";
+      }
+
+      if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
+
+      const emaDistance = Math.abs(price - ema200);
+      const distanceLimit = symbol.includes("JPY") ? 0.150 : 0.00150;
+      if (emaDistance < distanceLimit) confidenceScore += 3;
+
+      confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
+
+      return {
+        symbol,
+        price,
+        ema50,
+        ema200,
+        rsi,
+        support,
+        resistance,
+        signal,
+        signalColor,
+        tradeType,
+        confidenceScore,
+        entry,
+        sl,
+        tp1,
+        tp2,
+        trend,
+        trendClass,
+        reason
+      };
+    }
+
+    async function loadSymbolData(symbol, apiKey, interval, candles) {
+      const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === "error") {
+        throw new Error(symbol + ": " + data.message);
+      }
+
+      if (!data.values || data.values.length < 210) {
+        throw new Error(symbol + ": no llegaron suficientes velas.");
+      }
+
+      const closes = data.values
+        .map(candle => Number(candle.close))
+        .reverse()
+        .filter(value => !isNaN(value));
+
+      const price = closes[closes.length - 1];
+      const ema50 = calculateEMA(closes, 50);
+      const ema200 = calculateEMA(closes, 200);
+      const rsi = calculateRSI(closes, 14);
+      const support = calculateSupport(closes, 50);
+      const resistance = calculateResistance(closes, 50);
+
+      if (!ema50 || !ema200 || !rsi) {
+        throw new Error(symbol + ": no se pudieron calcular indicadores.");
+      }
+
+      return analyzeData(symbol, price, ema50, ema200, rsi, support, resistance);
+    }
+
+    function applyResultToDashboard(result) {
+      document.getElementById("inputSymbol").value = result.symbol;
+      document.getElementById("symbolValue").textContent = result.symbol;
+      document.getElementById("historyPair").textContent = result.symbol;
+
+      document.getElementById("inputPrice").value = formatPriceForSymbol(result.price, result.symbol);
+      document.getElementById("inputEma50").value = formatPriceForSymbol(result.ema50, result.symbol);
+      document.getElementById("inputEma200").value = formatPriceForSymbol(result.ema200, result.symbol);
+      document.getElementById("inputRsi").value = result.rsi.toFixed(1);
+      document.getElementById("inputSupport").value = formatPriceForSymbol(result.support, result.symbol);
+      document.getElementById("inputResistance").value = formatPriceForSymbol(result.resistance, result.symbol);
+
+      document.getElementById("priceValue").textContent = formatPriceForSymbol(result.price, result.symbol);
+      document.getElementById("ema50Value").textContent = formatPriceForSymbol(result.ema50, result.symbol);
+      document.getElementById("ema200Value").textContent = formatPriceForSymbol(result.ema200, result.symbol);
+      document.getElementById("rsiValue").textContent = result.rsi.toFixed(1);
+
+      document.getElementById("signalText").textContent = result.signal;
+      document.getElementById("signalText").style.color = result.signalColor;
+      document.getElementById("signalNote").textContent =
+        "Mejor oportunidad detectada: " + result.symbol + " · " + result.tradeType + " · Confianza " + result.confidenceScore + "%.";
+
+      const trendElement = document.getElementById("trendH1");
+      trendElement.textContent = result.trend;
+      trendElement.className = "value " + result.trendClass;
+
+      document.getElementById("m15State").textContent = result.signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
+      document.getElementById("m15State").className =
+        result.signal === "COMPRA" ? "green" :
+        result.signal === "VENTA" ? "red" : "yellow";
+
+      document.getElementById("m15Read").textContent =
+        result.signal === "ESPERAR"
+          ? "No hay alineación suficiente para entrar."
+          : "Usar M15 para confirmar vela de rechazo o ruptura antes de entrar.";
+
+      document.getElementById("m30State").textContent = result.trend;
+      document.getElementById("m30State").className = result.trendClass;
+      document.getElementById("m30Read").textContent = "Lectura basada en precio, EMA 50, EMA 200 y RSI.";
+
+      document.getElementById("h1State").textContent = result.trend;
+      document.getElementById("h1State").className = result.trendClass;
+      document.getElementById("h1Read").textContent =
+        result.trend === "Bajista"
+          ? "Precio y EMA 50 debajo de EMA 200."
+          : result.trend === "Alcista"
+          ? "Precio y EMA 50 arriba de EMA 200."
+          : "Estructura mixta o lateral.";
+
+      document.getElementById("h4State").textContent = "Contexto";
+      document.getElementById("h4State").className = "yellow";
+      document.getElementById("h4Read").textContent = "Para H4 real, selecciona 4h y vuelve a obtener indicadores.";
+
+      document.getElementById("tradeType").textContent = result.tradeType;
+      document.getElementById("entryZone").textContent = result.entry;
+      document.getElementById("stopLoss").textContent = result.sl;
+      document.getElementById("takeProfit1").textContent = result.tp1;
+      document.getElementById("takeProfit2").textContent = result.tp2;
+      document.getElementById("riskLevel").textContent =
+        result.confidenceScore >= 75 ? "Medio / favorable" :
+        result.confidenceScore >= 55 ? "Medio" : "Alto";
+
+      document.getElementById("analysisReason").textContent = result.reason;
+
+      const historySignal = document.getElementById("historySignal");
+      historySignal.textContent = result.tradeType;
+      historySignal.className =
+        result.signal === "COMPRA" ? "green" :
+        result.signal === "VENTA" ? "red" : "yellow";
+
+      document.getElementById("historyEntry").textContent = result.entry;
+
+      confidence = result.confidenceScore;
+      updateGauge(confidence);
+    }
+
     async function obtenerPrecioReal() {
       const apiKey = document.getElementById("apiKey").value.trim();
       const symbol = getSelectedSymbol();
@@ -647,7 +883,6 @@
 
         if (data.status === "error") {
           alert("Error de API: " + data.message);
-          document.getElementById("signalNote").textContent = "Error al obtener precio real.";
           return;
         }
 
@@ -655,12 +890,10 @@
 
         if (!price) {
           alert("No se pudo obtener el precio. Revisa tu API Key o el símbolo.");
-          console.log(data);
-          document.getElementById("signalNote").textContent = "No se pudo obtener el precio real.";
           return;
         }
 
-        const finalPrice = formatPrice(price);
+        const finalPrice = formatPriceForSymbol(price, symbol);
 
         document.getElementById("inputPrice").value = finalPrice;
         document.getElementById("priceValue").textContent = finalPrice;
@@ -668,14 +901,11 @@
         document.getElementById("historyPair").textContent = symbol;
 
         document.getElementById("signalNote").textContent =
-          "Precio real de " + symbol + " actualizado. Ahora puedes presionar Analizar par seleccionado.";
-
-        alert("Precio real actualizado: " + symbol + " = " + finalPrice);
+          "Precio real actualizado: " + symbol + " = " + finalPrice;
 
       } catch (error) {
         alert("No se pudo conectar con Twelve Data.");
         console.error(error);
-        document.getElementById("signalNote").textContent = "No se pudo conectar con Twelve Data.";
       }
     }
 
@@ -696,66 +926,14 @@
       }
 
       document.getElementById("signalNote").textContent =
-        "Descargando velas reales de " + symbol + " y calculando indicadores...";
+        "Descargando velas de " + symbol + " y calculando indicadores...";
 
       try {
-        const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.status === "error") {
-          alert("Error de API: " + data.message);
-          document.getElementById("signalNote").textContent = "Error al obtener velas.";
-          return;
-        }
-
-        if (!data.values || data.values.length < 210) {
-          alert("No llegaron suficientes velas. Revisa tu plan de Twelve Data o usa otra temporalidad.");
-          console.log(data);
-          document.getElementById("signalNote").textContent = "No llegaron suficientes velas para calcular EMA 200.";
-          return;
-        }
-
-        const closes = data.values
-          .map(candle => Number(candle.close))
-          .reverse()
-          .filter(value => !isNaN(value));
-
-        const price = closes[closes.length - 1];
-        const ema50 = calculateEMA(closes, 50);
-        const ema200 = calculateEMA(closes, 200);
-        const rsi = calculateRSI(closes, 14);
-        const support = calculateSupport(closes, 50);
-        const resistance = calculateResistance(closes, 50);
-
-        if (!ema50 || !ema200 || !rsi) {
-          alert("No se pudieron calcular los indicadores.");
-          return;
-        }
-
-        document.getElementById("inputPrice").value = formatPrice(price);
-        document.getElementById("inputEma50").value = formatPrice(ema50);
-        document.getElementById("inputEma200").value = formatPrice(ema200);
-        document.getElementById("inputRsi").value = rsi.toFixed(1);
-        document.getElementById("inputSupport").value = formatPrice(support);
-        document.getElementById("inputResistance").value = formatPrice(resistance);
-
-        document.getElementById("priceValue").textContent = formatPrice(price);
-        document.getElementById("ema50Value").textContent = formatPrice(ema50);
-        document.getElementById("ema200Value").textContent = formatPrice(ema200);
-        document.getElementById("rsiValue").textContent = rsi.toFixed(1);
-        document.getElementById("symbolValue").textContent = symbol;
-        document.getElementById("historyPair").textContent = symbol;
-
-        document.getElementById("signalNote").textContent =
-          "Indicadores automáticos de " + symbol + " actualizados en " + interval + ".";
-
-        analizarManual();
-
+        const result = await loadSymbolData(symbol, apiKey, interval, candles);
+        applyResultToDashboard(result);
       } catch (error) {
-        alert("No se pudo conectar o procesar datos de Twelve Data.");
+        alert(error.message);
         console.error(error);
-        document.getElementById("signalNote").textContent = "Error al procesar indicadores automáticos.";
       }
     }
 
@@ -767,7 +945,6 @@
       const rsi = parseFloat(document.getElementById("inputRsi").value);
       const support = parseFloat(document.getElementById("inputSupport").value);
       const resistance = parseFloat(document.getElementById("inputResistance").value);
-      const interval = document.getElementById("inputInterval").value;
 
       if (
         isNaN(price) ||
@@ -781,150 +958,106 @@
         return;
       }
 
-      let signal = "ESPERAR";
-      let signalColor = "#facc15";
-      let tradeType = "Esperar";
-      let reason = "";
-      let confidenceScore = 40;
-      let entry = "Pendiente";
-      let sl = "Pendiente";
-      let tp1 = "Pendiente";
-      let tp2 = "Pendiente";
-      let trendH1 = "Lateral";
-      let trendClass = "yellow";
+      const result = analyzeData(symbol, price, ema50, ema200, rsi, support, resistance);
+      applyResultToDashboard(result);
+    }
 
-      const pip = getPipSize(symbol);
+    async function escanearOportunidades() {
+      const apiKey = document.getElementById("apiKey").value.trim();
+      const interval = document.getElementById("inputInterval").value;
+      const candles = parseInt(document.getElementById("inputCandles").value);
 
-      const bullishTrend = price > ema200 && ema50 > ema200;
-      const bearishTrend = price < ema200 && ema50 < ema200;
-      const nearResistance = price >= resistance - (15 * pip);
-      const nearSupport = price <= support + (15 * pip);
-
-      if (bullishTrend) {
-        trendH1 = "Alcista";
-        trendClass = "green";
-        confidenceScore += 20;
-      } else if (bearishTrend) {
-        trendH1 = "Bajista";
-        trendClass = "red";
-        confidenceScore += 20;
-      } else {
-        trendH1 = "Lateral / Mixta";
-        trendClass = "yellow";
+      if (!apiKey) {
+        alert("Primero pega tu API Key de Twelve Data.");
+        return;
       }
 
-      if (bearishTrend && rsi >= 50 && rsi <= 70) {
-        signal = "VENTA";
-        signalColor = "#ef4444";
-        tradeType = "Venta / Short";
-        confidenceScore += 25;
-
-        if (nearResistance) confidenceScore += 10;
-
-        entry = formatPrice(price);
-        sl = formatPrice(resistance + (5 * pip));
-        tp1 = formatPrice(support);
-        tp2 = formatPrice(support - (15 * pip));
-
-        reason =
-          symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo. La venta mejora si el precio está cerca de resistencia.";
-      }
-      else if (bullishTrend && rsi >= 30 && rsi <= 50) {
-        signal = "COMPRA";
-        signalColor = "#22c55e";
-        tradeType = "Compra / Long";
-        confidenceScore += 25;
-
-        if (nearSupport) confidenceScore += 10;
-
-        entry = formatPrice(price);
-        sl = formatPrice(support - (5 * pip));
-        tp1 = formatPrice(resistance);
-        tp2 = formatPrice(resistance + (15 * pip));
-
-        reason =
-          symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable. La compra mejora si el precio está cerca de soporte.";
-      }
-      else {
-        signal = "ESPERAR";
-        signalColor = "#facc15";
-        tradeType = "Esperar";
-        confidenceScore -= 5;
-
-        entry = "No recomendado";
-        sl = "No aplica";
-        tp1 = "No aplica";
-        tp2 = "No aplica";
-
-        reason =
-          symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar porque tendencia, EMA 50, EMA 200 y RSI no dan una señal clara.";
+      if (candles < 210) {
+        alert("Usa mínimo 210 velas para calcular EMA 200 correctamente.");
+        return;
       }
 
-      if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
+      document.getElementById("scannerResults").innerHTML =
+        `<tr><td colspan="7">Escaneando oportunidades... espera unos segundos.</td></tr>`;
 
-      const emaDistance = Math.abs(price - ema200);
-      const distanceLimit = symbol.includes("JPY") ? 0.150 : 0.00150;
-      if (emaDistance < distanceLimit) confidenceScore += 3;
+      document.getElementById("bestOpportunityBox").textContent =
+        "Escaneando AUD/USD, EUR/USD, USD/JPY y GBP/USD...";
 
-      confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
-
-      document.getElementById("signalText").textContent = signal;
-      document.getElementById("signalText").style.color = signalColor;
       document.getElementById("signalNote").textContent =
-        "Análisis calculado para " + symbol + " con datos de " + interval + ".";
+        "Escaneando mejores oportunidades en " + interval + "...";
 
-      document.getElementById("symbolValue").textContent = symbol;
-      document.getElementById("historyPair").textContent = symbol;
+      const results = [];
 
-      document.getElementById("priceValue").textContent = formatPrice(price);
-      document.getElementById("ema50Value").textContent = formatPrice(ema50);
-      document.getElementById("ema200Value").textContent = formatPrice(ema200);
-      document.getElementById("rsiValue").textContent = rsi.toFixed(1);
+      for (const symbol of forexPairs) {
+        try {
+          const result = await loadSymbolData(symbol, apiKey, interval, candles);
+          results.push(result);
+        } catch (error) {
+          console.error(error);
+          results.push({
+            symbol,
+            signal: "ERROR",
+            tradeType: "Error",
+            confidenceScore: 0,
+            price: 0,
+            rsi: 0,
+            trend: "Sin datos",
+            trendClass: "yellow",
+            error: error.message
+          });
+        }
+      }
 
-      const trendElement = document.getElementById("trendH1");
-      trendElement.textContent = trendH1;
-      trendElement.className = "value " + trendClass;
+      results.sort((a, b) => b.confidenceScore - a.confidenceScore);
 
-      document.getElementById("m15State").textContent = signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
-      document.getElementById("m15State").className = signal === "COMPRA" ? "green" : signal === "VENTA" ? "red" : "yellow";
+      const actionable = results.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
+      const best = actionable.length > 0 ? actionable[0] : results[0];
 
-      document.getElementById("m15Read").textContent = signal === "ESPERAR" ?
-        "No hay alineación suficiente para entrar." :
-        "Usar M15 para confirmar vela de rechazo o ruptura antes de entrar.";
+      let rows = "";
 
-      document.getElementById("m30State").textContent = trendH1;
-      document.getElementById("m30State").className = trendClass;
-      document.getElementById("m30Read").textContent = "Lectura basada en precio, EMA 50, EMA 200 y RSI.";
+      results.forEach((r, index) => {
+        const signalClass =
+          r.signal === "COMPRA" ? "green" :
+          r.signal === "VENTA" ? "red" :
+          r.signal === "ERROR" ? "red" : "yellow";
 
-      document.getElementById("h1State").textContent = trendH1;
-      document.getElementById("h1State").className = trendClass;
-      document.getElementById("h1Read").textContent = bearishTrend ?
-        "Precio y EMA 50 debajo de EMA 200." :
-        bullishTrend ? "Precio y EMA 50 arriba de EMA 200." :
-        "Estructura mixta o lateral.";
+        const priceText = r.price ? formatPriceForSymbol(r.price, r.symbol) : "-";
+        const rsiText = r.rsi ? r.rsi.toFixed(1) : "-";
 
-      document.getElementById("h4State").textContent = "Contexto";
-      document.getElementById("h4State").className = "yellow";
-      document.getElementById("h4Read").textContent = "Para H4 real, selecciona 4h y vuelve a obtener indicadores.";
+        rows += `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${r.symbol}</td>
+            <td class="${signalClass}">${r.tradeType}</td>
+            <td>${r.confidenceScore}%</td>
+            <td>${priceText}</td>
+            <td>${rsiText}</td>
+            <td class="${r.trendClass || "yellow"}">${r.trend}</td>
+          </tr>
+        `;
+      });
 
-      document.getElementById("tradeType").textContent = tradeType;
-      document.getElementById("entryZone").textContent = entry;
-      document.getElementById("stopLoss").textContent = sl;
-      document.getElementById("takeProfit1").textContent = tp1;
-      document.getElementById("takeProfit2").textContent = tp2;
-      document.getElementById("riskLevel").textContent =
-        confidenceScore >= 75 ? "Medio / favorable" :
-        confidenceScore >= 55 ? "Medio" : "Alto";
+      document.getElementById("scannerResults").innerHTML = rows;
 
-      document.getElementById("analysisReason").textContent = reason;
+      if (best.signal === "COMPRA" || best.signal === "VENTA") {
+        document.getElementById("bestOpportunityBox").innerHTML = `
+          <strong>Mejor oportunidad:</strong> ${best.symbol}<br>
+          <strong>Señal:</strong> ${best.tradeType}<br>
+          <strong>Confianza:</strong> ${best.confidenceScore}%<br>
+          <strong>Entrada:</strong> ${best.entry}<br>
+          <strong>SL:</strong> ${best.sl}<br>
+          <strong>TP1:</strong> ${best.tp1}<br>
+          <strong>TP2:</strong> ${best.tp2}
+        `;
+      } else {
+        document.getElementById("bestOpportunityBox").innerHTML = `
+          <strong>Resultado:</strong> No hay señal fuerte por ahora.<br>
+          El mejor resultado fue ${best.symbol} con ${best.confidenceScore}%,
+          pero el agente recomienda esperar.
+        `;
+      }
 
-      const historySignal = document.getElementById("historySignal");
-      historySignal.textContent = tradeType;
-      historySignal.className = signal === "COMPRA" ? "green" : signal === "VENTA" ? "red" : "yellow";
-      document.getElementById("historyEntry").textContent = entry;
-
-      confidence = confidenceScore;
-      updateGauge(confidence);
+      applyResultToDashboard(best);
     }
 
     actualizarNombrePar();
