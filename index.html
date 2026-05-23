@@ -136,6 +136,7 @@
       cursor: pointer;
       margin-top: 10px;
       font-size: 15px;
+      margin-right: 8px;
     }
 
     .button:hover {
@@ -148,6 +149,14 @@
 
     .button-green:hover {
       background: #15803d;
+    }
+
+    .button-yellow {
+      background: #ca8a04;
+    }
+
+    .button-yellow:hover {
+      background: #a16207;
     }
 
     table {
@@ -230,6 +239,12 @@
       margin-top: 30px;
     }
 
+    .api-warning {
+      color: #facc15;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
     @media (max-width: 600px) {
       body { padding: 14px; }
       .signal-text { font-size: 36px; }
@@ -241,6 +256,10 @@
       .gauge-inner {
         width: 92px;
         height: 92px;
+      }
+      .button {
+        width: 100%;
+        margin-bottom: 10px;
       }
     }
   </style>
@@ -256,7 +275,7 @@
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Asistente manual</strong>
+        Modo actual: <strong>Asistente manual + precio real</strong>
       </div>
     </div>
 
@@ -264,17 +283,27 @@
       <h2>Señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Ingresa los datos del mercado en el panel manual y presiona Analizar AUD/USD.
+        Pega tu API Key, obtiene el precio real de AUD/USD y luego presiona Analizar AUD/USD.
       </p>
     </div>
 
     <div class="section">
       <h2>Panel de análisis manual</h2>
       <p class="note">
-        Coloca los valores actuales de AUD/USD. El agente calculará si conviene comprar, vender o esperar.
+        Primero puedes obtener el precio real desde Twelve Data. Después coloca o ajusta EMA 50, EMA 200, RSI, soporte y resistencia.
       </p>
 
-      <div class="grid">
+      <div class="input-group">
+        <label>API Key de Twelve Data</label>
+        <input type="password" id="apiKey" placeholder="Pega aquí tu API Key">
+        <div class="api-warning">
+          Nota: no guardes tu API Key públicamente en el código. Pégala aquí solo cuando uses la página.
+        </div>
+      </div>
+
+      <button class="button button-yellow" onclick="obtenerPrecioReal()">Obtener precio real AUD/USD</button>
+
+      <div class="grid" style="margin-top: 20px;">
         <div class="input-group">
           <label>Precio actual</label>
           <input type="number" step="0.00001" id="inputPrice" value="0.66420">
@@ -409,7 +438,7 @@
     </div>
 
     <div class="footer">
-      AUD/USD AI Agent · Cerebro manual v1 · Próximo paso: conectar datos reales
+      AUD/USD AI Agent · Cerebro manual v1 · Precio real por Twelve Data · Próximo paso: EMA y RSI automáticos
     </div>
 
   </div>
@@ -454,6 +483,51 @@
       return Number(value).toFixed(5);
     }
 
+    async function obtenerPrecioReal() {
+      const apiKey = document.getElementById("apiKey").value.trim();
+
+      if (!apiKey) {
+        alert("Primero pega tu API Key de Twelve Data.");
+        return;
+      }
+
+      document.getElementById("signalNote").textContent = "Buscando precio real de AUD/USD...";
+
+      try {
+        const url = `https://api.twelvedata.com/quote?symbol=AUD/USD&apikey=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.status === "error") {
+          alert("Error de API: " + data.message);
+          document.getElementById("signalNote").textContent = "Error al obtener precio real.";
+          return;
+        }
+
+        const price = data.close || data.price || data.previous_close;
+
+        if (!price) {
+          alert("No se pudo obtener el precio. Revisa tu API Key o el símbolo AUD/USD.");
+          console.log(data);
+          document.getElementById("signalNote").textContent = "No se pudo obtener el precio real.";
+          return;
+        }
+
+        const finalPrice = Number(price).toFixed(5);
+
+        document.getElementById("inputPrice").value = finalPrice;
+        document.getElementById("priceValue").textContent = finalPrice;
+
+        document.getElementById("signalNote").textContent = "Precio real actualizado. Ahora puedes presionar Analizar AUD/USD.";
+        alert("Precio real actualizado: " + finalPrice);
+
+      } catch (error) {
+        alert("No se pudo conectar con Twelve Data.");
+        console.error(error);
+        document.getElementById("signalNote").textContent = "No se pudo conectar con Twelve Data.";
+      }
+    }
+
     function analizarManual() {
       const price = parseFloat(document.getElementById("inputPrice").value);
       const ema50 = parseFloat(document.getElementById("inputEma50").value);
@@ -461,6 +535,18 @@
       const rsi = parseFloat(document.getElementById("inputRsi").value);
       const support = parseFloat(document.getElementById("inputSupport").value);
       const resistance = parseFloat(document.getElementById("inputResistance").value);
+
+      if (
+        isNaN(price) ||
+        isNaN(ema50) ||
+        isNaN(ema200) ||
+        isNaN(rsi) ||
+        isNaN(support) ||
+        isNaN(resistance)
+      ) {
+        alert("Revisa los datos. Todos los campos deben tener números válidos.");
+        return;
+      }
 
       let signal = "ESPERAR";
       let signalColor = "#facc15";
@@ -539,7 +625,7 @@
 
       document.getElementById("signalText").textContent = signal;
       document.getElementById("signalText").style.color = signalColor;
-      document.getElementById("signalNote").textContent = "Análisis calculado con los datos manuales ingresados.";
+      document.getElementById("signalNote").textContent = "Análisis calculado con los datos ingresados.";
 
       document.getElementById("priceValue").textContent = formatPrice(price);
 
