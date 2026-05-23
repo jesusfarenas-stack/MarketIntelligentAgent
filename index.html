@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AUD/USD AI Agent</title>
+  <title>Forex AI Agent</title>
 
   <style>
     * { box-sizing: border-box; }
@@ -257,14 +257,17 @@
       body { padding: 14px; }
       .signal-text { font-size: 36px; }
       .title h1 { font-size: 28px; }
+
       .gauge {
         width: 130px;
         height: 130px;
       }
+
       .gauge-inner {
         width: 92px;
         height: 92px;
       }
+
       .button {
         width: 100%;
         margin-bottom: 10px;
@@ -278,12 +281,12 @@
 
     <div class="header">
       <div class="title">
-        <h1>AUD/USD AI Agent</h1>
-        <p>Dashboard automático para precio, EMA 50, EMA 200, RSI, entrada, SL y TP.</p>
+        <h1>Forex AI Agent</h1>
+        <p>Dashboard automático para AUD/USD, EUR/USD, USD/JPY y GBP/USD.</p>
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Agente automático v2</strong>
+        Modo actual: <strong>Multi-par automático v3</strong>
       </div>
     </div>
 
@@ -291,14 +294,14 @@
       <h2>Señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Pega tu API Key y presiona Obtener indicadores automáticos.
+        Selecciona el par, pega tu API Key y presiona Obtener indicadores automáticos.
       </p>
     </div>
 
     <div class="section">
       <h2>Panel de análisis automático</h2>
       <p class="note">
-        Este panel obtiene velas reales de AUD/USD, calcula EMA 50, EMA 200 y RSI 14 automáticamente.
+        Elige el par que quieres analizar. El agente descargará velas reales, calculará EMA 50, EMA 200, RSI 14, soporte y resistencia.
       </p>
 
       <div class="input-group">
@@ -310,6 +313,16 @@
       </div>
 
       <div class="grid">
+        <div class="input-group">
+          <label>Par a analizar</label>
+          <select id="inputSymbol" onchange="actualizarNombrePar()">
+            <option value="AUD/USD" selected>AUD/USD</option>
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+            <option value="GBP/USD">GBP/USD</option>
+          </select>
+        </div>
+
         <div class="input-group">
           <label>Temporalidad para cálculo</label>
           <select id="inputInterval">
@@ -367,11 +380,16 @@
       </div>
 
       <button class="button button-green" onclick="analizarManual()">
-        Analizar AUD/USD
+        Analizar par seleccionado
       </button>
     </div>
 
     <div class="grid">
+      <div class="card">
+        <h3>Par actual</h3>
+        <div class="value blue" id="symbolValue">AUD/USD</div>
+      </div>
+
       <div class="card">
         <h3>Precio actual</h3>
         <div class="value blue" id="priceValue">0.66420</div>
@@ -393,7 +411,7 @@
       </div>
 
       <div class="card">
-        <h3>Tendencia H1</h3>
+        <h3>Tendencia</h3>
         <div class="value red" id="trendH1">Bajista</div>
       </div>
 
@@ -472,7 +490,7 @@
           <th>Resultado</th>
         </tr>
         <tr>
-          <td>AUD/USD</td>
+          <td id="historyPair">AUD/USD</td>
           <td id="historySignal" class="yellow">Esperar</td>
           <td id="historyEntry">Pendiente</td>
           <td>Pendiente</td>
@@ -481,13 +499,44 @@
     </div>
 
     <div class="footer">
-      AUD/USD AI Agent · Automático v2 · Precio + EMA 50 + EMA 200 + RSI 14
+      Forex AI Agent · Multi-par v3 · AUD/USD · EUR/USD · USD/JPY · GBP/USD
     </div>
 
   </div>
 
   <script>
     let confidence = 68;
+
+    function getSelectedSymbol() {
+      return document.getElementById("inputSymbol").value;
+    }
+
+    function getPipSize(symbol) {
+      if (symbol.includes("JPY")) {
+        return 0.010;
+      }
+      return 0.00010;
+    }
+
+    function getDecimals(symbol) {
+      if (symbol.includes("JPY")) {
+        return 3;
+      }
+      return 5;
+    }
+
+    function formatPrice(value) {
+      const symbol = getSelectedSymbol();
+      return Number(value).toFixed(getDecimals(symbol));
+    }
+
+    function actualizarNombrePar() {
+      const symbol = getSelectedSymbol();
+      document.getElementById("symbolValue").textContent = symbol;
+      document.getElementById("historyPair").textContent = symbol;
+      document.getElementById("signalNote").textContent =
+        "Par cambiado a " + symbol + ". Presiona Obtener indicadores automáticos.";
+    }
 
     function getGaugeColor(value) {
       if (value <= 50) {
@@ -520,10 +569,6 @@
       valueText.textContent = value + "%";
       statusText.textContent = getConfidenceStatus(value);
       statusText.style.color = color;
-    }
-
-    function formatPrice(value) {
-      return Number(value).toFixed(5);
     }
 
     function calculateEMA(values, period) {
@@ -586,16 +631,17 @@
 
     async function obtenerPrecioReal() {
       const apiKey = document.getElementById("apiKey").value.trim();
+      const symbol = getSelectedSymbol();
 
       if (!apiKey) {
         alert("Primero pega tu API Key de Twelve Data.");
         return;
       }
 
-      document.getElementById("signalNote").textContent = "Buscando precio real de AUD/USD...";
+      document.getElementById("signalNote").textContent = "Buscando precio real de " + symbol + "...";
 
       try {
-        const url = `https://api.twelvedata.com/quote?symbol=AUD/USD&apikey=${apiKey}`;
+        const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbol)}&apikey=${apiKey}`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -608,19 +654,23 @@
         const price = data.close || data.price || data.previous_close;
 
         if (!price) {
-          alert("No se pudo obtener el precio. Revisa tu API Key o el símbolo AUD/USD.");
+          alert("No se pudo obtener el precio. Revisa tu API Key o el símbolo.");
           console.log(data);
           document.getElementById("signalNote").textContent = "No se pudo obtener el precio real.";
           return;
         }
 
-        const finalPrice = Number(price).toFixed(5);
+        const finalPrice = formatPrice(price);
 
         document.getElementById("inputPrice").value = finalPrice;
         document.getElementById("priceValue").textContent = finalPrice;
+        document.getElementById("symbolValue").textContent = symbol;
+        document.getElementById("historyPair").textContent = symbol;
 
-        document.getElementById("signalNote").textContent = "Precio real actualizado. Ahora puedes presionar Analizar AUD/USD.";
-        alert("Precio real actualizado: " + finalPrice);
+        document.getElementById("signalNote").textContent =
+          "Precio real de " + symbol + " actualizado. Ahora puedes presionar Analizar par seleccionado.";
+
+        alert("Precio real actualizado: " + symbol + " = " + finalPrice);
 
       } catch (error) {
         alert("No se pudo conectar con Twelve Data.");
@@ -631,6 +681,7 @@
 
     async function obtenerIndicadoresAutomaticos() {
       const apiKey = document.getElementById("apiKey").value.trim();
+      const symbol = getSelectedSymbol();
       const interval = document.getElementById("inputInterval").value;
       const candles = parseInt(document.getElementById("inputCandles").value);
 
@@ -644,10 +695,11 @@
         return;
       }
 
-      document.getElementById("signalNote").textContent = "Descargando velas reales y calculando indicadores...";
+      document.getElementById("signalNote").textContent =
+        "Descargando velas reales de " + symbol + " y calculando indicadores...";
 
       try {
-        const url = `https://api.twelvedata.com/time_series?symbol=AUD/USD&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
+        const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
         const response = await fetch(url);
         const data = await response.json();
 
@@ -692,9 +744,11 @@
         document.getElementById("ema50Value").textContent = formatPrice(ema50);
         document.getElementById("ema200Value").textContent = formatPrice(ema200);
         document.getElementById("rsiValue").textContent = rsi.toFixed(1);
+        document.getElementById("symbolValue").textContent = symbol;
+        document.getElementById("historyPair").textContent = symbol;
 
-        document.getElementById("signalNote").textContent = 
-          "Indicadores automáticos actualizados en " + interval + ". Presiona Analizar AUD/USD.";
+        document.getElementById("signalNote").textContent =
+          "Indicadores automáticos de " + symbol + " actualizados en " + interval + ".";
 
         analizarManual();
 
@@ -706,6 +760,7 @@
     }
 
     function analizarManual() {
+      const symbol = getSelectedSymbol();
       const price = parseFloat(document.getElementById("inputPrice").value);
       const ema50 = parseFloat(document.getElementById("inputEma50").value);
       const ema200 = parseFloat(document.getElementById("inputEma200").value);
@@ -738,7 +793,7 @@
       let trendH1 = "Lateral";
       let trendClass = "yellow";
 
-      const pip = 0.00010;
+      const pip = getPipSize(symbol);
 
       const bullishTrend = price > ema200 && ema50 > ema200;
       const bearishTrend = price < ema200 && ema50 < ema200;
@@ -771,8 +826,9 @@
         tp1 = formatPrice(support);
         tp2 = formatPrice(support - (15 * pip));
 
-        reason = "El agente detecta estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo. La venta mejora si el precio está cerca de resistencia.";
-      } 
+        reason =
+          symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo. La venta mejora si el precio está cerca de resistencia.";
+      }
       else if (bullishTrend && rsi >= 30 && rsi <= 50) {
         signal = "COMPRA";
         signalColor = "#22c55e";
@@ -786,8 +842,9 @@
         tp1 = formatPrice(resistance);
         tp2 = formatPrice(resistance + (15 * pip));
 
-        reason = "El agente detecta estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable. La compra mejora si el precio está cerca de soporte.";
-      } 
+        reason =
+          symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable. La compra mejora si el precio está cerca de soporte.";
+      }
       else {
         signal = "ESPERAR";
         signalColor = "#facc15";
@@ -799,17 +856,25 @@
         tp1 = "No aplica";
         tp2 = "No aplica";
 
-        reason = "Las condiciones no están alineadas. El agente recomienda esperar porque tendencia, EMA 50, EMA 200 y RSI no dan una señal suficientemente clara.";
+        reason =
+          symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar porque tendencia, EMA 50, EMA 200 y RSI no dan una señal clara.";
       }
 
       if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
-      if (Math.abs(price - ema200) < 0.00150) confidenceScore += 3;
+
+      const emaDistance = Math.abs(price - ema200);
+      const distanceLimit = symbol.includes("JPY") ? 0.150 : 0.00150;
+      if (emaDistance < distanceLimit) confidenceScore += 3;
 
       confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
 
       document.getElementById("signalText").textContent = signal;
       document.getElementById("signalText").style.color = signalColor;
-      document.getElementById("signalNote").textContent = "Análisis calculado con datos de " + interval + ".";
+      document.getElementById("signalNote").textContent =
+        "Análisis calculado para " + symbol + " con datos de " + interval + ".";
+
+      document.getElementById("symbolValue").textContent = symbol;
+      document.getElementById("historyPair").textContent = symbol;
 
       document.getElementById("priceValue").textContent = formatPrice(price);
       document.getElementById("ema50Value").textContent = formatPrice(ema50);
@@ -823,8 +888,8 @@
       document.getElementById("m15State").textContent = signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
       document.getElementById("m15State").className = signal === "COMPRA" ? "green" : signal === "VENTA" ? "red" : "yellow";
 
-      document.getElementById("m15Read").textContent = signal === "ESPERAR" ? 
-        "No hay alineación suficiente para entrar." : 
+      document.getElementById("m15Read").textContent = signal === "ESPERAR" ?
+        "No hay alineación suficiente para entrar." :
         "Usar M15 para confirmar vela de rechazo o ruptura antes de entrar.";
 
       document.getElementById("m30State").textContent = trendH1;
@@ -833,7 +898,7 @@
 
       document.getElementById("h1State").textContent = trendH1;
       document.getElementById("h1State").className = trendClass;
-      document.getElementById("h1Read").textContent = bearishTrend ? 
+      document.getElementById("h1Read").textContent = bearishTrend ?
         "Precio y EMA 50 debajo de EMA 200." :
         bullishTrend ? "Precio y EMA 50 arriba de EMA 200." :
         "Estructura mixta o lateral.";
@@ -847,7 +912,9 @@
       document.getElementById("stopLoss").textContent = sl;
       document.getElementById("takeProfit1").textContent = tp1;
       document.getElementById("takeProfit2").textContent = tp2;
-      document.getElementById("riskLevel").textContent = confidenceScore >= 75 ? "Medio / favorable" : confidenceScore >= 55 ? "Medio" : "Alto";
+      document.getElementById("riskLevel").textContent =
+        confidenceScore >= 75 ? "Medio / favorable" :
+        confidenceScore >= 55 ? "Medio" : "Alto";
 
       document.getElementById("analysisReason").textContent = reason;
 
@@ -860,6 +927,7 @@
       updateGauge(confidence);
     }
 
+    actualizarNombrePar();
     updateGauge(confidence);
   </script>
 </body>
