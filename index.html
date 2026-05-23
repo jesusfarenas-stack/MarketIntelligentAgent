@@ -6,7 +6,9 @@
   <title>Market AI Agent</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -17,7 +19,7 @@
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1250px;
       margin: auto;
     }
 
@@ -139,22 +141,49 @@
       margin-right: 8px;
     }
 
-    .button:hover { background: #1d4ed8; }
+    .button:hover {
+      background: #1d4ed8;
+    }
 
-    .button-green { background: #16a34a; }
-    .button-green:hover { background: #15803d; }
+    .button-green {
+      background: #16a34a;
+    }
 
-    .button-yellow { background: #ca8a04; }
-    .button-yellow:hover { background: #a16207; }
+    .button-green:hover {
+      background: #15803d;
+    }
 
-    .button-purple { background: #7c3aed; }
-    .button-purple:hover { background: #6d28d9; }
+    .button-yellow {
+      background: #ca8a04;
+    }
 
-    .button-red { background: #dc2626; }
-    .button-red:hover { background: #b91c1c; }
+    .button-yellow:hover {
+      background: #a16207;
+    }
 
-    .button-blue { background: #0284c7; }
-    .button-blue:hover { background: #0369a1; }
+    .button-purple {
+      background: #7c3aed;
+    }
+
+    .button-purple:hover {
+      background: #6d28d9;
+    }
+
+    .button-red {
+      background: #dc2626;
+    }
+
+    .button-red:hover {
+      background: #b91c1c;
+    }
+
+    .button-blue {
+      background: #0284c7;
+    }
+
+    .button-blue:hover {
+      background: #0369a1;
+    }
 
     table {
       width: 100%;
@@ -168,7 +197,9 @@
       border-bottom: 1px solid #334155;
     }
 
-    th { color: #cbd5e1; }
+    th {
+      color: #cbd5e1;
+    }
 
     .confidence-card {
       text-align: center;
@@ -242,6 +273,50 @@
       line-height: 1.7;
     }
 
+    .strong-alert {
+      display: none;
+      background: linear-gradient(135deg, #14532d, #052e16);
+      border: 2px solid #22c55e;
+      color: white;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 25px rgba(34, 197, 94, 0.45);
+      animation: pulseAlert 1.2s infinite;
+    }
+
+    .strong-alert h2 {
+      margin-top: 0;
+      color: #86efac;
+    }
+
+    .strong-alert-red {
+      background: linear-gradient(135deg, #7f1d1d, #450a0a);
+      border: 2px solid #ef4444;
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.45);
+    }
+
+    .alert-actions {
+      margin-top: 14px;
+    }
+
+    @keyframes pulseAlert {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.01);
+        opacity: 0.92;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
     .footer {
       text-align: center;
       color: #94a3b8;
@@ -250,9 +325,17 @@
     }
 
     @media (max-width: 600px) {
-      body { padding: 14px; }
-      .signal-text { font-size: 36px; }
-      .title h1 { font-size: 28px; }
+      body {
+        padding: 14px;
+      }
+
+      .signal-text {
+        font-size: 36px;
+      }
+
+      .title h1 {
+        font-size: 28px;
+      }
 
       .gauge {
         width: 130px;
@@ -282,11 +365,22 @@
     <div class="header">
       <div class="title">
         <h1>Market AI Agent</h1>
-        <p>Scanner inteligente dividido en Forex, Crypto y Stocks.</p>
+        <p>Scanner inteligente con Forex, Crypto, Stocks, EMA, RSI, CHoCH, BOS y alertas.</p>
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Smart Confluence Scanner v6</strong>
+        Modo actual: <strong>Smart Money Scanner v7</strong>
+      </div>
+    </div>
+
+    <div class="strong-alert" id="strongAlertBox">
+      <h2>🚨 Alerta fuerte detectada</h2>
+      <p id="strongAlertText">Pendiente de señal fuerte.</p>
+
+      <div class="alert-actions">
+        <button class="button button-yellow" onclick="hideStrongAlert()">
+          Ocultar alerta
+        </button>
       </div>
     </div>
 
@@ -294,14 +388,14 @@
       <h2>Mejor señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Usa el Smart Scanner para analizar categoría completa y confirmar los 3 mejores en M15, M30, H1 y H4.
+        Usa el Smart Scanner para analizar Forex, Crypto o Stocks con confirmación multi-timeframe.
       </p>
     </div>
 
     <div class="section">
       <h2>Panel de análisis automático</h2>
       <p class="note">
-        Puedes analizar un activo individual, escanear una categoría o usar el Smart Scanner con confirmación multi-timeframe.
+        Puedes analizar un activo individual, escanear una categoría o usar el Smart Scanner con CHoCH/BOS.
       </p>
 
       <div class="input-group">
@@ -400,7 +494,7 @@
     <div class="section">
       <h2>Scanner de oportunidades</h2>
       <p class="note">
-        El scanner ordena los activos por confianza. El Smart Scanner primero filtra en H1 y después confirma el Top 3 con M15, M30, H1 y H4.
+        El scanner ordena los activos por confianza. El Smart Scanner filtra en H1 y confirma el Top 3 con M15, M30, H1 y H4.
       </p>
 
       <div class="best-box" id="bestOpportunityBox">
@@ -415,11 +509,12 @@
           <th>Confianza</th>
           <th>Precio</th>
           <th>RSI</th>
+          <th>Estructura</th>
           <th>Tendencia</th>
         </tr>
         <tbody id="scannerResults">
           <tr>
-            <td colspan="7">Presiona “Smart Scanner multi-timeframe”.</td>
+            <td colspan="8">Presiona “Smart Scanner multi-timeframe”.</td>
           </tr>
         </tbody>
       </table>
@@ -428,7 +523,7 @@
     <div class="section">
       <h2>Confirmación multi-timeframe</h2>
       <p class="note">
-        Aquí verás la lectura M15, M30, H1 y H4 del mejor activo detectado.
+        Lectura M15, M30, H1 y H4 del mejor activo detectado.
       </p>
 
       <table>
@@ -436,12 +531,13 @@
           <th>Timeframe</th>
           <th>Tendencia</th>
           <th>RSI</th>
+          <th>CHoCH/BOS</th>
           <th>Señal base</th>
           <th>Confianza base</th>
         </tr>
         <tbody id="multiTfResults">
           <tr>
-            <td colspan="5">Pendiente de Smart Scanner.</td>
+            <td colspan="6">Pendiente de Smart Scanner.</td>
           </tr>
         </tbody>
       </table>
@@ -471,6 +567,11 @@
       <div class="card">
         <h3>RSI 14</h3>
         <div class="value yellow" id="rsiValue">58.0</div>
+      </div>
+
+      <div class="card">
+        <h3>CHoCH / BOS</h3>
+        <div class="value yellow" id="structureValue">Pendiente</div>
       </div>
 
       <div class="card">
@@ -516,12 +617,12 @@
         <tr>
           <td>Tendencia</td>
           <td class="yellow" id="h1State">Esperando datos</td>
-          <td id="h1Read">Pendiente de analizar EMA 50, EMA 200 y RSI.</td>
+          <td id="h1Read">Pendiente de analizar EMA 50, EMA 200, RSI y estructura.</td>
         </tr>
         <tr>
           <td>Contexto</td>
           <td class="yellow" id="h4State">Referencia</td>
-          <td id="h4Read">En esta versión el cálculo principal usa la temporalidad seleccionada.</td>
+          <td id="h4Read">El Smart Scanner usa H4 como contexto mayor.</td>
         </tr>
       </table>
     </div>
@@ -562,13 +663,14 @@
     </div>
 
     <div class="footer">
-      Market AI Agent · Smart Confluence Scanner v6 · Forex · Crypto · Stocks
+      Market AI Agent · Smart Money Scanner v7 · Forex · Crypto · Stocks
     </div>
 
   </div>
 
   <script>
     let confidence = 68;
+    let lastStrongAlertKey = "";
 
     const markets = {
       forex: ["AUD/USD", "EUR/USD", "USD/JPY", "GBP/USD"],
@@ -596,7 +698,7 @@
       return markets[getCategory()];
     }
 
-    function getStepForSymbol(symbol) {
+    function getStepForSymbol(symbol, price = null) {
       const category = getCategory();
 
       if (category === "forex") {
@@ -604,7 +706,11 @@
         return 0.00010;
       }
 
-      return 0.001;
+      if (price && price > 0) {
+        return price * 0.001;
+      }
+
+      return 0.01;
     }
 
     function getDecimalsBySymbol(symbol) {
@@ -625,6 +731,7 @@
         ) {
           return 2;
         }
+
         return 4;
       }
 
@@ -657,6 +764,7 @@
 
     function actualizarNombreActivo() {
       const symbol = getSelectedSymbol();
+
       document.getElementById("symbolValue").textContent = symbol;
       document.getElementById("historyPair").textContent = symbol;
       document.getElementById("signalNote").textContent =
@@ -669,6 +777,7 @@
       const ratio = (value - 51) / 49;
       const saturation = 55 + (ratio * 35);
       const lightness = 42 - (ratio * 12);
+
       return `hsl(135, ${saturation}%, ${lightness}%)`;
     }
 
@@ -688,7 +797,9 @@
       const degrees = (value / 100) * 360;
       const color = getGaugeColor(value);
 
-      gauge.style.background = `conic-gradient(${color} 0deg ${degrees}deg, #334155 ${degrees}deg 360deg)`;
+      gauge.style.background =
+        `conic-gradient(${color} 0deg ${degrees}deg, #334155 ${degrees}deg 360deg)`;
+
       valueText.textContent = value + "%";
       statusText.textContent = getConfidenceStatus(value);
       statusText.style.color = color;
@@ -721,6 +832,7 @@
 
       for (let i = 1; i <= period; i++) {
         const diff = values[i] - values[i - 1];
+
         if (diff >= 0) gains += diff;
         else losses -= diff;
       }
@@ -753,7 +865,119 @@
       return Math.max(...recent);
     }
 
-    function analyzeData(symbol, price, ema50, ema200, rsi, support, resistance) {
+    function detectSwings(candles, depth = 2) {
+      const swings = [];
+
+      for (let i = depth; i < candles.length - depth; i++) {
+        let isSwingHigh = true;
+        let isSwingLow = true;
+
+        for (let j = i - depth; j <= i + depth; j++) {
+          if (j === i) continue;
+
+          if (candles[i].high <= candles[j].high) {
+            isSwingHigh = false;
+          }
+
+          if (candles[i].low >= candles[j].low) {
+            isSwingLow = false;
+          }
+        }
+
+        if (isSwingHigh) {
+          swings.push({
+            type: "high",
+            index: i,
+            price: candles[i].high
+          });
+        }
+
+        if (isSwingLow) {
+          swings.push({
+            type: "low",
+            index: i,
+            price: candles[i].low
+          });
+        }
+      }
+
+      return swings;
+    }
+
+    function analyzeMarketStructure(candles) {
+      const swings = detectSwings(candles, 2);
+
+      const highs = swings.filter(s => s.type === "high");
+      const lows = swings.filter(s => s.type === "low");
+
+      const lastHigh = highs[highs.length - 1];
+      const prevHigh = highs[highs.length - 2];
+
+      const lastLow = lows[lows.length - 1];
+      const prevLow = lows[lows.length - 2];
+
+      const lastCandle = candles[candles.length - 1];
+      const prevCandle = candles[candles.length - 2];
+
+      let structureTrend = "Mixta";
+      let event = "Sin ruptura";
+      let eventType = "NONE";
+      let eventDirection = "neutral";
+
+      if (lastHigh && prevHigh && lastLow && prevLow) {
+        if (lastHigh.price > prevHigh.price && lastLow.price > prevLow.price) {
+          structureTrend = "Alcista";
+        } else if (lastHigh.price < prevHigh.price && lastLow.price < prevLow.price) {
+          structureTrend = "Bajista";
+        } else {
+          structureTrend = "Mixta";
+        }
+      }
+
+      if (
+        lastHigh &&
+        prevCandle.close <= lastHigh.price &&
+        lastCandle.close > lastHigh.price
+      ) {
+        eventDirection = "bullish";
+
+        if (structureTrend === "Bajista") {
+          eventType = "CHoCH";
+          event = "CHoCH alcista";
+        } else {
+          eventType = "BOS";
+          event = "BOS alcista";
+        }
+      }
+
+      if (
+        lastLow &&
+        prevCandle.close >= lastLow.price &&
+        lastCandle.close < lastLow.price
+      ) {
+        eventDirection = "bearish";
+
+        if (structureTrend === "Alcista") {
+          eventType = "CHoCH";
+          event = "CHoCH bajista";
+        } else {
+          eventType = "BOS";
+          event = "BOS bajista";
+        }
+      }
+
+      return {
+        structureTrend,
+        event,
+        eventType,
+        eventDirection,
+        lastHigh: lastHigh ? lastHigh.price : null,
+        lastLow: lastLow ? lastLow.price : null,
+        label: structureTrend + " · " + event
+      };
+    }
+
+    function analyzeData(symbol, price, ema50, ema200, rsi, support, resistance, structure = null) {
       let signal = "ESPERAR";
       let signalColor = "#facc15";
       let tradeType = "Esperar";
@@ -766,11 +990,26 @@
       let trend = "Lateral / Mixta";
       let trendClass = "yellow";
 
-      const step = getStepForSymbol(symbol);
+      const category = getCategory();
+      let step = getStepForSymbol(symbol, price);
+
+      if (category !== "forex") {
+        step = price * 0.001;
+      }
+
       const bullishTrend = price > ema200 && ema50 > ema200;
       const bearishTrend = price < ema200 && ema50 < ema200;
+
       const nearResistance = price >= resistance - (15 * step);
       const nearSupport = price <= support + (15 * step);
+
+      const bullishStructure =
+        structure &&
+        (structure.eventDirection === "bullish" || structure.structureTrend === "Alcista");
+
+      const bearishStructure =
+        structure &&
+        (structure.eventDirection === "bearish" || structure.structureTrend === "Bajista");
 
       if (bullishTrend) {
         trend = "Alcista";
@@ -790,12 +1029,20 @@
 
         if (nearResistance) confidenceScore += 10;
 
+        if (bearishStructure) {
+          confidenceScore += structure.eventType === "BOS" ? 18 : 14;
+        }
+
         entry = formatPriceForSymbol(price, symbol);
         sl = formatPriceForSymbol(resistance + (5 * step), symbol);
         tp1 = formatPriceForSymbol(support, symbol);
         tp2 = formatPriceForSymbol(support - (15 * step), symbol);
 
-        reason = symbol + " muestra estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo.";
+        reason =
+          symbol +
+          " muestra posible venta: precio debajo de EMA 200, EMA 50 debajo de EMA 200, RSI en zona de rechazo y estructura " +
+          (structure ? structure.label : "sin lectura") +
+          ".";
       }
       else if (bullishTrend && rsi >= 30 && rsi <= 50) {
         signal = "COMPRA";
@@ -805,34 +1052,72 @@
 
         if (nearSupport) confidenceScore += 10;
 
+        if (bullishStructure) {
+          confidenceScore += structure.eventType === "BOS" ? 18 : 14;
+        }
+
         entry = formatPriceForSymbol(price, symbol);
         sl = formatPriceForSymbol(support - (5 * step), symbol);
         tp1 = formatPriceForSymbol(resistance, symbol);
         tp2 = formatPriceForSymbol(resistance + (15 * step), symbol);
 
-        reason = symbol + " muestra estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable.";
+        reason =
+          symbol +
+          " muestra posible compra: precio arriba de EMA 200, EMA 50 arriba de EMA 200, RSI en retroceso saludable y estructura " +
+          (structure ? structure.label : "sin lectura") +
+          ".";
       }
       else {
         confidenceScore -= 5;
-        reason = symbol + " no tiene condiciones suficientemente alineadas. El agente recomienda esperar.";
+
+        if (structure && structure.eventType === "CHoCH") {
+          confidenceScore += 8;
+        }
+
+        reason =
+          symbol +
+          " no tiene condiciones suficientemente alineadas. El agente recomienda esperar. Estructura: " +
+          (structure ? structure.label : "sin lectura") +
+          ".";
       }
 
       if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
 
       const distancePercent = Math.abs(price - ema200) / price;
-      if (distancePercent < 0.003) confidenceScore += 3;
+
+      if (distancePercent < 0.003) {
+        confidenceScore += 3;
+      }
 
       confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
 
       return {
-        symbol, price, ema50, ema200, rsi, support, resistance,
-        signal, signalColor, tradeType, confidenceScore,
-        entry, sl, tp1, tp2, trend, trendClass, reason
+        symbol,
+        price,
+        ema50,
+        ema200,
+        rsi,
+        support,
+        resistance,
+        signal,
+        signalColor,
+        tradeType,
+        confidenceScore,
+        entry,
+        sl,
+        tp1,
+        tp2,
+        trend,
+        trendClass,
+        reason,
+        structure
       };
     }
 
     async function loadSymbolData(symbol, apiKey, interval, candles) {
-      const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
+      const url =
+        `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
+
       const response = await fetch(url);
       const data = await response.json();
 
@@ -844,26 +1129,147 @@
         throw new Error(symbol + " " + interval + ": no llegaron suficientes velas.");
       }
 
-      const closes = data.values
-        .map(candle => Number(candle.close))
+      const candleData = data.values
+        .map(candle => ({
+          open: Number(candle.open),
+          high: Number(candle.high),
+          low: Number(candle.low),
+          close: Number(candle.close)
+        }))
         .reverse()
-        .filter(value => !isNaN(value));
+        .filter(candle =>
+          !isNaN(candle.open) &&
+          !isNaN(candle.high) &&
+          !isNaN(candle.low) &&
+          !isNaN(candle.close)
+        );
+
+      const closes = candleData.map(candle => candle.close);
+      const highs = candleData.map(candle => candle.high);
+      const lows = candleData.map(candle => candle.low);
 
       const price = closes[closes.length - 1];
       const ema50 = calculateEMA(closes, 50);
       const ema200 = calculateEMA(closes, 200);
       const rsi = calculateRSI(closes, 14);
-      const support = calculateSupport(closes, 50);
-      const resistance = calculateResistance(closes, 50);
+      const support = calculateSupport(lows, 50);
+      const resistance = calculateResistance(highs, 50);
+      const structure = analyzeMarketStructure(candleData);
 
-      if (!ema50 || !ema200 || !rsi) {
+      if (ema50 === null || ema200 === null || rsi === null) {
         throw new Error(symbol + " " + interval + ": no se pudieron calcular indicadores.");
       }
 
-      const result = analyzeData(symbol, price, ema50, ema200, rsi, support, resistance);
+      const result = analyzeData(
+        symbol,
+        price,
+        ema50,
+        ema200,
+        rsi,
+        support,
+        resistance,
+        structure
+      );
+
       result.interval = interval;
 
       return result;
+    }
+
+    function playPageAlertSound() {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator1.type = "sine";
+        oscillator2.type = "sine";
+
+        oscillator1.frequency.setValueAtTime(880, audioContext.currentTime);
+        oscillator2.frequency.setValueAtTime(660, audioContext.currentTime + 0.18);
+
+        gainNode.gain.setValueAtTime(0.18, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1.0);
+
+        oscillator1.connect(gainNode);
+        oscillator2.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator1.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + 0.45);
+
+        oscillator2.start(audioContext.currentTime + 0.18);
+        oscillator2.stop(audioContext.currentTime + 1.0);
+      } catch (error) {
+        console.log("Sonido no disponible:", error);
+      }
+    }
+
+    function hideStrongAlert() {
+      const alertBox = document.getElementById("strongAlertBox");
+
+      if (alertBox) {
+        alertBox.style.display = "none";
+      }
+    }
+
+    function checkStrongAlert(result) {
+      const alertBox = document.getElementById("strongAlertBox");
+      const alertText = document.getElementById("strongAlertText");
+
+      if (!alertBox || !alertText) return;
+
+      const isStrongSignal =
+        result.confidenceScore >= 80 &&
+        (result.signal === "COMPRA" || result.signal === "VENTA");
+
+      if (!isStrongSignal) {
+        alertBox.style.display = "none";
+        return;
+      }
+
+      const alertKey =
+        result.symbol + "-" +
+        result.signal + "-" +
+        result.confidenceScore + "-" +
+        result.entry;
+
+      alertBox.style.display = "block";
+      alertBox.classList.remove("strong-alert-red");
+
+      if (result.signal === "VENTA") {
+        alertBox.classList.add("strong-alert-red");
+      }
+
+      alertText.innerHTML = `
+        <strong>Activo:</strong> ${result.symbol}<br>
+        <strong>Señal:</strong> ${result.tradeType}<br>
+        <strong>Confianza:</strong> ${result.confidenceScore}%<br>
+        <strong>Entrada:</strong> ${result.entry}<br>
+        <strong>Stop Loss:</strong> ${result.sl}<br>
+        <strong>Take Profit 1:</strong> ${result.tp1}<br>
+        <strong>Take Profit 2:</strong> ${result.tp2}<br><br>
+        <strong>Estructura:</strong> ${result.structure ? result.structure.label : "Sin estructura"}<br>
+        <strong>Motivo:</strong> ${result.reason}
+      `;
+
+      if (alertKey !== lastStrongAlertKey) {
+        lastStrongAlertKey = alertKey;
+        playPageAlertSound();
+
+        alert(
+          "🚨 Señal fuerte detectada\n\n" +
+          "Activo: " + result.symbol + "\n" +
+          "Señal: " + result.tradeType + "\n" +
+          "Confianza: " + result.confidenceScore + "%\n" +
+          "Entrada: " + result.entry + "\n" +
+          "SL: " + result.sl + "\n" +
+          "TP1: " + result.tp1 + "\n" +
+          "TP2: " + result.tp2
+        );
+      }
     }
 
     function applyResultToDashboard(result) {
@@ -883,6 +1289,19 @@
       document.getElementById("ema200Value").textContent = formatPriceForSymbol(result.ema200, result.symbol);
       document.getElementById("rsiValue").textContent = result.rsi.toFixed(1);
 
+      const structureText = result.structure ? result.structure.label : "Sin estructura";
+      const structureElement = document.getElementById("structureValue");
+
+      structureElement.textContent = structureText;
+
+      if (result.structure && result.structure.eventDirection === "bullish") {
+        structureElement.className = "value green";
+      } else if (result.structure && result.structure.eventDirection === "bearish") {
+        structureElement.className = "value red";
+      } else {
+        structureElement.className = "value yellow";
+      }
+
       document.getElementById("signalText").textContent = result.signal;
       document.getElementById("signalText").style.color = result.signalColor;
 
@@ -893,7 +1312,9 @@
       trendElement.textContent = result.trend;
       trendElement.className = "value " + result.trendClass;
 
-      document.getElementById("m15State").textContent = result.signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
+      document.getElementById("m15State").textContent =
+        result.signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
+
       document.getElementById("m15State").className =
         result.signal === "COMPRA" ? "green" :
         result.signal === "VENTA" ? "red" : "yellow";
@@ -905,10 +1326,11 @@
 
       document.getElementById("m30State").textContent = result.trend;
       document.getElementById("m30State").className = result.trendClass;
-      document.getElementById("m30Read").textContent = "Confirmación basada en EMA 50, EMA 200 y RSI.";
+      document.getElementById("m30Read").textContent = "Confirmación basada en EMA 50, EMA 200, RSI y estructura.";
 
       document.getElementById("h1State").textContent = result.trend;
       document.getElementById("h1State").className = result.trendClass;
+
       document.getElementById("h1Read").textContent =
         result.trend === "Bajista"
           ? "Precio y EMA 50 debajo de EMA 200."
@@ -925,6 +1347,7 @@
       document.getElementById("stopLoss").textContent = result.sl;
       document.getElementById("takeProfit1").textContent = result.tp1;
       document.getElementById("takeProfit2").textContent = result.tp2;
+
       document.getElementById("riskLevel").textContent =
         result.confidenceScore >= 80 ? "Favorable / fuerte" :
         result.confidenceScore >= 66 ? "Medio / válido" :
@@ -933,6 +1356,7 @@
       document.getElementById("analysisReason").textContent = result.reason;
 
       const historySignal = document.getElementById("historySignal");
+
       historySignal.textContent = result.tradeType;
       historySignal.className =
         result.signal === "COMPRA" ? "green" :
@@ -942,6 +1366,7 @@
 
       confidence = result.confidenceScore;
       updateGauge(confidence);
+      checkStrongAlert(result);
     }
 
     function buildMultiTfRows(results) {
@@ -952,11 +1377,18 @@
           r.signal === "COMPRA" ? "green" :
           r.signal === "VENTA" ? "red" : "yellow";
 
+        const structureText = r.structure ? r.structure.label : "Sin estructura";
+
+        const structureClass =
+          r.structure && r.structure.eventDirection === "bullish" ? "green" :
+          r.structure && r.structure.eventDirection === "bearish" ? "red" : "yellow";
+
         rows += `
           <tr>
             <td>${r.interval}</td>
             <td class="${r.trendClass}">${r.trend}</td>
             <td>${r.rsi.toFixed(1)}</td>
+            <td class="${structureClass}">${structureText}</td>
             <td class="${signalClass}">${r.tradeType}</td>
             <td>${r.confidenceScore}%</td>
           </tr>
@@ -975,17 +1407,34 @@
       let buyScore = 0;
       let sellScore = 0;
 
-      function addTrendScore(result, buyPoints, sellPoints) {
+      function addTrendScore(result, points) {
         if (!result) return;
 
-        if (result.trend === "Alcista") buyScore += buyPoints;
-        if (result.trend === "Bajista") sellScore += sellPoints;
+        if (result.trend === "Alcista") buyScore += points;
+        if (result.trend === "Bajista") sellScore += points;
       }
 
-      addTrendScore(h4, 20, 20);
-      addTrendScore(h1, 25, 25);
-      addTrendScore(m30, 15, 15);
-      addTrendScore(m15, 10, 10);
+      function addStructureScore(result, points) {
+        if (!result || !result.structure) return;
+
+        if (result.structure.eventDirection === "bullish") {
+          buyScore += result.structure.eventType === "BOS" ? points : Math.round(points * 0.75);
+        }
+
+        if (result.structure.eventDirection === "bearish") {
+          sellScore += result.structure.eventType === "BOS" ? points : Math.round(points * 0.75);
+        }
+      }
+
+      addTrendScore(h4, 15);
+      addTrendScore(h1, 20);
+      addTrendScore(m30, 10);
+      addTrendScore(m15, 10);
+
+      addStructureScore(h4, 12);
+      addStructureScore(h1, 18);
+      addStructureScore(m30, 15);
+      addStructureScore(m15, 15);
 
       if (h1 && h1.rsi >= 30 && h1.rsi <= 50) buyScore += 10;
       if (h1 && h1.rsi >= 50 && h1.rsi <= 70) sellScore += 10;
@@ -993,12 +1442,20 @@
       if (m15 && m15.signal === "COMPRA") buyScore += 10;
       if (m15 && m15.signal === "VENTA") sellScore += 10;
 
-      const direction = buyScore > sellScore ? "COMPRA" : sellScore > buyScore ? "VENTA" : "ESPERAR";
+      const direction =
+        buyScore > sellScore ? "COMPRA" :
+        sellScore > buyScore ? "VENTA" :
+        "ESPERAR";
+
       const finalScore = Math.max(buyScore, sellScore);
+      const base = h1 || tfResults[0];
+      const result = { ...base };
 
-      let base = h1 || tfResults[0];
+      let step = getStepForSymbol(symbol, base.price);
 
-      let result = { ...base };
+      if (getCategory() !== "forex") {
+        step = base.price * 0.001;
+      }
 
       result.symbol = symbol;
       result.confidenceScore = Math.max(20, Math.min(95, finalScore));
@@ -1007,15 +1464,29 @@
         result.signal = "COMPRA";
         result.signalColor = "#22c55e";
         result.tradeType = "Compra / Long";
+        result.entry = formatPriceForSymbol(base.price, symbol);
+        result.sl = formatPriceForSymbol(base.support - (5 * step), symbol);
+        result.tp1 = formatPriceForSymbol(base.resistance, symbol);
+        result.tp2 = formatPriceForSymbol(base.resistance + (15 * step), symbol);
         result.reason =
-          symbol + " tiene confluencia alcista multi-timeframe. H4/H1/M30/M15 favorecen compra o retroceso saludable.";
-      } else if (direction === "VENTA") {
+          symbol +
+          " tiene confluencia alcista multi-timeframe con EMA, RSI, CHoCH/BOS y estructura a favor. " +
+          "Score compra: " + buyScore + " / Score venta: " + sellScore + ".";
+      }
+      else if (direction === "VENTA") {
         result.signal = "VENTA";
         result.signalColor = "#ef4444";
         result.tradeType = "Venta / Short";
+        result.entry = formatPriceForSymbol(base.price, symbol);
+        result.sl = formatPriceForSymbol(base.resistance + (5 * step), symbol);
+        result.tp1 = formatPriceForSymbol(base.support, symbol);
+        result.tp2 = formatPriceForSymbol(base.support - (15 * step), symbol);
         result.reason =
-          symbol + " tiene confluencia bajista multi-timeframe. H4/H1/M30/M15 favorecen venta o rechazo desde resistencia.";
-      } else {
+          symbol +
+          " tiene confluencia bajista multi-timeframe con EMA, RSI, CHoCH/BOS y estructura a favor. " +
+          "Score compra: " + buyScore + " / Score venta: " + sellScore + ".";
+      }
+      else {
         result.signal = "ESPERAR";
         result.signalColor = "#facc15";
         result.tradeType = "Esperar";
@@ -1024,7 +1495,8 @@
         result.tp1 = "No aplica";
         result.tp2 = "No aplica";
         result.reason =
-          symbol + " no tiene confluencia clara entre M15, M30, H1 y H4. Mejor esperar.";
+          symbol +
+          " no tiene confluencia clara entre EMA, RSI, CHoCH, BOS y multi-timeframe. Mejor esperar.";
       }
 
       return result;
@@ -1053,10 +1525,13 @@
         return;
       }
 
-      document.getElementById("signalNote").textContent = "Buscando precio real de " + symbol + "...";
+      document.getElementById("signalNote").textContent =
+        "Buscando precio real de " + symbol + "...";
 
       try {
-        const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbol)}&apikey=${apiKey}`;
+        const url =
+          `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbol)}&apikey=${apiKey}`;
+
         const response = await fetch(url);
         const data = await response.json();
 
@@ -1118,6 +1593,7 @@
 
     function analizarManual() {
       const symbol = getSelectedSymbol();
+
       const price = parseFloat(document.getElementById("inputPrice").value);
       const ema50 = parseFloat(document.getElementById("inputEma50").value);
       const ema200 = parseFloat(document.getElementById("inputEma200").value);
@@ -1137,7 +1613,17 @@
         return;
       }
 
-      const result = analyzeData(symbol, price, ema50, ema200, rsi, support, resistance);
+      const result = analyzeData(
+        symbol,
+        price,
+        ema50,
+        ema200,
+        rsi,
+        support,
+        resistance,
+        null
+      );
+
       applyResultToDashboard(result);
     }
 
@@ -1159,13 +1645,10 @@
       }
 
       document.getElementById("scannerResults").innerHTML =
-        `<tr><td colspan="7">Escaneando ${category}... espera unos segundos.</td></tr>`;
+        `<tr><td colspan="8">Escaneando ${category}... espera unos segundos.</td></tr>`;
 
       document.getElementById("bestOpportunityBox").textContent =
         "Escaneando categoría: " + category + "...";
-
-      document.getElementById("signalNote").textContent =
-        "Escaneando mejores oportunidades en " + category + " con temporalidad " + interval + "...";
 
       const results = [];
 
@@ -1175,6 +1658,7 @@
           results.push(result);
         } catch (error) {
           console.error(error);
+
           results.push({
             symbol,
             signal: "ERROR",
@@ -1184,6 +1668,7 @@
             rsi: 0,
             trend: "Sin datos",
             trendClass: "yellow",
+            structure: null,
             error: error.message
           });
         }
@@ -1192,7 +1677,11 @@
       showScannerResults(results);
 
       const actionable = results.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
-      const best = actionable.length > 0 ? actionable.sort((a, b) => b.confidenceScore - a.confidenceScore)[0] : results.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
+
+      const best =
+        actionable.length > 0
+          ? actionable.sort((a, b) => b.confidenceScore - a.confidenceScore)[0]
+          : results.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
 
       showBestBox(best);
       applyResultToDashboard(best);
@@ -1212,6 +1701,12 @@
         const priceText = r.price ? formatPriceForSymbol(r.price, r.symbol) : "-";
         const rsiText = r.rsi ? r.rsi.toFixed(1) : "-";
 
+        const structureText = r.structure ? r.structure.label : "-";
+
+        const structureClass =
+          r.structure && r.structure.eventDirection === "bullish" ? "green" :
+          r.structure && r.structure.eventDirection === "bearish" ? "red" : "yellow";
+
         rows += `
           <tr>
             <td>${index + 1}</td>
@@ -1220,6 +1715,7 @@
             <td>${r.confidenceScore}%</td>
             <td>${priceText}</td>
             <td>${rsiText}</td>
+            <td class="${structureClass}">${structureText}</td>
             <td class="${r.trendClass || "yellow"}">${r.trend}</td>
           </tr>
         `;
@@ -1239,7 +1735,8 @@
           <strong>Entrada:</strong> ${best.entry}<br>
           <strong>SL:</strong> ${best.sl}<br>
           <strong>TP1:</strong> ${best.tp1}<br>
-          <strong>TP2:</strong> ${best.tp2}
+          <strong>TP2:</strong> ${best.tp2}<br>
+          <strong>Estructura:</strong> ${best.structure ? best.structure.label : "Sin estructura"}
         `;
       } else {
         document.getElementById("bestOpportunityBox").innerHTML = `
@@ -1267,13 +1764,13 @@
       }
 
       document.getElementById("scannerResults").innerHTML =
-        `<tr><td colspan="7">Fase 1: escaneando ${category} en H1...</td></tr>`;
+        `<tr><td colspan="8">Fase 1: escaneando ${category} en H1...</td></tr>`;
 
       document.getElementById("bestOpportunityBox").textContent =
         "Smart Scanner iniciado. Fase 1: escaneo rápido en H1.";
 
       document.getElementById("multiTfResults").innerHTML =
-        `<tr><td colspan="5">Esperando confirmación multi-timeframe...</td></tr>`;
+        `<tr><td colspan="6">Esperando confirmación multi-timeframe...</td></tr>`;
 
       document.getElementById("signalNote").textContent =
         "Smart Scanner: analizando categoría completa en H1...";
@@ -1299,11 +1796,13 @@
       const topThree = phaseOneResults.slice(0, 3);
 
       document.getElementById("scannerResults").innerHTML =
-        `<tr><td colspan="7">Fase 2: confirmando Top 3 en M15, M30, H1 y H4...</td></tr>`;
+        `<tr><td colspan="8">Fase 2: confirmando Top 3 en M15, M30, H1 y H4...</td></tr>`;
 
       document.getElementById("bestOpportunityBox").innerHTML =
         `<strong>Top 3 para confirmar:</strong><br>
-        ${topThree.map((r, i) => `${i + 1}. ${r.symbol} · ${r.tradeType} · ${r.confidenceScore}%`).join("<br>")}`;
+        ${topThree.map((r, i) =>
+          `${i + 1}. ${r.symbol} · ${r.tradeType} · ${r.confidenceScore}% · ${r.structure ? r.structure.label : "Sin estructura"}`
+        ).join("<br>")}`;
 
       document.getElementById("signalNote").textContent =
         "Smart Scanner: confirmando Top 3 con multi-timeframe...";
@@ -1327,7 +1826,11 @@
       deepResults.sort((a, b) => b.confidenceScore - a.confidenceScore);
 
       const actionable = deepResults.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
-      const best = actionable.length > 0 ? actionable[0] : deepResults[0];
+
+      const best =
+        actionable.length > 0
+          ? actionable[0]
+          : deepResults[0];
 
       showScannerResults(deepResults);
       showBestBox(best);
@@ -1338,7 +1841,13 @@
       }
 
       document.getElementById("signalNote").textContent =
-        "Smart Scanner completado. Mejor señal: " + best.symbol + " · " + best.tradeType + " · " + best.confidenceScore + "%.";
+        "Smart Scanner completado. Mejor señal: " +
+        best.symbol +
+        " · " +
+        best.tradeType +
+        " · " +
+        best.confidenceScore +
+        "%.";
     }
 
     actualizarListaActivos();
