@@ -105,7 +105,7 @@
       line-height: 1.6;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 13px;
       border-radius: 10px;
@@ -157,6 +157,14 @@
 
     .button-yellow:hover {
       background: #a16207;
+    }
+
+    .button-purple {
+      background: #7c3aed;
+    }
+
+    .button-purple:hover {
+      background: #6d28d9;
     }
 
     table {
@@ -232,17 +240,17 @@
       margin-top: 8px;
     }
 
+    .api-warning {
+      color: #facc15;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
     .footer {
       text-align: center;
       color: #94a3b8;
       font-size: 14px;
       margin-top: 30px;
-    }
-
-    .api-warning {
-      color: #facc15;
-      font-size: 14px;
-      margin-top: 8px;
     }
 
     @media (max-width: 600px) {
@@ -271,11 +279,11 @@
     <div class="header">
       <div class="title">
         <h1>AUD/USD AI Agent</h1>
-        <p>Dashboard de análisis para tendencia, entrada, Stop Loss y Take Profit.</p>
+        <p>Dashboard automático para precio, EMA 50, EMA 200, RSI, entrada, SL y TP.</p>
       </div>
 
       <div class="badge">
-        Modo actual: <strong>Asistente manual + precio real</strong>
+        Modo actual: <strong>Agente automático v2</strong>
       </div>
     </div>
 
@@ -283,25 +291,48 @@
       <h2>Señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
       <p class="note" id="signalNote">
-        Pega tu API Key, obtiene el precio real de AUD/USD y luego presiona Analizar AUD/USD.
+        Pega tu API Key y presiona Obtener indicadores automáticos.
       </p>
     </div>
 
     <div class="section">
-      <h2>Panel de análisis manual</h2>
+      <h2>Panel de análisis automático</h2>
       <p class="note">
-        Primero puedes obtener el precio real desde Twelve Data. Después coloca o ajusta EMA 50, EMA 200, RSI, soporte y resistencia.
+        Este panel obtiene velas reales de AUD/USD, calcula EMA 50, EMA 200 y RSI 14 automáticamente.
       </p>
 
       <div class="input-group">
         <label>API Key de Twelve Data</label>
         <input type="password" id="apiKey" placeholder="Pega aquí tu API Key">
         <div class="api-warning">
-          Nota: no guardes tu API Key públicamente en el código. Pégala aquí solo cuando uses la página.
+          Recomendación: pega tu API Key solo cuando uses la página. No la guardes fija en el código público.
         </div>
       </div>
 
-      <button class="button button-yellow" onclick="obtenerPrecioReal()">Obtener precio real AUD/USD</button>
+      <div class="grid">
+        <div class="input-group">
+          <label>Temporalidad para cálculo</label>
+          <select id="inputInterval">
+            <option value="15min">M15</option>
+            <option value="30min">M30</option>
+            <option value="1h" selected>H1</option>
+            <option value="4h">H4</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Velas a descargar</label>
+          <input type="number" id="inputCandles" value="250">
+        </div>
+      </div>
+
+      <button class="button button-purple" onclick="obtenerIndicadoresAutomaticos()">
+        Obtener indicadores automáticos
+      </button>
+
+      <button class="button button-yellow" onclick="obtenerPrecioReal()">
+        Obtener solo precio real
+      </button>
 
       <div class="grid" style="margin-top: 20px;">
         <div class="input-group">
@@ -320,7 +351,7 @@
         </div>
 
         <div class="input-group">
-          <label>RSI</label>
+          <label>RSI 14</label>
           <input type="number" step="0.1" id="inputRsi" value="58">
         </div>
 
@@ -335,7 +366,9 @@
         </div>
       </div>
 
-      <button class="button button-green" onclick="analizarManual()">Analizar AUD/USD</button>
+      <button class="button button-green" onclick="analizarManual()">
+        Analizar AUD/USD
+      </button>
     </div>
 
     <div class="grid">
@@ -345,8 +378,18 @@
       </div>
 
       <div class="card">
-        <h3>Tendencia H4</h3>
-        <div class="value yellow" id="trendH4">Pendiente</div>
+        <h3>EMA 50</h3>
+        <div class="value blue" id="ema50Value">0.66380</div>
+      </div>
+
+      <div class="card">
+        <h3>EMA 200</h3>
+        <div class="value blue" id="ema200Value">0.66550</div>
+      </div>
+
+      <div class="card">
+        <h3>RSI 14</h3>
+        <div class="value yellow" id="rsiValue">58.0</div>
       </div>
 
       <div class="card">
@@ -380,24 +423,24 @@
           <th>Lectura</th>
         </tr>
         <tr>
-          <td>M15</td>
+          <td>M15 / Entrada</td>
           <td class="yellow" id="m15State">Esperando datos</td>
-          <td id="m15Read">El agente usará los datos manuales para generar lectura.</td>
+          <td id="m15Read">El agente usará los datos automáticos o manuales.</td>
         </tr>
         <tr>
-          <td>M30</td>
+          <td>M30 / Confirmación</td>
           <td class="yellow" id="m30State">Esperando datos</td>
           <td id="m30Read">Pendiente de confirmación.</td>
         </tr>
         <tr>
-          <td>H1</td>
+          <td>H1 / Tendencia</td>
           <td class="yellow" id="h1State">Esperando datos</td>
           <td id="h1Read">Pendiente de analizar EMA 50, EMA 200 y RSI.</td>
         </tr>
         <tr>
-          <td>H4</td>
-          <td class="yellow" id="h4State">Manual</td>
-          <td id="h4Read">En esta versión H4 se mantiene como referencia manual.</td>
+          <td>H4 / Contexto</td>
+          <td class="yellow" id="h4State">Referencia</td>
+          <td id="h4Read">En esta versión el cálculo principal usa la temporalidad seleccionada.</td>
         </tr>
       </table>
     </div>
@@ -415,7 +458,7 @@
     <div class="section">
       <h2>Motivo del análisis</h2>
       <p class="note" id="analysisReason">
-        El agente todavía no ha procesado los datos manuales.
+        El agente todavía no ha procesado los datos.
       </p>
     </div>
 
@@ -438,7 +481,7 @@
     </div>
 
     <div class="footer">
-      AUD/USD AI Agent · Cerebro manual v1 · Precio real por Twelve Data · Próximo paso: EMA y RSI automáticos
+      AUD/USD AI Agent · Automático v2 · Precio + EMA 50 + EMA 200 + RSI 14
     </div>
 
   </div>
@@ -481,6 +524,64 @@
 
     function formatPrice(value) {
       return Number(value).toFixed(5);
+    }
+
+    function calculateEMA(values, period) {
+      if (values.length < period) return null;
+
+      const multiplier = 2 / (period + 1);
+
+      let ema = 0;
+      for (let i = 0; i < period; i++) {
+        ema += values[i];
+      }
+      ema = ema / period;
+
+      for (let i = period; i < values.length; i++) {
+        ema = (values[i] - ema) * multiplier + ema;
+      }
+
+      return ema;
+    }
+
+    function calculateRSI(values, period = 14) {
+      if (values.length <= period) return null;
+
+      let gains = 0;
+      let losses = 0;
+
+      for (let i = 1; i <= period; i++) {
+        const diff = values[i] - values[i - 1];
+        if (diff >= 0) gains += diff;
+        else losses -= diff;
+      }
+
+      let avgGain = gains / period;
+      let avgLoss = losses / period;
+
+      for (let i = period + 1; i < values.length; i++) {
+        const diff = values[i] - values[i - 1];
+        const gain = diff > 0 ? diff : 0;
+        const loss = diff < 0 ? -diff : 0;
+
+        avgGain = ((avgGain * (period - 1)) + gain) / period;
+        avgLoss = ((avgLoss * (period - 1)) + loss) / period;
+      }
+
+      if (avgLoss === 0) return 100;
+
+      const rs = avgGain / avgLoss;
+      return 100 - (100 / (1 + rs));
+    }
+
+    function calculateSupport(values, lookback = 50) {
+      const recent = values.slice(-lookback);
+      return Math.min(...recent);
+    }
+
+    function calculateResistance(values, lookback = 50) {
+      const recent = values.slice(-lookback);
+      return Math.max(...recent);
     }
 
     async function obtenerPrecioReal() {
@@ -528,6 +629,82 @@
       }
     }
 
+    async function obtenerIndicadoresAutomaticos() {
+      const apiKey = document.getElementById("apiKey").value.trim();
+      const interval = document.getElementById("inputInterval").value;
+      const candles = parseInt(document.getElementById("inputCandles").value);
+
+      if (!apiKey) {
+        alert("Primero pega tu API Key de Twelve Data.");
+        return;
+      }
+
+      if (candles < 210) {
+        alert("Usa mínimo 210 velas para calcular EMA 200 correctamente.");
+        return;
+      }
+
+      document.getElementById("signalNote").textContent = "Descargando velas reales y calculando indicadores...";
+
+      try {
+        const url = `https://api.twelvedata.com/time_series?symbol=AUD/USD&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.status === "error") {
+          alert("Error de API: " + data.message);
+          document.getElementById("signalNote").textContent = "Error al obtener velas.";
+          return;
+        }
+
+        if (!data.values || data.values.length < 210) {
+          alert("No llegaron suficientes velas. Revisa tu plan de Twelve Data o usa otra temporalidad.");
+          console.log(data);
+          document.getElementById("signalNote").textContent = "No llegaron suficientes velas para calcular EMA 200.";
+          return;
+        }
+
+        const closes = data.values
+          .map(candle => Number(candle.close))
+          .reverse()
+          .filter(value => !isNaN(value));
+
+        const price = closes[closes.length - 1];
+        const ema50 = calculateEMA(closes, 50);
+        const ema200 = calculateEMA(closes, 200);
+        const rsi = calculateRSI(closes, 14);
+        const support = calculateSupport(closes, 50);
+        const resistance = calculateResistance(closes, 50);
+
+        if (!ema50 || !ema200 || !rsi) {
+          alert("No se pudieron calcular los indicadores.");
+          return;
+        }
+
+        document.getElementById("inputPrice").value = formatPrice(price);
+        document.getElementById("inputEma50").value = formatPrice(ema50);
+        document.getElementById("inputEma200").value = formatPrice(ema200);
+        document.getElementById("inputRsi").value = rsi.toFixed(1);
+        document.getElementById("inputSupport").value = formatPrice(support);
+        document.getElementById("inputResistance").value = formatPrice(resistance);
+
+        document.getElementById("priceValue").textContent = formatPrice(price);
+        document.getElementById("ema50Value").textContent = formatPrice(ema50);
+        document.getElementById("ema200Value").textContent = formatPrice(ema200);
+        document.getElementById("rsiValue").textContent = rsi.toFixed(1);
+
+        document.getElementById("signalNote").textContent = 
+          "Indicadores automáticos actualizados en " + interval + ". Presiona Analizar AUD/USD.";
+
+        analizarManual();
+
+      } catch (error) {
+        alert("No se pudo conectar o procesar datos de Twelve Data.");
+        console.error(error);
+        document.getElementById("signalNote").textContent = "Error al procesar indicadores automáticos.";
+      }
+    }
+
     function analizarManual() {
       const price = parseFloat(document.getElementById("inputPrice").value);
       const ema50 = parseFloat(document.getElementById("inputEma50").value);
@@ -535,6 +712,7 @@
       const rsi = parseFloat(document.getElementById("inputRsi").value);
       const support = parseFloat(document.getElementById("inputSupport").value);
       const resistance = parseFloat(document.getElementById("inputResistance").value);
+      const interval = document.getElementById("inputInterval").value;
 
       if (
         isNaN(price) ||
@@ -564,6 +742,8 @@
 
       const bullishTrend = price > ema200 && ema50 > ema200;
       const bearishTrend = price < ema200 && ema50 < ema200;
+      const nearResistance = price >= resistance - (15 * pip);
+      const nearSupport = price <= support + (15 * pip);
 
       if (bullishTrend) {
         trendH1 = "Alcista";
@@ -578,31 +758,35 @@
         trendClass = "yellow";
       }
 
-      if (bearishTrend && rsi >= 50 && rsi <= 70 && price < resistance) {
+      if (bearishTrend && rsi >= 50 && rsi <= 70) {
         signal = "VENTA";
         signalColor = "#ef4444";
         tradeType = "Venta / Short";
         confidenceScore += 25;
+
+        if (nearResistance) confidenceScore += 10;
 
         entry = formatPrice(price);
         sl = formatPrice(resistance + (5 * pip));
         tp1 = formatPrice(support);
         tp2 = formatPrice(support - (15 * pip));
 
-        reason = "El precio está debajo de EMA 200, EMA 50 también está debajo de EMA 200 y el RSI está en zona de posible rechazo. El agente detecta oportunidad de venta si hay confirmación bajista.";
+        reason = "El agente detecta estructura bajista: precio debajo de EMA 200, EMA 50 debajo de EMA 200 y RSI en zona de posible rechazo. La venta mejora si el precio está cerca de resistencia.";
       } 
-      else if (bullishTrend && rsi >= 30 && rsi <= 50 && price > support) {
+      else if (bullishTrend && rsi >= 30 && rsi <= 50) {
         signal = "COMPRA";
         signalColor = "#22c55e";
         tradeType = "Compra / Long";
         confidenceScore += 25;
+
+        if (nearSupport) confidenceScore += 10;
 
         entry = formatPrice(price);
         sl = formatPrice(support - (5 * pip));
         tp1 = formatPrice(resistance);
         tp2 = formatPrice(resistance + (15 * pip));
 
-        reason = "El precio está arriba de EMA 200, EMA 50 también está arriba de EMA 200 y el RSI está en zona de retroceso saludable. El agente detecta oportunidad de compra si hay confirmación alcista.";
+        reason = "El agente detecta estructura alcista: precio arriba de EMA 200, EMA 50 arriba de EMA 200 y RSI en zona de retroceso saludable. La compra mejora si el precio está cerca de soporte.";
       } 
       else {
         signal = "ESPERAR";
@@ -615,37 +799,37 @@
         tp1 = "No aplica";
         tp2 = "No aplica";
 
-        reason = "Las condiciones no están alineadas. El agente recomienda esperar porque la tendencia, EMA 50, EMA 200 y RSI no dan una señal suficientemente clara.";
+        reason = "Las condiciones no están alineadas. El agente recomienda esperar porque tendencia, EMA 50, EMA 200 y RSI no dan una señal suficientemente clara.";
       }
 
-      if (rsi >= 45 && rsi <= 60) confidenceScore += 8;
-      if (Math.abs(price - ema200) < 0.00150) confidenceScore += 5;
+      if (rsi >= 45 && rsi <= 60) confidenceScore += 5;
+      if (Math.abs(price - ema200) < 0.00150) confidenceScore += 3;
 
       confidenceScore = Math.max(20, Math.min(95, Math.round(confidenceScore)));
 
       document.getElementById("signalText").textContent = signal;
       document.getElementById("signalText").style.color = signalColor;
-      document.getElementById("signalNote").textContent = "Análisis calculado con los datos ingresados.";
+      document.getElementById("signalNote").textContent = "Análisis calculado con datos de " + interval + ".";
 
       document.getElementById("priceValue").textContent = formatPrice(price);
+      document.getElementById("ema50Value").textContent = formatPrice(ema50);
+      document.getElementById("ema200Value").textContent = formatPrice(ema200);
+      document.getElementById("rsiValue").textContent = rsi.toFixed(1);
 
       const trendElement = document.getElementById("trendH1");
       trendElement.textContent = trendH1;
       trendElement.className = "value " + trendClass;
-
-      document.getElementById("trendH4").textContent = "Referencia manual";
-      document.getElementById("trendH4").className = "value yellow";
 
       document.getElementById("m15State").textContent = signal === "ESPERAR" ? "Sin entrada" : "Zona activa";
       document.getElementById("m15State").className = signal === "COMPRA" ? "green" : signal === "VENTA" ? "red" : "yellow";
 
       document.getElementById("m15Read").textContent = signal === "ESPERAR" ? 
         "No hay alineación suficiente para entrar." : 
-        "M15 puede usarse para buscar confirmación de entrada.";
+        "Usar M15 para confirmar vela de rechazo o ruptura antes de entrar.";
 
       document.getElementById("m30State").textContent = trendH1;
       document.getElementById("m30State").className = trendClass;
-      document.getElementById("m30Read").textContent = "Lectura basada en relación de precio, EMA 50 y EMA 200.";
+      document.getElementById("m30Read").textContent = "Lectura basada en precio, EMA 50, EMA 200 y RSI.";
 
       document.getElementById("h1State").textContent = trendH1;
       document.getElementById("h1State").className = trendClass;
@@ -653,6 +837,10 @@
         "Precio y EMA 50 debajo de EMA 200." :
         bullishTrend ? "Precio y EMA 50 arriba de EMA 200." :
         "Estructura mixta o lateral.";
+
+      document.getElementById("h4State").textContent = "Contexto";
+      document.getElementById("h4State").className = "yellow";
+      document.getElementById("h4Read").textContent = "Para H4 real, selecciona 4h y vuelve a obtener indicadores.";
 
       document.getElementById("tradeType").textContent = tradeType;
       document.getElementById("entryZone").textContent = entry;
