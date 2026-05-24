@@ -273,6 +273,31 @@
       line-height: 1.7;
     }
 
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 430px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .chart-status {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
     .strong-alert {
       display: none;
       background: linear-gradient(135deg, #14532d, #052e16);
@@ -390,6 +415,25 @@
       <p class="note" id="signalNote">
         Usa el Smart Scanner para analizar Forex, Crypto o Stocks con confirmación multi-timeframe.
       </p>
+    </div>
+
+    <div class="section">
+      <div class="chart-header">
+        <div>
+          <h2>Gráfico de velas</h2>
+          <p class="note">
+            Velas reales con EMA 50, EMA 200, soporte, resistencia, entrada, SL y TP.
+          </p>
+        </div>
+        <button class="button button-purple" onclick="renderCurrentChart()">
+          Actualizar gráfico
+        </button>
+      </div>
+
+      <div id="chartContainer" class="chart-container"></div>
+      <div id="chartStatus" class="chart-status">
+        El gráfico aparecerá cuando obtengas indicadores o uses el Smart Scanner.
+      </div>
     </div>
 
     <div class="section">
@@ -668,9 +712,13 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+
   <script>
     let confidence = 68;
     let lastStrongAlertKey = "";
+    let chart = null;
+    let lastChartResult = null;
 
     const markets = {
       forex: ["AUD/USD", "EUR/USD", "USD/JPY", "GBP/USD"],
@@ -1114,6 +1162,254 @@
       };
     }
 
+
+    function normalizeChartTime(datetimeText) {
+      if (!datetimeText) {
+        return Math.floor(Date.now() / 1000);
+      }
+
+      const cleaned = String(datetimeText).replace(" ", "T");
+      const timestamp = Math.floor(new Date(cleaned).getTime() / 1000);
+
+      if (!isNaN(timestamp)) {
+        return timestamp;
+      }
+
+      return Math.floor(Date.now() / 1000);
+    }
+
+    function calculateEMAForChart(values, period) {
+      const result = new Array(values.length).fill(null);
+
+      if (values.length < period) {
+        return result;
+      }
+
+      const multiplier = 2 / (period + 1);
+      let ema = 0;
+
+      for (let i = 0; i < period; i++) {
+        ema += values[i];
+      }
+
+      ema = ema / period;
+      result[period - 1] = ema;
+
+      for (let i = period; i < values.length; i++) {
+        ema = (values[i] - ema) * multiplier + ema;
+        result[i] = ema;
+      }
+
+      return result;
+    }
+
+    function clearChart() {
+      const container = document.getElementById("chartContainer");
+
+      if (!container) return;
+
+      container.innerHTML = "";
+      chart = null;
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${src}"]`);
+
+        if (existing) {
+          existing.addEventListener("load", resolve);
+          existing.addEventListener("error", reject);
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    async function ensureChartLibrary() {
+      if (window.LightweightCharts) {
+        return true;
+      }
+
+      const sources = [
+        "https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js",
+        "https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js",
+        "https://cdn.jsdelivr.net/npm/lightweight-charts/dist/lightweight-charts.standalone.production.js"
+      ];
+
+      for (const src of sources) {
+        try {
+          await loadScript(src);
+          if (window.LightweightCharts) {
+            return true;
+          }
+        } catch (error) {
+          console.log("No cargó la librería desde:", src, error);
+        }
+      }
+
+      return false;
+    }
+
+    async function renderChart(result) {
+      const container = document.getElementById("chartContainer");
+      const status = document.getElementById("chartStatus");
+
+      if (!container || !status) return;
+
+      status.textContent = "Cargando gráfico...";
+
+      const chartLibraryReady = await ensureChartLibrary();
+
+      if (!chartLibraryReady || !window.LightweightCharts) {
+        status.textContent = "No se pudo cargar el gráfico. Revisa conexión o bloqueadores del navegador.";
+        return;
+      }
+
+      if (!result || !result.candles || result.candles.length === 0) {
+        status.textContent = "No hay velas disponibles para graficar todavía.";
+        return;
+      }
+
+      clearChart();
+
+      const width = container.clientWidth || 900;
+      const height = 430;
+
+      chart = LightweightCharts.createChart(container, {
+        width,
+        height,
+        layout: {
+          background: { type: "solid", color: "#0f172a" },
+          textColor: "#cbd5e1"
+        },
+        grid: {
+          vertLines: { color: "#1e293b" },
+          horzLines: { color: "#1e293b" }
+        },
+        crosshair: {
+          mode: LightweightCharts.CrosshairMode.Normal
+        },
+        rightPriceScale: {
+          borderColor: "#334155"
+        },
+        timeScale: {
+          borderColor: "#334155",
+          timeVisible: true,
+          secondsVisible: false
+        }
+      });
+
+      const candleSeries = chart.addCandlestickSeries({
+        upColor: "#22c55e",
+        downColor: "#ef4444",
+        borderUpColor: "#22c55e",
+        borderDownColor: "#ef4444",
+        wickUpColor: "#22c55e",
+        wickDownColor: "#ef4444"
+      });
+
+      const candles = result.candles
+        .filter(c => c.time && !isNaN(c.open) && !isNaN(c.high) && !isNaN(c.low) && !isNaN(c.close))
+        .map(c => ({
+          time: c.time,
+          open: c.open,
+          high: c.high,
+          low: c.low,
+          close: c.close
+        }));
+
+      candleSeries.setData(candles);
+
+      const closes = candles.map(c => c.close);
+      const ema50Values = calculateEMAForChart(closes, 50);
+      const ema200Values = calculateEMAForChart(closes, 200);
+
+      const ema50Data = ema50Values
+        .map((value, index) => value === null ? null : { time: candles[index].time, value })
+        .filter(Boolean);
+
+      const ema200Data = ema200Values
+        .map((value, index) => value === null ? null : { time: candles[index].time, value })
+        .filter(Boolean);
+
+      const ema50Series = chart.addLineSeries({
+        color: "#38bdf8",
+        lineWidth: 2,
+        title: "EMA 50"
+      });
+
+      const ema200Series = chart.addLineSeries({
+        color: "#facc15",
+        lineWidth: 2,
+        title: "EMA 200"
+      });
+
+      ema50Series.setData(ema50Data);
+      ema200Series.setData(ema200Data);
+
+      function addPriceLine(price, color, title, width = 1) {
+        const numericPrice = Number(price);
+
+        if (isNaN(numericPrice) || numericPrice <= 0) return;
+
+        candleSeries.createPriceLine({
+          price: numericPrice,
+          color,
+          lineWidth: width,
+          lineStyle: LightweightCharts.LineStyle.Dashed,
+          axisLabelVisible: true,
+          title
+        });
+      }
+
+      addPriceLine(result.support, "#38bdf8", "Soporte", 1);
+      addPriceLine(result.resistance, "#facc15", "Resistencia", 1);
+
+      if (result.signal === "COMPRA" || result.signal === "VENTA") {
+        addPriceLine(result.entry, "#ffffff", "Entrada", 2);
+        addPriceLine(result.sl, "#ef4444", "SL", 2);
+        addPriceLine(result.tp1, "#22c55e", "TP1", 2);
+        addPriceLine(result.tp2, "#16a34a", "TP2", 2);
+      }
+
+      chart.timeScale().fitContent();
+
+      window.addEventListener("resize", () => {
+        if (chart && container) {
+          chart.applyOptions({ width: container.clientWidth || 900 });
+        }
+      });
+
+      status.textContent =
+        "Gráfico actualizado: " +
+        result.symbol +
+        " · " +
+        (result.interval || "multi-timeframe") +
+        " · " +
+        result.tradeType +
+        " · Confianza " +
+        result.confidenceScore +
+        "%.";
+    }
+
+    async function renderCurrentChart() {
+      if (lastChartResult) {
+        await renderChart(lastChartResult);
+      } else {
+        const status = document.getElementById("chartStatus");
+        if (status) {
+          status.textContent = "Primero obtén indicadores o usa el Smart Scanner.";
+        }
+      }
+    }
+
+
     async function loadSymbolData(symbol, apiKey, interval, candles) {
       const url =
         `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(symbol)}&interval=${interval}&outputsize=${candles}&apikey=${apiKey}`;
@@ -1131,6 +1427,8 @@
 
       const candleData = data.values
         .map(candle => ({
+          time: normalizeChartTime(candle.datetime),
+          datetime: candle.datetime,
           open: Number(candle.open),
           high: Number(candle.high),
           low: Number(candle.low),
@@ -1138,6 +1436,7 @@
         }))
         .reverse()
         .filter(candle =>
+          candle.time &&
           !isNaN(candle.open) &&
           !isNaN(candle.high) &&
           !isNaN(candle.low) &&
@@ -1172,6 +1471,7 @@
       );
 
       result.interval = interval;
+      result.candles = candleData;
 
       return result;
     }
@@ -1367,6 +1667,11 @@
       confidence = result.confidenceScore;
       updateGauge(confidence);
       checkStrongAlert(result);
+
+      if (result.candles && result.candles.length > 0) {
+        lastChartResult = result;
+        renderChart(result);
+      }
     }
 
     function buildMultiTfRows(results) {
@@ -1676,21 +1981,12 @@
 
       showScannerResults(results);
 
-      const validResults = results.filter(r => r.signal !== "ERROR" && r.price && r.ema50 && r.ema200 && r.rsi);
-
-      if (validResults.length === 0) {
-        document.getElementById("bestOpportunityBox").innerHTML =
-          "<strong>Error:</strong> No se pudo obtener información válida para esta categoría.";
-        alert("No se pudo obtener información válida para esta categoría.");
-        return;
-      }
-
-      const actionable = validResults.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
+      const actionable = results.filter(r => r.signal === "COMPRA" || r.signal === "VENTA");
 
       const best =
         actionable.length > 0
           ? actionable.sort((a, b) => b.confidenceScore - a.confidenceScore)[0]
-          : validResults.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
+          : results.sort((a, b) => b.confidenceScore - a.confidenceScore)[0];
 
       showBestBox(best);
       applyResultToDashboard(best);
