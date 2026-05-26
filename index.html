@@ -50,6 +50,49 @@
       color: #cbd5e1;
     }
 
+
+    .active-signal-time {
+      background: linear-gradient(135deg, #020617, #111827);
+      border: 2px solid #334155;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.18);
+    }
+
+    .active-signal-time h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #cbd5e1;
+      font-size: 20px;
+    }
+
+    .signal-clock {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      line-height: 1.2;
+      color: #facc15;
+      text-shadow: 0 0 18px rgba(250, 204, 21, 0.55);
+    }
+
+    .signal-clock.green {
+      color: #22c55e;
+      text-shadow: 0 0 22px rgba(34, 197, 94, 0.75);
+    }
+
+    .signal-clock.red {
+      color: #ef4444;
+      text-shadow: 0 0 22px rgba(239, 68, 68, 0.75);
+    }
+
+    .signal-clock-sub {
+      margin-top: 8px;
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
     .main-signal {
       background: linear-gradient(135deg, #1e293b, #111827);
       border: 1px solid #334155;
@@ -258,6 +301,28 @@
       margin-top: 8px;
     }
 
+
+    .gmail-alert-panel {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 16px;
+      margin-bottom: 18px;
+    }
+
+    .gmail-alert-panel h3 {
+      margin-top: 0;
+      color: #e2e8f0;
+    }
+
+    .gmail-status {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
     .api-warning {
       color: #facc15;
       font-size: 14px;
@@ -317,6 +382,196 @@
       }
     }
 
+
+    .tv-widget-box {
+      width: 100%;
+      height: 540px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .tv-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      margin-bottom: 8px;
+    }
+
+    .tv-note {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+
+    .language-switch-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #cbd5e1;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    .lang-label {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .lang-label.active {
+      color: #ffffff;
+    }
+
+    .language-switch {
+      position: relative;
+      width: 64px;
+      height: 32px;
+      background: #334155;
+      border-radius: 999px;
+      cursor: pointer;
+      border: 1px solid #475569;
+      transition: all 0.25s ease;
+    }
+
+    .language-switch.english {
+      background: #2563eb;
+    }
+
+    .language-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .language-switch.english .language-knob {
+      left: 35px;
+    }
+
+    .active-signal-pro {
+      background: linear-gradient(135deg, #111827, #020617);
+      border: 2px solid #334155;
+      border-radius: 22px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 26px rgba(15, 23, 42, 0.75);
+    }
+
+    .active-signal-pro.buy {
+      border-color: #22c55e;
+      box-shadow: 0 0 32px rgba(34, 197, 94, 0.35);
+    }
+
+    .active-signal-pro.sell {
+      border-color: #ef4444;
+      box-shadow: 0 0 32px rgba(239, 68, 68, 0.35);
+    }
+
+    .active-signal-title {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .active-signal-main {
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #facc15;
+      text-shadow: 0 0 22px rgba(250, 204, 21, 0.45);
+      margin-bottom: 12px;
+    }
+
+    .active-signal-main.buy {
+      color: #22c55e;
+      text-shadow: 0 0 25px rgba(34, 197, 94, 0.75);
+    }
+
+    .active-signal-main.sell {
+      color: #ef4444;
+      text-shadow: 0 0 25px rgba(239, 68, 68, 0.75);
+    }
+
+    .active-signal-date {
+      font-size: 30px;
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    .active-signal-meta {
+      color: #cbd5e1;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .signal-state {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+      margin-left: 8px;
+      background: #334155;
+      color: white;
+    }
+
+    .signal-state.new {
+      background: #16a34a;
+    }
+
+    .signal-state.active {
+      background: #2563eb;
+    }
+
+    .signal-state.old {
+      background: #ca8a04;
+    }
+
+    .history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .system-status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .status-pill {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .status-pill strong {
+      color: white;
+    }
+
     .footer {
       text-align: center;
       color: #94a3b8;
@@ -368,8 +623,16 @@
         <p>Scanner inteligente con Forex, Crypto, Stocks, EMA, RSI, CHoCH, BOS y alertas.</p>
       </div>
 
-      <div class="badge">
-        Modo actual: <strong>Smart Money Scanner v7</strong>
+      <div class="badge" id="modeBadge">
+        Modo actual: <strong>Smart Money Scanner v10</strong>
+      </div>
+
+      <div class="language-switch-wrap">
+        <span class="lang-label active" id="langEsLabel">Español</span>
+        <div class="language-switch" id="languageSwitch" onclick="toggleLanguage()">
+          <div class="language-knob"></div>
+        </div>
+        <span class="lang-label" id="langEnLabel">English</span>
       </div>
     </div>
 
@@ -396,6 +659,87 @@
       </button>
     </div>
 
+    <div class="active-signal-time" id="activeSignalTimeBox">
+      <h2>Fecha y hora de la señal activa</h2>
+      <div class="signal-clock" id="activeSignalTimeText">Sin señal activa</div>
+      <div class="signal-clock-sub" id="activeSignalTimeSub">
+        Cuando aparezca una COMPRA o VENTA, aquí se mostrará la fecha y hora en grande.
+      </div>
+    </div>
+
+    <div class="active-signal-pro" id="activeSignalProBox">
+      <h2 class="active-signal-title" id="activeSignalProTitle">SEÑAL ACTIVA</h2>
+      <div class="active-signal-main" id="activeSignalMain">ESPERAR</div>
+      <div class="active-signal-date" id="activeSignalDate">Sin señal activa</div>
+      <div class="active-signal-meta" id="activeSignalMeta">
+        Cuando el agente detecte una COMPRA o VENTA fuerte, aquí verás la hora exacta, entrada, SL, TP y estado.
+      </div>
+    </div>
+
+    <div class="section" id="weeklyHistorySection">
+      <h2 id="weeklyHistoryTitle">Historial semanal de señales</h2>
+      <p class="note" id="weeklyHistoryNote">
+        Guarda solo señales nuevas. Reinicio automático cada lunes. Bloquea señales repetidas por 60 minutos.
+      </p>
+
+      <div class="history-actions">
+        <button class="button button-yellow" onclick="copyWeeklyHistory()" id="copyHistoryBtn">Copiar historial</button>
+        <button class="button button-red" onclick="clearWeeklyHistory()" id="clearHistoryBtn">Limpiar historial</button>
+      </div>
+
+      <table>
+        <tr>
+          <th>Fecha / Hora</th>
+          <th>Activo</th>
+          <th>Categoría</th>
+          <th>Señal</th>
+          <th>Confianza</th>
+          <th>Entrada</th>
+          <th>SL</th>
+          <th>TP1</th>
+          <th>TP2</th>
+          <th>Estado</th>
+        </tr>
+        <tbody id="weeklyHistoryBody">
+          <tr><td colspan="10">Sin señales esta semana.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2 id="systemStatusTitle">Estado del sistema</h2>
+      <div class="system-status-grid">
+        <div class="status-pill"><strong>Twelve Data:</strong><br><span id="statusTwelveData">En espera</span></div>
+        <div class="status-pill"><strong>TradingView:</strong><br><span id="statusTradingView">En espera</span></div>
+        <div class="status-pill"><strong>Gmail:</strong><br><span id="statusGmail">Desactivado</span></div>
+        <div class="status-pill"><strong>Última alerta:</strong><br><span id="statusLastAlert">Ninguna</span></div>
+      </div>
+    </div>
+
+
+    <div class="section">
+      <h2>TradingView integrado</h2>
+      <p class="note">
+        Gráfico profesional de TradingView para confirmar visualmente la señal del agente.
+      </p>
+
+      <div class="tv-actions">
+        <button class="button button-purple" onclick="updateTradingViewWidget()">
+          Actualizar TradingView
+        </button>
+
+        <button class="button button-yellow" onclick="openTradingView()">
+          Abrir en TradingView
+        </button>
+      </div>
+
+      <div id="tradingViewWidgetBox" class="tv-widget-box"></div>
+
+      <div class="tv-note" id="tvWidgetStatus">
+        El widget cargará el activo seleccionado.
+      </div>
+    </div>
+
     <div class="section">
       <h2>Panel de análisis automático</h2>
       <p class="note">
@@ -407,6 +751,41 @@
         <input type="password" id="apiKey" placeholder="Pega aquí tu API Key">
         <div class="api-warning">
           Recomendación: pega tu API Key solo cuando uses la página. No la guardes fija en el código público.
+        </div>
+      </div>
+
+      <div class="gmail-alert-panel">
+        <h3>Alertas por Gmail</h3>
+        <p class="note">
+          El agente enviará correo solo cuando salga una nueva COMPRA o VENTA fuerte. No repite la misma señal varias veces.
+        </p>
+
+        <div class="grid">
+          <div class="input-group">
+            <label>Activar Gmail alerts</label>
+            <select id="gmailAlertsEnabled">
+              <option value="no" selected>No</option>
+              <option value="yes">Sí</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Google Apps Script Web App URL</label>
+            <input type="text" id="gmailWebhookUrl" placeholder="Pega aquí tu URL /exec de Apps Script">
+          </div>
+
+          <div class="input-group">
+            <label>Email destino</label>
+            <input type="email" id="gmailRecipient" placeholder="tuemail@gmail.com">
+          </div>
+        </div>
+
+        <button class="button button-green" onclick="sendTestGmailAlert()" id="testGmailBtn">
+          Probar Gmail
+        </button>
+
+        <div class="gmail-status" id="gmailStatus">
+          Gmail alerts en espera. Primero configura Apps Script y pega la URL.
         </div>
       </div>
 
@@ -1219,6 +1598,557 @@
       }
     }
 
+
+
+
+    const ALERT_COOLDOWN_MINUTES = 60;
+    let currentLanguage = localStorage.getItem("marketAiLanguage") || "es";
+
+    const translations = {
+      es: {
+        mode: "Modo actual: Smart Money Scanner v10",
+        activeTitle: "SEÑAL ACTIVA",
+        wait: "ESPERAR",
+        buy: "COMPRA",
+        sell: "VENTA",
+        noSignal: "Sin señal activa",
+        noSignalMeta: "Cuando el agente detecte una COMPRA o VENTA fuerte, aquí verás la hora exacta, entrada, SL, TP y estado.",
+        weeklyTitle: "Historial semanal de señales",
+        weeklyNote: "Guarda solo señales nuevas. Reinicio automático cada lunes. Bloquea señales repetidas por 60 minutos.",
+        copyHistory: "Copiar historial",
+        clearHistory: "Limpiar historial",
+        systemStatus: "Estado del sistema",
+        testGmail: "Probar Gmail",
+        newState: "Nueva",
+        activeState: "Activa",
+        oldState: "Vieja",
+        repeatedBlocked: "Señal repetida bloqueada por 60 minutos.",
+        historyEmpty: "Sin señales esta semana."
+      },
+      en: {
+        mode: "Current mode: Smart Money Scanner v10",
+        activeTitle: "ACTIVE SIGNAL",
+        wait: "WAIT",
+        buy: "BUY",
+        sell: "SELL",
+        noSignal: "No active signal",
+        noSignalMeta: "When the agent detects a strong BUY or SELL, the exact time, entry, SL, TP and status will appear here.",
+        weeklyTitle: "Weekly signal history",
+        weeklyNote: "Stores only new signals. Auto-resets every Monday. Blocks repeated signals for 60 minutes.",
+        copyHistory: "Copy history",
+        clearHistory: "Clear history",
+        systemStatus: "System status",
+        testGmail: "Test Gmail",
+        newState: "New",
+        activeState: "Active",
+        oldState: "Old",
+        repeatedBlocked: "Repeated signal blocked for 60 minutes.",
+        historyEmpty: "No signals this week."
+      }
+    };
+
+    function t(key) {
+      return translations[currentLanguage]?.[key] || translations.es[key] || key;
+    }
+
+    function applyLanguage() {
+      const switchEl = document.getElementById("languageSwitch");
+      const esLabel = document.getElementById("langEsLabel");
+      const enLabel = document.getElementById("langEnLabel");
+
+      if (switchEl) {
+        switchEl.classList.toggle("english", currentLanguage === "en");
+      }
+
+      if (esLabel && enLabel) {
+        esLabel.classList.toggle("active", currentLanguage === "es");
+        enLabel.classList.toggle("active", currentLanguage === "en");
+      }
+
+      const modeBadge = document.getElementById("modeBadge");
+      if (modeBadge) {
+        modeBadge.innerHTML = currentLanguage === "es"
+          ? 'Modo actual: <strong>Smart Money Scanner v10</strong>'
+          : 'Current mode: <strong>Smart Money Scanner v10</strong>';
+      }
+
+      const activeTitle = document.getElementById("activeSignalProTitle");
+      const weeklyTitle = document.getElementById("weeklyHistoryTitle");
+      const weeklyNote = document.getElementById("weeklyHistoryNote");
+      const copyBtn = document.getElementById("copyHistoryBtn");
+      const clearBtn = document.getElementById("clearHistoryBtn");
+      const systemTitle = document.getElementById("systemStatusTitle");
+      const testGmailBtn = document.getElementById("testGmailBtn");
+
+      if (activeTitle) activeTitle.textContent = t("activeTitle");
+      if (weeklyTitle) weeklyTitle.textContent = t("weeklyTitle");
+      if (weeklyNote) weeklyNote.textContent = t("weeklyNote");
+      if (copyBtn) copyBtn.textContent = t("copyHistory");
+      if (clearBtn) clearBtn.textContent = t("clearHistory");
+      if (systemTitle) systemTitle.textContent = t("systemStatus");
+      if (testGmailBtn) testGmailBtn.textContent = t("testGmail");
+
+      renderWeeklyHistory();
+      restoreActiveSignalTime();
+    }
+
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === "es" ? "en" : "es";
+      localStorage.setItem("marketAiLanguage", currentLanguage);
+      applyLanguage();
+    }
+
+    function getWeekKey(date = new Date()) {
+      const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      return d.getUTCFullYear() + "-W" + String(weekNo).padStart(2, "0");
+    }
+
+    function resetWeeklyHistoryIfNeeded() {
+      const currentWeek = getWeekKey(new Date());
+      const savedWeek = localStorage.getItem("marketAiHistoryWeek");
+
+      if (savedWeek !== currentWeek) {
+        localStorage.setItem("marketAiHistoryWeek", currentWeek);
+        localStorage.setItem("marketAiWeeklyHistory", JSON.stringify([]));
+      }
+    }
+
+    function getWeeklyHistory() {
+      resetWeeklyHistoryIfNeeded();
+
+      try {
+        return JSON.parse(localStorage.getItem("marketAiWeeklyHistory") || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveWeeklyHistory(history) {
+      resetWeeklyHistoryIfNeeded();
+      localStorage.setItem("marketAiWeeklyHistory", JSON.stringify(history.slice(0, 50)));
+      renderWeeklyHistory();
+      updateSystemStatus();
+    }
+
+    function getSignalState(timestamp) {
+      const minutes = (Date.now() - new Date(timestamp).getTime()) / 60000;
+
+      if (minutes < 15) return { label: t("newState"), className: "new" };
+      if (minutes <= 90) return { label: t("activeState"), className: "active" };
+      return { label: t("oldState"), className: "old" };
+    }
+
+    function shouldSaveNewSignal(result) {
+      const newKey = buildSignalAlertKey(result);
+      const last = JSON.parse(localStorage.getItem("marketAiLastSavedSignal") || "null");
+
+      if (!last) return { save: true, key: newKey };
+
+      const minutes = (Date.now() - new Date(last.timestamp).getTime()) / 60000;
+
+      const sameDirection = last.symbol === result.symbol && last.signal === result.signal;
+      const sameEntry = String(last.entry) === String(result.entry);
+      const confidenceClose = Math.abs(Number(last.confidenceScore || 0) - Number(result.confidenceScore || 0)) <= 3;
+
+      if (sameDirection && sameEntry && confidenceClose && minutes < ALERT_COOLDOWN_MINUTES) {
+        return { save: false, key: newKey, reason: t("repeatedBlocked") };
+      }
+
+      return { save: true, key: newKey };
+    }
+
+    function saveSignalToWeeklyHistory(result, dateText) {
+      const decision = shouldSaveNewSignal(result);
+
+      if (!decision.save) {
+        const statusLastAlert = document.getElementById("statusLastAlert");
+        if (statusLastAlert) statusLastAlert.textContent = decision.reason;
+        return { saved: false, reason: decision.reason };
+      }
+
+      const timestamp = new Date().toISOString();
+
+      const item = {
+        timestamp,
+        dateText,
+        symbol: result.symbol,
+        category: getCategory(),
+        signal: result.signal,
+        tradeType: result.tradeType,
+        confidenceScore: result.confidenceScore,
+        entry: result.entry,
+        sl: result.sl,
+        tp1: result.tp1,
+        tp2: result.tp2,
+        reason: result.reason,
+        structure: result.structure ? result.structure.label : "Sin estructura",
+        key: decision.key
+      };
+
+      const history = getWeeklyHistory();
+      history.unshift(item);
+      saveWeeklyHistory(history);
+
+      localStorage.setItem("marketAiLastSavedSignal", JSON.stringify(item));
+
+      return { saved: true, item };
+    }
+
+    function renderWeeklyHistory() {
+      const body = document.getElementById("weeklyHistoryBody");
+      if (!body) return;
+
+      const history = getWeeklyHistory();
+
+      if (history.length === 0) {
+        body.innerHTML = '<tr><td colspan="10">' + t("historyEmpty") + '</td></tr>';
+        return;
+      }
+
+      let rows = "";
+
+      history.forEach(item => {
+        const isBuy = item.signal === "COMPRA";
+        const signalClass = isBuy ? "green" : "red";
+        const state = getSignalState(item.timestamp);
+
+        rows += `
+          <tr>
+            <td>${item.dateText}</td>
+            <td>${item.symbol}</td>
+            <td>${item.category}</td>
+            <td class="${signalClass}"><strong>${item.signal}</strong></td>
+            <td>${item.confidenceScore}%</td>
+            <td>${item.entry}</td>
+            <td>${item.sl}</td>
+            <td>${item.tp1}</td>
+            <td>${item.tp2}</td>
+            <td><span class="signal-state ${state.className}">${state.label}</span></td>
+          </tr>
+        `;
+      });
+
+      body.innerHTML = rows;
+    }
+
+    function clearWeeklyHistory() {
+      localStorage.setItem("marketAiWeeklyHistory", JSON.stringify([]));
+      renderWeeklyHistory();
+      updateSystemStatus();
+    }
+
+    function copyWeeklyHistory() {
+      const history = getWeeklyHistory();
+
+      if (history.length === 0) {
+        alert(t("historyEmpty"));
+        return;
+      }
+
+      const text = history.map(item =>
+        `${item.dateText} | ${item.symbol} | ${item.signal} | ${item.confidenceScore}% | Entry ${item.entry} | SL ${item.sl} | TP1 ${item.tp1} | TP2 ${item.tp2}`
+      ).join("\\n");
+
+      navigator.clipboard.writeText(text)
+        .then(() => alert(currentLanguage === "es" ? "Historial copiado." : "History copied."))
+        .catch(() => alert(currentLanguage === "es" ? "No se pudo copiar." : "Could not copy."));
+    }
+
+    function updateActiveSignalPro(result, dateText) {
+      const box = document.getElementById("activeSignalProBox");
+      const main = document.getElementById("activeSignalMain");
+      const date = document.getElementById("activeSignalDate");
+      const meta = document.getElementById("activeSignalMeta");
+
+      if (!box || !main || !date || !meta) return;
+
+      box.classList.remove("buy", "sell");
+      main.classList.remove("buy", "sell");
+
+      if (!(result.signal === "COMPRA" || result.signal === "VENTA")) {
+        main.textContent = t("wait");
+        date.textContent = t("noSignal");
+        meta.textContent = t("noSignalMeta");
+        return;
+      }
+
+      const isBuy = result.signal === "COMPRA";
+      box.classList.add(isBuy ? "buy" : "sell");
+      main.classList.add(isBuy ? "buy" : "sell");
+      main.textContent = isBuy ? t("buy") : t("sell");
+      date.textContent = dateText;
+
+      const state = getSignalState(new Date().toISOString());
+
+      meta.innerHTML =
+        "<strong>" + result.symbol + "</strong>" +
+        " · " + (currentLanguage === "es" ? "Confianza" : "Confidence") + " <strong>" + result.confidenceScore + "%</strong>" +
+        " · " + (currentLanguage === "es" ? "Entrada" : "Entry") + " <strong>" + result.entry + "</strong>" +
+        " · SL <strong>" + result.sl + "</strong>" +
+        " · TP1 <strong>" + result.tp1 + "</strong>" +
+        " · TP2 <strong>" + result.tp2 + "</strong>" +
+        ' <span class="signal-state ' + state.className + '">' + state.label + '</span>';
+    }
+
+    function updateSystemStatus() {
+      const gmailEnabled = document.getElementById("gmailAlertsEnabled")?.value || "no";
+      const statusTwelveData = document.getElementById("statusTwelveData");
+      const statusTradingView = document.getElementById("statusTradingView");
+      const statusGmail = document.getElementById("statusGmail");
+      const statusLastAlert = document.getElementById("statusLastAlert");
+
+      if (statusTwelveData) {
+        statusTwelveData.textContent = currentLanguage === "es" ? "Listo / esperando escaneo" : "Ready / waiting scan";
+      }
+
+      if (statusTradingView) {
+        statusTradingView.textContent = window.TradingView ? "Cargado" : (currentLanguage === "es" ? "En espera" : "Waiting");
+      }
+
+      if (statusGmail) {
+        statusGmail.textContent = gmailEnabled === "yes"
+          ? (currentLanguage === "es" ? "Activado" : "Enabled")
+          : (currentLanguage === "es" ? "Desactivado" : "Disabled");
+      }
+
+      if (statusLastAlert) {
+        const last = JSON.parse(localStorage.getItem("marketAiLastSavedSignal") || "null");
+        statusLastAlert.textContent = last
+          ? `${last.signal} ${last.symbol} · ${last.dateText}`
+          : (currentLanguage === "es" ? "Ninguna" : "None");
+      }
+    }
+
+    async function sendTestGmailAlert() {
+      const result = {
+        symbol: "TEST",
+        signal: "COMPRA",
+        tradeType: currentLanguage === "es" ? "Prueba Gmail" : "Gmail Test",
+        confidenceScore: 99,
+        entry: "0.00",
+        sl: "0.00",
+        tp1: "0.00",
+        tp2: "0.00",
+        reason: currentLanguage === "es" ? "Prueba manual de Gmail desde el agente." : "Manual Gmail test from the agent.",
+        structure: { label: "Test" }
+      };
+
+      await sendGmailAlert(result, formatSignalDateTime(new Date()), true);
+    }
+
+
+    function buildSignalAlertKey(result) {
+      return [
+        result.symbol,
+        result.signal,
+        result.confidenceScore,
+        result.entry,
+        result.sl,
+        result.tp1,
+        result.tp2
+      ].join("|");
+    }
+
+    function getSavedGmailSettings() {
+      return {
+        enabled: localStorage.getItem("gmailAlertsEnabled") || "no",
+        webhookUrl: localStorage.getItem("gmailWebhookUrl") || "",
+        recipient: localStorage.getItem("gmailRecipient") || ""
+      };
+    }
+
+    function saveGmailSettings() {
+      const enabled = document.getElementById("gmailAlertsEnabled")?.value || "no";
+      const webhookUrl = document.getElementById("gmailWebhookUrl")?.value.trim() || "";
+      const recipient = document.getElementById("gmailRecipient")?.value.trim() || "";
+
+      localStorage.setItem("gmailAlertsEnabled", enabled);
+      localStorage.setItem("gmailWebhookUrl", webhookUrl);
+      localStorage.setItem("gmailRecipient", recipient);
+    }
+
+    function restoreGmailSettings() {
+      const settings = getSavedGmailSettings();
+
+      const enabledInput = document.getElementById("gmailAlertsEnabled");
+      const webhookInput = document.getElementById("gmailWebhookUrl");
+      const recipientInput = document.getElementById("gmailRecipient");
+
+      if (enabledInput) enabledInput.value = settings.enabled;
+      if (webhookInput) webhookInput.value = settings.webhookUrl;
+      if (recipientInput) recipientInput.value = settings.recipient;
+
+      if (enabledInput) enabledInput.addEventListener("change", saveGmailSettings);
+      if (webhookInput) webhookInput.addEventListener("input", saveGmailSettings);
+      if (recipientInput) recipientInput.addEventListener("input", saveGmailSettings);
+    }
+
+    async function sendGmailAlert(result, dateText, forceSend = false) {
+      const status = document.getElementById("gmailStatus");
+
+      saveGmailSettings();
+
+      const enabled = document.getElementById("gmailAlertsEnabled")?.value || "no";
+      const webhookUrl = document.getElementById("gmailWebhookUrl")?.value.trim() || "";
+      const recipient = document.getElementById("gmailRecipient")?.value.trim() || "";
+
+      if (enabled !== "yes") {
+        if (status) status.textContent = "Gmail alerts desactivado.";
+        return;
+      }
+
+      if (!webhookUrl || !recipient) {
+        if (status) {
+          status.textContent = "Falta URL de Apps Script o email destino. No se envió Gmail.";
+        }
+        return;
+      }
+
+      const alertKey = buildSignalAlertKey(result);
+      const lastEmailKey = localStorage.getItem("marketAiLastGmailAlertKey") || "";
+
+      if (!forceSend && alertKey === lastEmailKey) {
+        if (status) {
+          status.textContent = currentLanguage === "es"
+            ? "No se envió Gmail porque es la misma señal repetida."
+            : "Gmail not sent because it is the same repeated signal.";
+        }
+        return;
+      }
+
+      const payload = {
+        recipient: recipient,
+        symbol: result.symbol,
+        signal: result.signal,
+        tradeType: result.tradeType,
+        confidenceScore: result.confidenceScore,
+        entry: result.entry,
+        sl: result.sl,
+        tp1: result.tp1,
+        tp2: result.tp2,
+        reason: result.reason,
+        structure: result.structure ? result.structure.label : "Sin estructura",
+        category: getCategory(),
+        interval: document.getElementById("inputInterval")?.value || "Smart Scanner",
+        dateText: dateText || formatSignalDateTime(new Date()),
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        if (status) status.textContent = "Enviando alerta a Gmail...";
+
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        localStorage.setItem("marketAiLastGmailAlertKey", alertKey);
+
+        if (status) {
+          status.textContent =
+            "Gmail enviado o solicitado: " +
+            payload.signal +
+            " " +
+            payload.symbol +
+            " · " +
+            payload.dateText;
+        }
+      } catch (error) {
+        console.log("Error Gmail alert:", error);
+
+        if (status) {
+          status.textContent = "No se pudo enviar Gmail. Revisa la URL de Apps Script.";
+        }
+      }
+    }
+
+
+    function formatSignalDateTime(date = new Date()) {
+      return date.toLocaleString("es-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      });
+    }
+
+    function updateActiveSignalTime(result) {
+      const timeText = document.getElementById("activeSignalTimeText");
+      const timeSub = document.getElementById("activeSignalTimeSub");
+
+      if (!timeText || !timeSub) return;
+
+      const isSignal = result.signal === "COMPRA" || result.signal === "VENTA";
+
+      if (!isSignal) {
+        timeText.textContent = t("noSignal");
+        timeText.className = "signal-clock";
+        timeSub.textContent = currentLanguage === "es" ? "El agente recomienda esperar. No hay compra o venta activa." : "The agent recommends waiting. No active buy or sell.";
+        updateActiveSignalPro(result, t("noSignal"));
+        return;
+      }
+
+      const now = new Date();
+      const dateText = formatSignalDateTime(now);
+
+      timeText.textContent = dateText;
+      timeText.className = result.signal === "COMPRA" ? "signal-clock green" : "signal-clock red";
+      updateActiveSignalPro(result, dateText);
+
+      timeSub.innerHTML =
+        "<strong>" + result.signal + "</strong> activa en " +
+        "<strong>" + result.symbol + "</strong>" +
+        " · Confianza <strong>" + result.confidenceScore + "%</strong>" +
+        " · Entrada <strong>" + result.entry + "</strong>";
+
+      localStorage.setItem("marketAiLastSignalTime", JSON.stringify({
+        symbol: result.symbol,
+        signal: result.signal,
+        tradeType: result.tradeType,
+        confidenceScore: result.confidenceScore,
+        entry: result.entry,
+        dateText: dateText,
+        timestamp: now.toISOString()
+      }));
+    }
+
+    function restoreActiveSignalTime() {
+      const timeText = document.getElementById("activeSignalTimeText");
+      const timeSub = document.getElementById("activeSignalTimeSub");
+
+      if (!timeText || !timeSub) return;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem("marketAiLastSignalTime") || "null");
+
+        if (!saved) return;
+
+        timeText.textContent = saved.dateText || "Señal guardada";
+        timeText.className = saved.signal === "COMPRA" ? "signal-clock green" : "signal-clock red";
+
+        timeSub.innerHTML =
+          "<strong>" + saved.signal + "</strong> guardada en " +
+          "<strong>" + saved.symbol + "</strong>" +
+          " · Confianza <strong>" + saved.confidenceScore + "%</strong>" +
+          " · Entrada <strong>" + saved.entry + "</strong>";
+      } catch (error) {
+        console.log("No se pudo restaurar la hora de señal:", error);
+      }
+    }
+
+
     function checkStrongAlert(result) {
       const alertBox = document.getElementById("strongAlertBox");
       const alertText = document.getElementById("strongAlertText");
@@ -1260,8 +2190,20 @@
       `;
 
       if (alertKey !== lastStrongAlertKey) {
+        const dateText = formatSignalDateTime(new Date());
+        const saveResult = saveSignalToWeeklyHistory(result, dateText);
+
+        if (!saveResult.saved) {
+          const gmailStatus = document.getElementById("gmailStatus");
+          if (gmailStatus) gmailStatus.textContent = saveResult.reason;
+          return;
+        }
+
         lastStrongAlertKey = alertKey;
         playPageAlertSound();
+        sendGmailAlert(result, dateText);
+        updateActiveSignalPro(result, dateText);
+        updateSystemStatus();
 
         alert(
           "🚨 Señal fuerte detectada\n\n" +
@@ -1370,6 +2312,7 @@
 
       confidence = result.confidenceScore;
       updateGauge(confidence);
+      updateActiveSignalTime(result);
       checkStrongAlert(result);
     }
 
@@ -1594,6 +2537,103 @@
         encodeURIComponent(tvInterval);
 
       window.open(url, "_blank");
+    }
+
+
+
+    function clearTradingViewWidget() {
+      const box = document.getElementById("tradingViewWidgetBox");
+      if (!box) return;
+      box.innerHTML = "";
+    }
+
+    function updateTradingViewWidget() {
+      const box = document.getElementById("tradingViewWidgetBox");
+      const status = document.getElementById("tvWidgetStatus");
+
+      if (!box) return;
+
+      const symbol = getSelectedSymbol();
+      const tvSymbol = getTradingViewSymbol(symbol);
+      const tvInterval = getTradingViewInterval();
+
+      clearTradingViewWidget();
+
+      const widgetId = "tv_widget_" + Date.now();
+
+      const widgetContainer = document.createElement("div");
+      widgetContainer.className = "tradingview-widget-container";
+      widgetContainer.style.height = "100%";
+      widgetContainer.style.width = "100%";
+
+      const widgetDiv = document.createElement("div");
+      widgetDiv.id = widgetId;
+      widgetDiv.style.height = "100%";
+      widgetDiv.style.width = "100%";
+
+      widgetContainer.appendChild(widgetDiv);
+      box.appendChild(widgetContainer);
+
+      function createWidget() {
+        if (!window.TradingView) {
+          if (status) {
+            status.textContent = "No se pudo cargar TradingView todavía. Presiona Actualizar TradingView otra vez.";
+          }
+          return;
+        }
+
+        new TradingView.widget({
+          autosize: true,
+          symbol: tvSymbol,
+          interval: tvInterval,
+          timezone: "America/Los_Angeles",
+          theme: "dark",
+          style: "1",
+          locale: "en",
+          enable_publishing: false,
+          hide_top_toolbar: false,
+          hide_side_toolbar: false,
+          allow_symbol_change: true,
+          save_image: true,
+          calendar: false,
+          studies: [
+            "RSI@tv-basicstudies",
+            "MASimple@tv-basicstudies"
+          ],
+          container_id: widgetId,
+          support_host: "https://www.tradingview.com"
+        });
+
+        if (status) {
+          status.textContent =
+            "TradingView actualizado: " +
+            tvSymbol +
+            " · Intervalo " +
+            tvInterval +
+            ".";
+        }
+      }
+
+      if (window.TradingView) {
+        createWidget();
+      } else {
+        const existingScript = document.querySelector('script[src="https://s3.tradingview.com/tv.js"]');
+
+        if (existingScript) {
+          existingScript.addEventListener("load", createWidget);
+          setTimeout(createWidget, 1200);
+        } else {
+          const script = document.createElement("script");
+          script.src = "https://s3.tradingview.com/tv.js";
+          script.onload = createWidget;
+          script.onerror = function() {
+            if (status) {
+              status.textContent = "Error cargando TradingView. Revisa conexión o bloqueador del navegador.";
+            }
+          };
+          document.body.appendChild(script);
+        }
+      }
     }
 
 
@@ -1942,6 +2982,12 @@
 
     actualizarListaActivos();
     updateGauge(confidence);
+    restoreActiveSignalTime();
+    restoreGmailSettings();
+    applyLanguage();
+    renderWeeklyHistory();
+    updateSystemStatus();
+    setTimeout(updateTradingViewWidget, 800);
   </script>
 </body>
 </html>
