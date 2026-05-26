@@ -301,28 +301,6 @@
       margin-top: 8px;
     }
 
-
-    .gmail-alert-panel {
-      background: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 18px;
-      margin-top: 16px;
-      margin-bottom: 18px;
-    }
-
-    .gmail-alert-panel h3 {
-      margin-top: 0;
-      color: #e2e8f0;
-    }
-
-    .gmail-status {
-      color: #94a3b8;
-      font-size: 14px;
-      margin-top: 10px;
-      line-height: 1.5;
-    }
-
     .api-warning {
       color: #facc15;
       font-size: 14px;
@@ -573,10 +551,18 @@
     }
 
     .footer {
-      text-align: center;
+      text-align: left;
       color: #94a3b8;
-      font-size: 14px;
+      font-size: 12px;
       margin-top: 30px;
+    }
+
+    .version-credit {
+      color: #475569;
+      font-size: 9px;
+      text-align: left;
+      margin-top: 8px;
+      letter-spacing: 0.2px;
     }
 
     @media (max-width: 600px) {
@@ -622,11 +608,6 @@
         <h1>Market AI Agent</h1>
         <p>Scanner inteligente con Forex, Crypto, Stocks, EMA, RSI, CHoCH, BOS y alertas.</p>
       </div>
-
-      <div class="badge" id="modeBadge">
-        Modo actual: <strong>Smart Money Scanner v10</strong>
-      </div>
-
       <div class="language-switch-wrap">
         <span class="lang-label active" id="langEsLabel">Español</span>
         <div class="language-switch" id="languageSwitch" onclick="toggleLanguage()">
@@ -711,7 +692,6 @@
       <div class="system-status-grid">
         <div class="status-pill"><strong>Twelve Data:</strong><br><span id="statusTwelveData">En espera</span></div>
         <div class="status-pill"><strong>TradingView:</strong><br><span id="statusTradingView">En espera</span></div>
-        <div class="status-pill"><strong>Gmail:</strong><br><span id="statusGmail">Desactivado</span></div>
         <div class="status-pill"><strong>Última alerta:</strong><br><span id="statusLastAlert">Ninguna</span></div>
       </div>
     </div>
@@ -751,41 +731,6 @@
         <input type="password" id="apiKey" placeholder="Pega aquí tu API Key">
         <div class="api-warning">
           Recomendación: pega tu API Key solo cuando uses la página. No la guardes fija en el código público.
-        </div>
-      </div>
-
-      <div class="gmail-alert-panel">
-        <h3>Alertas por Gmail</h3>
-        <p class="note">
-          El agente enviará correo solo cuando salga una nueva COMPRA o VENTA fuerte. No repite la misma señal varias veces.
-        </p>
-
-        <div class="grid">
-          <div class="input-group">
-            <label>Activar Gmail alerts</label>
-            <select id="gmailAlertsEnabled">
-              <option value="no" selected>No</option>
-              <option value="yes">Sí</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label>Google Apps Script Web App URL</label>
-            <input type="text" id="gmailWebhookUrl" placeholder="Pega aquí tu URL /exec de Apps Script">
-          </div>
-
-          <div class="input-group">
-            <label>Email destino</label>
-            <input type="email" id="gmailRecipient" placeholder="tuemail@gmail.com">
-          </div>
-        </div>
-
-        <button class="button button-green" onclick="sendTestGmailAlert()" id="testGmailBtn">
-          Probar Gmail
-        </button>
-
-        <div class="gmail-status" id="gmailStatus">
-          Gmail alerts en espera. Primero configura Apps Script y pega la URL.
         </div>
       </div>
 
@@ -1046,7 +991,8 @@
     </div>
 
     <div class="footer">
-      Market AI Agent · Smart Money Scanner v7 · Forex · Crypto · Stocks
+      <div>Market AI Agent · Forex · Crypto · Stocks</div>
+      <div class="version-credit">Smart Money Scanner v10</div>
     </div>
 
   </div>
@@ -1651,6 +1597,154 @@
       return translations[currentLanguage]?.[key] || translations.es[key] || key;
     }
 
+    function trText(es, en) {
+      return currentLanguage === "es" ? es : en;
+    }
+
+    function displaySignal(signal) {
+      if (currentLanguage === "en") {
+        if (signal === "COMPRA") return "BUY";
+        if (signal === "VENTA") return "SELL";
+        if (signal === "ESPERAR") return "WAIT";
+      }
+      return signal;
+    }
+
+    function displayTradeType(type) {
+      if (currentLanguage === "en") {
+        if (type === "Compra / Long") return "Buy / Long";
+        if (type === "Venta / Short") return "Sell / Short";
+        if (type === "Esperar") return "Wait";
+        if (type === "Error") return "Error";
+      }
+      return type;
+    }
+
+    function translateElementsByText(selector, dictionary) {
+      document.querySelectorAll(selector).forEach(el => {
+        const current = el.textContent.trim();
+        const entry = dictionary.find(item => item.es === current || item.en === current);
+        if (entry) el.textContent = currentLanguage === "es" ? entry.es : entry.en;
+      });
+    }
+
+    function translateStaticUI() {
+      const titleP = document.querySelector(".title p");
+      if (titleP) titleP.textContent = trText(
+        "Scanner inteligente con Forex, Crypto, Stocks, EMA, RSI, CHoCH, BOS y alertas.",
+        "Smart scanner with Forex, Crypto, Stocks, EMA, RSI, CHoCH, BOS and alerts."
+      );
+
+      translateElementsByText("h2", [
+        { es: "🚨 Alerta fuerte detectada", en: "🚨 Strong alert detected" },
+        { es: "Mejor señal actual", en: "Current best signal" },
+        { es: "Fecha y hora de la señal activa", en: "Active signal date and time" },
+        { es: "SEÑAL ACTIVA", en: "ACTIVE SIGNAL" },
+        { es: "Historial semanal de señales", en: "Weekly signal history" },
+        { es: "Estado del sistema", en: "System status" },
+        { es: "TradingView integrado", en: "Integrated TradingView" },
+        { es: "Panel de análisis automático", en: "Automatic analysis panel" },
+        { es: "Scanner de oportunidades", en: "Opportunity scanner" },
+        { es: "Confirmación multi-timeframe", en: "Multi-timeframe confirmation" },
+        { es: "Lectura técnica", en: "Technical reading" },
+        { es: "Zona de operación", en: "Trade zone" },
+        { es: "Motivo del análisis", en: "Analysis reason" },
+        { es: "Historial de señales", en: "Signal history" }
+      ]);
+
+      translateElementsByText("h3", [
+        { es: "Activo actual", en: "Current asset" },
+        { es: "Precio actual", en: "Current price" },
+        { es: "Tendencia", en: "Trend" },
+        { es: "Confianza", en: "Confidence" }
+      ]);
+
+      translateElementsByText("label", [
+        { es: "API Key de Twelve Data", en: "Twelve Data API Key" },
+        { es: "Categoría", en: "Category" },
+        { es: "Activo a analizar", en: "Asset to analyze" },
+        { es: "Temporalidad simple", en: "Simple timeframe" },
+        { es: "Velas a descargar", en: "Candles to download" },
+        { es: "Precio actual", en: "Current price" },
+        { es: "Soporte", en: "Support" },
+        { es: "Resistencia", en: "Resistance" }
+      ]);
+
+      translateElementsByText("button", [
+        { es: "Ocultar alerta", en: "Hide alert" },
+        { es: "Abrir gráfico en TradingView", en: "Open chart in TradingView" },
+        { es: "Copiar historial", en: "Copy history" },
+        { es: "Limpiar historial", en: "Clear history" },
+        { es: "Actualizar TradingView", en: "Update TradingView" },
+        { es: "Abrir en TradingView", en: "Open in TradingView" },
+        { es: "Smart Scanner multi-timeframe", en: "Smart multi-timeframe scanner" },
+        { es: "Escanear categoría simple", en: "Scan simple category" },
+        { es: "Obtener indicadores del activo", en: "Get asset indicators" },
+        { es: "Obtener solo precio real", en: "Get real price only" },
+        { es: "Analizar activo seleccionado", en: "Analyze selected asset" }
+      ]);
+
+      translateElementsByText("th", [
+        { es: "Fecha / Hora", en: "Date / Time" },
+        { es: "Activo", en: "Asset" },
+        { es: "Categoría", en: "Category" },
+        { es: "Señal", en: "Signal" },
+        { es: "Confianza", en: "Confidence" },
+        { es: "Entrada", en: "Entry" },
+        { es: "Estado", en: "Status" },
+        { es: "Precio", en: "Price" },
+        { es: "Estructura", en: "Structure" },
+        { es: "Tendencia", en: "Trend" },
+        { es: "Señal base", en: "Base signal" },
+        { es: "Confianza base", en: "Base confidence" },
+        { es: "Marco", en: "Frame" },
+        { es: "Lectura", en: "Reading" },
+        { es: "Resultado", en: "Result" }
+      ]);
+
+      document.querySelectorAll(".note").forEach(el => {
+        const text = el.textContent.trim();
+        if (text.includes("Usa el Smart Scanner")) {
+          el.textContent = trText(
+            "Usa el Smart Scanner para analizar Forex, Crypto o Stocks con confirmación multi-timeframe.",
+            "Use the Smart Scanner to analyze Forex, Crypto or Stocks with multi-timeframe confirmation."
+          );
+        } else if (text.includes("Gráfico profesional")) {
+          el.textContent = trText(
+            "Gráfico profesional de TradingView para confirmar visualmente la señal del agente.",
+            "Professional TradingView chart to visually confirm the agent signal."
+          );
+        } else if (text.includes("Puedes analizar")) {
+          el.textContent = trText(
+            "Puedes analizar un activo individual, escanear una categoría o usar el Smart Scanner con CHoCH/BOS.",
+            "Analyze one asset, scan a category, or use the Smart Scanner with CHoCH/BOS."
+          );
+        } else if (text.includes("El scanner ordena")) {
+          el.textContent = trText(
+            "El scanner ordena los activos por confianza. El Smart Scanner filtra en H1 y confirma el Top 3 con M15, M30, H1 y H4.",
+            "The scanner ranks assets by confidence. The Smart Scanner filters on H1 and confirms the Top 3 with M15, M30, H1 and H4."
+          );
+        } else if (text.includes("Lectura M15")) {
+          el.textContent = trText(
+            "Lectura M15, M30, H1 y H4 del mejor activo detectado.",
+            "M15, M30, H1 and H4 reading of the best detected asset."
+          );
+        }
+      });
+
+      const apiWarning = document.querySelector(".api-warning");
+      if (apiWarning) {
+        apiWarning.textContent = trText(
+          "Recomendación: pega tu API Key solo cuando uses la página. No la guardes fija en el código público.",
+          "Recommendation: paste your API Key only when using the page. Do not hard-code it in public code."
+        );
+      }
+
+      const footer = document.querySelector(".footer > div:first-child");
+      if (footer) footer.textContent = "Market AI Agent · Forex · Crypto · Stocks";
+    }
+
+
     function applyLanguage() {
       const switchEl = document.getElementById("languageSwitch");
       const esLabel = document.getElementById("langEsLabel");
@@ -1665,20 +1759,12 @@
         enLabel.classList.toggle("active", currentLanguage === "en");
       }
 
-      const modeBadge = document.getElementById("modeBadge");
-      if (modeBadge) {
-        modeBadge.innerHTML = currentLanguage === "es"
-          ? 'Modo actual: <strong>Smart Money Scanner v10</strong>'
-          : 'Current mode: <strong>Smart Money Scanner v10</strong>';
-      }
-
       const activeTitle = document.getElementById("activeSignalProTitle");
       const weeklyTitle = document.getElementById("weeklyHistoryTitle");
       const weeklyNote = document.getElementById("weeklyHistoryNote");
       const copyBtn = document.getElementById("copyHistoryBtn");
       const clearBtn = document.getElementById("clearHistoryBtn");
       const systemTitle = document.getElementById("systemStatusTitle");
-      const testGmailBtn = document.getElementById("testGmailBtn");
 
       if (activeTitle) activeTitle.textContent = t("activeTitle");
       if (weeklyTitle) weeklyTitle.textContent = t("weeklyTitle");
@@ -1686,8 +1772,8 @@
       if (copyBtn) copyBtn.textContent = t("copyHistory");
       if (clearBtn) clearBtn.textContent = t("clearHistory");
       if (systemTitle) systemTitle.textContent = t("systemStatus");
-      if (testGmailBtn) testGmailBtn.textContent = t("testGmail");
 
+      translateStaticUI();
       renderWeeklyHistory();
       restoreActiveSignalTime();
     }
@@ -1821,7 +1907,7 @@
             <td>${item.dateText}</td>
             <td>${item.symbol}</td>
             <td>${item.category}</td>
-            <td class="${signalClass}"><strong>${item.signal}</strong></td>
+            <td class="${signalClass}"><strong>${displaySignal(item.signal)}</strong></td>
             <td>${item.confidenceScore}%</td>
             <td>${item.entry}</td>
             <td>${item.sl}</td>
@@ -1895,10 +1981,8 @@
     }
 
     function updateSystemStatus() {
-      const gmailEnabled = document.getElementById("gmailAlertsEnabled")?.value || "no";
       const statusTwelveData = document.getElementById("statusTwelveData");
       const statusTradingView = document.getElementById("statusTradingView");
-      const statusGmail = document.getElementById("statusGmail");
       const statusLastAlert = document.getElementById("statusLastAlert");
 
       if (statusTwelveData) {
@@ -1907,12 +1991,6 @@
 
       if (statusTradingView) {
         statusTradingView.textContent = window.TradingView ? "Cargado" : (currentLanguage === "es" ? "En espera" : "Waiting");
-      }
-
-      if (statusGmail) {
-        statusGmail.textContent = gmailEnabled === "yes"
-          ? (currentLanguage === "es" ? "Activado" : "Enabled")
-          : (currentLanguage === "es" ? "Desactivado" : "Disabled");
       }
 
       if (statusLastAlert) {
@@ -2110,8 +2188,8 @@
       timeSub.innerHTML =
         "<strong>" + result.signal + "</strong> activa en " +
         "<strong>" + result.symbol + "</strong>" +
-        " · Confianza <strong>" + result.confidenceScore + "%</strong>" +
-        " · Entrada <strong>" + result.entry + "</strong>";
+        " · " + (currentLanguage === "es" ? "Confianza" : "Confidence") + " <strong>" + result.confidenceScore + "%</strong>" +
+        " · " + (currentLanguage === "es" ? "Entrada" : "Entry") + " <strong>" + result.entry + "</strong>";
 
       localStorage.setItem("marketAiLastSignalTime", JSON.stringify({
         symbol: result.symbol,
@@ -2178,15 +2256,15 @@
       }
 
       alertText.innerHTML = `
-        <strong>Activo:</strong> ${result.symbol}<br>
-        <strong>Señal:</strong> ${result.tradeType}<br>
-        <strong>Confianza:</strong> ${result.confidenceScore}%<br>
-        <strong>Entrada:</strong> ${result.entry}<br>
+        <strong>${currentLanguage === "es" ? "Activo" : "Asset"}:</strong> ${result.symbol}<br>
+        <strong>${currentLanguage === "es" ? "Señal" : "Signal"}:</strong> ${displayTradeType(result.tradeType)}<br>
+        <strong>${currentLanguage === "es" ? "Confianza" : "Confidence"}:</strong> ${result.confidenceScore}%<br>
+        <strong>${currentLanguage === "es" ? "Entrada" : "Entry"}:</strong> ${result.entry}<br>
         <strong>Stop Loss:</strong> ${result.sl}<br>
         <strong>Take Profit 1:</strong> ${result.tp1}<br>
         <strong>Take Profit 2:</strong> ${result.tp2}<br><br>
-        <strong>Estructura:</strong> ${result.structure ? result.structure.label : "Sin estructura"}<br>
-        <strong>Motivo:</strong> ${result.reason}
+        <strong>${currentLanguage === "es" ? "Estructura" : "Structure"}:</strong> ${result.structure ? result.structure.label : (currentLanguage === "es" ? "Sin estructura" : "No structure")}<br>
+        <strong>${currentLanguage === "es" ? "Motivo" : "Reason"}:</strong> ${result.reason}
       `;
 
       if (alertKey !== lastStrongAlertKey) {
@@ -2194,14 +2272,13 @@
         const saveResult = saveSignalToWeeklyHistory(result, dateText);
 
         if (!saveResult.saved) {
-          const gmailStatus = document.getElementById("gmailStatus");
-          if (gmailStatus) gmailStatus.textContent = saveResult.reason;
+          const statusLastAlert = document.getElementById("statusLastAlert");
+          if (statusLastAlert) statusLastAlert.textContent = saveResult.reason;
           return;
         }
 
         lastStrongAlertKey = alertKey;
         playPageAlertSound();
-        sendGmailAlert(result, dateText);
         updateActiveSignalPro(result, dateText);
         updateSystemStatus();
 
@@ -2248,7 +2325,7 @@
         structureElement.className = "value yellow";
       }
 
-      document.getElementById("signalText").textContent = result.signal;
+      document.getElementById("signalText").textContent = displaySignal(result.signal);
       document.getElementById("signalText").style.color = result.signalColor;
 
       document.getElementById("signalNote").textContent =
@@ -2288,7 +2365,7 @@
       document.getElementById("h4State").className = "yellow";
       document.getElementById("h4Read").textContent = "Contexto usado dentro del Smart Scanner.";
 
-      document.getElementById("tradeType").textContent = result.tradeType;
+      document.getElementById("tradeType").textContent = displayTradeType(result.tradeType);
       document.getElementById("entryZone").textContent = result.entry;
       document.getElementById("stopLoss").textContent = result.sl;
       document.getElementById("takeProfit1").textContent = result.tp1;
@@ -2303,7 +2380,7 @@
 
       const historySignal = document.getElementById("historySignal");
 
-      historySignal.textContent = result.tradeType;
+      historySignal.textContent = displayTradeType(result.tradeType);
       historySignal.className =
         result.signal === "COMPRA" ? "green" :
         result.signal === "VENTA" ? "red" : "yellow";
@@ -2336,7 +2413,7 @@
             <td class="${r.trendClass}">${r.trend}</td>
             <td>${r.rsi.toFixed(1)}</td>
             <td class="${structureClass}">${structureText}</td>
-            <td class="${signalClass}">${r.tradeType}</td>
+            <td class="${signalClass}">${displayTradeType(r.tradeType)}</td>
             <td>${r.confidenceScore}%</td>
           </tr>
         `;
@@ -2841,7 +2918,7 @@
           <tr>
             <td>${index + 1}</td>
             <td>${r.symbol}</td>
-            <td class="${signalClass}">${r.tradeType}</td>
+            <td class="${signalClass}">${displayTradeType(r.tradeType)}</td>
             <td>${r.confidenceScore}%</td>
             <td>${priceText}</td>
             <td>${rsiText}</td>
@@ -2983,7 +3060,6 @@
     actualizarListaActivos();
     updateGauge(confidence);
     restoreActiveSignalTime();
-    restoreGmailSettings();
     applyLanguage();
     renderWeeklyHistory();
     updateSystemStatus();
