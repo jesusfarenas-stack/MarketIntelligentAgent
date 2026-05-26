@@ -903,7 +903,7 @@
         <div id="quickWatchlist"></div>
 
         <div class="quick-actions">
-          <button class="button button-blue" onclick="smartConfluenceScanner()">Smart Scanner</button>
+          <button class="button button-blue" onclick="escanearOportunidades()">Escanear categoría simple</button>
           <button class="button button-purple" onclick="updateTradingViewWidget()">Actualizar TradingView</button>
           <button class="button button-yellow" onclick="openTradingView()">Abrir en TradingView</button>
         </div>
@@ -1231,9 +1231,9 @@
           <td id="h1Read">Pendiente de analizar EMA 50, EMA 200, RSI y estructura.</td>
         </tr>
         <tr>
-          <td>Contexto</td>
+          <td>Decisión</td>
           <td class="yellow" id="h4State">Referencia</td>
-          <td id="h4Read">El Smart Scanner usa H4 como contexto mayor.</td>
+          <td id="h4Read">Esperar confirmación antes de entrar.</td>
         </tr>
       </table>
     </div>
@@ -2191,8 +2191,22 @@
         { es: "Señal base", en: "Base signal" },
         { es: "Confianza base", en: "Base confidence" },
         { es: "Marco", en: "Frame" },
+        { es: "Decisión", en: "Decision" },
         { es: "Lectura", en: "Reading" },
         { es: "Resultado", en: "Result" }
+      ]);
+
+
+      translateElementsByText("td", [
+        { es: "Entrada", en: "Entry" },
+        { es: "Confirmación", en: "Confirmation" },
+        { es: "Tendencia", en: "Trend" },
+        { es: "Decisión", en: "Decision" },
+        { es: "Esperar", en: "Wait" },
+        { es: "Zona activa", en: "Active zone" },
+        { es: "Alcista", en: "Bullish" },
+        { es: "Bajista", en: "Bearish" },
+        { es: "Lateral / Mixta", en: "Sideways / Mixed" }
       ]);
 
       document.querySelectorAll(".note").forEach(el => {
@@ -2919,9 +2933,27 @@
           ? "Precio y EMA 50 arriba de EMA 200."
           : "Estructura mixta o lateral.";
 
-      document.getElementById("h4State").textContent = "Contexto";
-      document.getElementById("h4State").className = "yellow";
-      document.getElementById("h4Read").textContent = "Contexto usado dentro del Smart Scanner.";
+      document.getElementById("h4State").textContent =
+        result.signal === "COMPRA"
+          ? (currentLanguage === "es" ? "Entrar en compra" : "Enter buy")
+          : result.signal === "VENTA"
+          ? (currentLanguage === "es" ? "Entrar en venta" : "Enter sell")
+          : (currentLanguage === "es" ? "Esperar" : "Wait");
+      document.getElementById("h4State").className =
+        result.signal === "COMPRA" ? "green" :
+        result.signal === "VENTA" ? "red" : "yellow";
+      document.getElementById("h4Read").textContent =
+        result.signal === "COMPRA"
+          ? (currentLanguage === "es"
+              ? "Condiciones alineadas para posible compra. Confirmar vela y riesgo antes de entrar."
+              : "Conditions aligned for a possible buy. Confirm candle and risk before entering.")
+          : result.signal === "VENTA"
+          ? (currentLanguage === "es"
+              ? "Condiciones alineadas para posible venta. Confirmar vela y riesgo antes de entrar."
+              : "Conditions aligned for a possible sell. Confirm candle and risk before entering.")
+          : (currentLanguage === "es"
+              ? "No hay señal suficientemente clara. Mejor esperar fuera del mercado."
+              : "No clear enough signal. Better to wait out of the market.");
 
       document.getElementById("tradeType").textContent = displayTradeType(result.tradeType);
       document.getElementById("entryZone").textContent = result.entry;
