@@ -628,6 +628,191 @@
       display: none;
     }
 
+
+    .pro-terminal-layout {
+      display: grid;
+      grid-template-columns: 280px minmax(520px, 1fr) 330px;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 24px;
+    }
+
+    .terminal-panel {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 18px;
+      min-height: 220px;
+    }
+
+    .terminal-panel h2,
+    .terminal-panel h3 {
+      margin-top: 0;
+    }
+
+    .watchlist-item {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .watchlist-item:hover {
+      border-color: #38bdf8;
+      transform: translateY(-1px);
+    }
+
+    .watchlist-item.active {
+      border-color: #22c55e;
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.22);
+    }
+
+    .watchlist-symbol {
+      font-weight: 900;
+      font-size: 16px;
+      color: white;
+    }
+
+    .watchlist-meta {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .quick-actions .button {
+      width: 100%;
+      margin: 0;
+      padding: 11px 12px;
+      font-size: 13px;
+    }
+
+    .terminal-tv {
+      min-height: 780px;
+    }
+
+    .terminal-tv .tv-widget-box {
+      height: 720px !important;
+      margin-top: 8px;
+    }
+
+    .signal-side-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .signal-side-main {
+      font-size: 34px;
+      font-weight: 900;
+      margin: 8px 0;
+      color: #facc15;
+    }
+
+    .signal-side-main.buy {
+      color: #22c55e;
+      text-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    }
+
+    .signal-side-main.sell {
+      color: #ef4444;
+      text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+    }
+
+    .rr-box {
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+      line-height: 1.7;
+    }
+
+    .rr-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: #38bdf8;
+    }
+
+    .score-breakdown {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .score-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 9px 11px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+
+    .score-row strong {
+      color: white;
+    }
+
+    .pro-filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .mini-pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #334155;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .mini-pill.green {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+    }
+
+    .mini-pill.red {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+
+    .mini-pill.yellow {
+      background: rgba(250, 204, 21, 0.18);
+      color: #fde68a;
+    }
+
+    @media (max-width: 1100px) {
+      .pro-terminal-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .terminal-tv {
+        min-height: 620px;
+      }
+
+      .terminal-tv .tv-widget-box {
+        height: 560px !important;
+      }
+    }
+
     .footer {
       text-align: left;
       color: #94a3b8;
@@ -710,6 +895,55 @@
       </div>
     </div>
 
+
+    <div class="pro-terminal-layout" id="proTerminalLayout">
+      <div class="terminal-panel">
+        <h2 id="watchlistTitle">Watchlist</h2>
+        <p class="note" id="watchlistNote">Selecciona un activo rápido o escanea la categoría.</p>
+        <div id="quickWatchlist"></div>
+
+        <div class="quick-actions">
+          <button class="button button-blue" onclick="smartConfluenceScanner()">Smart Scanner</button>
+          <button class="button button-purple" onclick="updateTradingViewWidget()">Actualizar TradingView</button>
+          <button class="button button-yellow" onclick="openTradingView()">Abrir en TradingView</button>
+        </div>
+      </div>
+
+      <div class="terminal-panel terminal-tv">
+        <h2 id="terminalChartTitle">TradingView principal</h2>
+        <div id="tradingViewWidgetBox" class="tv-widget-box"></div>
+        <div class="tv-note" id="tvWidgetStatus">El widget cargará el activo seleccionado.</div>
+      </div>
+
+      <div class="terminal-panel">
+        <h2 id="sideSignalTitle">Señal activa</h2>
+
+        <div class="signal-side-card">
+          <div class="mini-pill yellow" id="sideSignalState">WAIT</div>
+          <div class="signal-side-main" id="sideSignalMain">ESPERAR</div>
+          <div class="note" id="sideSignalMeta">Sin señal activa.</div>
+        </div>
+
+        <div class="signal-side-card">
+          <h3 id="rrTitle">Risk / Reward</h3>
+          <div class="rr-box">
+            <div id="rrText">Pendiente</div>
+            <div class="rr-value" id="rrValue">--</div>
+          </div>
+        </div>
+
+        <div class="signal-side-card">
+          <h3 id="scoreTitle">Score breakdown</h3>
+          <div class="score-breakdown" id="scoreBreakdown">
+            <div class="score-row"><span>EMA</span><strong>--</strong></div>
+            <div class="score-row"><span>RSI</span><strong>--</strong></div>
+            <div class="score-row"><span>Structure</span><strong>--</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <div class="main-signal">
       <h2>Mejor señal actual</h2>
       <div class="signal-text" id="signalText">ESPERAR</div>
@@ -767,31 +1001,6 @@
           <tr><td colspan="10">Sin señales esta semana.</td></tr>
         </tbody>
       </table>
-    </div>
-
-
-
-    <div class="section">
-      <h2>TradingView integrado</h2>
-      <p class="note">
-        Gráfico profesional de TradingView para confirmar visualmente la señal del agente.
-      </p>
-
-      <div class="tv-actions">
-        <button class="button button-purple" onclick="updateTradingViewWidget()">
-          Actualizar TradingView
-        </button>
-
-        <button class="button button-yellow" onclick="openTradingView()">
-          Abrir en TradingView
-        </button>
-      </div>
-
-      <div id="tradingViewWidgetBox" class="tv-widget-box"></div>
-
-      <div class="tv-note" id="tvWidgetStatus">
-        El widget cargará el activo seleccionado.
-      </div>
     </div>
 
     <div class="section">
@@ -1078,7 +1287,7 @@
 
     <div class="footer">
       <div>Market AI Agent · Forex · Crypto · Stocks</div>
-      <div class="version-credit">Smart Money Scanner v10</div>
+      <div class="version-credit">Smart Money Scanner v14</div>
     </div>
 
   </div>
@@ -1107,6 +1316,172 @@
       if (!reason) return;
       reason.classList.toggle("analysis-hidden");
     }
+
+
+    function getDefaultWatchlist() {
+      return ["AUD/USD", "EUR/USD", "BTC/USD", "SOL/USD", "NVDA", "TSLA"];
+    }
+
+    function getSymbolCategory(symbol) {
+      if (markets.forex.includes(symbol)) return "forex";
+      if (markets.crypto.includes(symbol)) return "crypto";
+      if (markets.stocks.includes(symbol)) return "stocks";
+      return getCategory();
+    }
+
+    function renderQuickWatchlist() {
+      const box = document.getElementById("quickWatchlist");
+      if (!box) return;
+
+      const selected = getSelectedSymbol ? getSelectedSymbol() : "";
+      const list = getDefaultWatchlist();
+
+      box.innerHTML = list.map(symbol => {
+        const cat = getSymbolCategory(symbol);
+        const activeClass = symbol === selected ? "active" : "";
+
+        return `
+          <div class="watchlist-item ${activeClass}" onclick="selectWatchSymbol('${symbol}')">
+            <div class="watchlist-symbol">${symbol}</div>
+            <div class="watchlist-meta">${cat.toUpperCase()}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function selectWatchSymbol(symbol) {
+      const cat = getSymbolCategory(symbol);
+      const catSelect = document.getElementById("inputCategory");
+      const symSelect = document.getElementById("inputSymbol");
+
+      if (catSelect) {
+        catSelect.value = cat;
+        actualizarListaActivos();
+      }
+
+      if (symSelect) {
+        symSelect.value = symbol;
+        actualizarNombreActivo();
+      }
+
+      renderQuickWatchlist();
+      updateTradingViewWidget();
+    }
+
+    function calculateRiskReward(result) {
+      const entry = Number(result.entry);
+      const sl = Number(result.sl);
+      const tp1 = Number(result.tp1);
+      const tp2 = Number(result.tp2);
+
+      if ([entry, sl, tp1].some(v => isNaN(v) || v <= 0)) {
+        return null;
+      }
+
+      const risk = Math.abs(entry - sl);
+      const reward1 = Math.abs(tp1 - entry);
+      const reward2 = (!isNaN(tp2) && tp2 > 0) ? Math.abs(tp2 - entry) : 0;
+
+      if (risk <= 0) return null;
+
+      return {
+        risk,
+        reward1,
+        reward2,
+        rr1: reward1 / risk,
+        rr2: reward2 > 0 ? reward2 / risk : null
+      };
+    }
+
+    function buildScoreBreakdown(result) {
+      const rows = [];
+
+      const emaOk =
+        (result.signal === "COMPRA" && result.trend === "Alcista") ||
+        (result.signal === "VENTA" && result.trend === "Bajista");
+
+      const rsiOk =
+        (result.signal === "COMPRA" && result.rsi >= 30 && result.rsi <= 55) ||
+        (result.signal === "VENTA" && result.rsi >= 45 && result.rsi <= 70);
+
+      const structureOk =
+        result.structure &&
+        (
+          (result.signal === "COMPRA" && (result.structure.eventDirection === "bullish" || result.structure.structureTrend === "Alcista")) ||
+          (result.signal === "VENTA" && (result.structure.eventDirection === "bearish" || result.structure.structureTrend === "Bajista"))
+        );
+
+      const rr = calculateRiskReward(result);
+      const rrOk = rr && rr.rr1 >= 1.5;
+
+      rows.push({ label: "EMA 50/200", ok: emaOk, value: emaOk ? "+25" : "0" });
+      rows.push({ label: "RSI", ok: rsiOk, value: rsiOk ? "+15" : "0" });
+      rows.push({ label: "CHoCH/BOS", ok: structureOk, value: structureOk ? "+20" : "0" });
+      rows.push({ label: "R:R TP1", ok: rrOk, value: rr ? rr.rr1.toFixed(2) : "--" });
+      rows.push({ label: currentLanguage === "es" ? "Confianza" : "Confidence", ok: result.confidenceScore >= 80, value: result.confidenceScore + "%" });
+
+      return rows;
+    }
+
+    function updateProfessionalTerminal(result) {
+      const sideMain = document.getElementById("sideSignalMain");
+      const sideMeta = document.getElementById("sideSignalMeta");
+      const sideState = document.getElementById("sideSignalState");
+      const rrText = document.getElementById("rrText");
+      const rrValue = document.getElementById("rrValue");
+      const scoreBox = document.getElementById("scoreBreakdown");
+
+      if (!sideMain || !sideMeta || !sideState || !rrText || !rrValue || !scoreBox) return;
+
+      sideMain.classList.remove("buy", "sell");
+      sideState.className = "mini-pill yellow";
+
+      if (result.signal === "COMPRA") {
+        sideMain.classList.add("buy");
+        sideState.className = "mini-pill green";
+      } else if (result.signal === "VENTA") {
+        sideMain.classList.add("sell");
+        sideState.className = "mini-pill red";
+      }
+
+      sideMain.textContent = displaySignal(result.signal);
+      sideState.textContent = result.signal === "COMPRA" || result.signal === "VENTA"
+        ? (currentLanguage === "es" ? "ACTIVA" : "ACTIVE")
+        : (currentLanguage === "es" ? "ESPERAR" : "WAIT");
+
+      sideMeta.innerHTML =
+        "<strong>" + result.symbol + "</strong><br>" +
+        (currentLanguage === "es" ? "Confianza: " : "Confidence: ") + "<strong>" + result.confidenceScore + "%</strong><br>" +
+        (currentLanguage === "es" ? "Entrada: " : "Entry: ") + "<strong>" + result.entry + "</strong><br>" +
+        "SL: <strong>" + result.sl + "</strong> · TP1: <strong>" + result.tp1 + "</strong>";
+
+      const rr = calculateRiskReward(result);
+
+      if (rr) {
+        rrText.innerHTML =
+          (currentLanguage === "es" ? "Riesgo: " : "Risk: ") + rr.risk.toFixed(getDecimalsBySymbol(result.symbol)) +
+          "<br>" +
+          (currentLanguage === "es" ? "Ganancia TP1: " : "TP1 reward: ") + rr.reward1.toFixed(getDecimalsBySymbol(result.symbol));
+
+        rrValue.textContent = "1:" + rr.rr1.toFixed(2);
+        rrValue.style.color = rr.rr1 >= 1.5 ? "#22c55e" : "#facc15";
+      } else {
+        rrText.textContent = currentLanguage === "es" ? "Pendiente" : "Pending";
+        rrValue.textContent = "--";
+        rrValue.style.color = "#38bdf8";
+      }
+
+      const rows = buildScoreBreakdown(result);
+      scoreBox.innerHTML = rows.map(row => `
+        <div class="score-row">
+          <span>${row.label}</span>
+          <strong class="${row.ok ? "green" : "yellow"}">${row.value}</strong>
+        </div>
+      `).join("");
+
+      renderQuickWatchlist();
+    }
+
 
     function getCategory() {
       return document.getElementById("inputCategory").value;
@@ -1645,7 +2020,7 @@
 
     const translations = {
       es: {
-        mode: "Modo actual: Smart Money Scanner v10",
+        mode: "Modo actual: Smart Money Scanner v14",
         activeTitle: "SEÑAL ACTIVA",
         wait: "ESPERAR",
         buy: "COMPRA",
@@ -1665,7 +2040,7 @@
         historyEmpty: "Sin señales esta semana."
       },
       en: {
-        mode: "Current mode: Smart Money Scanner v10",
+        mode: "Current mode: Smart Money Scanner v14",
         activeTitle: "ACTIVE SIGNAL",
         wait: "WAIT",
         buy: "BUY",
@@ -1894,6 +2269,14 @@
         if (found) strong.textContent = isEs ? found[0] : found[1];
       });
 
+
+      setText("#watchlistTitle", "Watchlist", "Watchlist");
+      setText("#watchlistNote", "Selecciona un activo rápido o escanea la categoría.", "Select a quick asset or scan the category.");
+      setText("#terminalChartTitle", "TradingView principal", "Main TradingView");
+      setText("#sideSignalTitle", "Señal activa", "Active signal");
+      setText("#rrTitle", "Risk / Reward", "Risk / Reward");
+      setText("#scoreTitle", "Score breakdown", "Score breakdown");
+
       const footer = document.querySelector(".footer > div:first-child");
       if (footer) footer.textContent = "Market AI Agent · Forex · Crypto · Stocks";
     }
@@ -1928,6 +2311,7 @@
       if (systemTitle) systemTitle.textContent = t("systemStatus");
 
       translateStaticUI();
+      updateProfessionalTerminal(result);
       renderWeeklyHistory();
       restoreActiveSignalTime();
     }
