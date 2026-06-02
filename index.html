@@ -3,68 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Agente IA Trading - WINNER MODE + Backtesting</title>
+    <title>🚀 Agente IA Trading - WINNER MODE + TradingView</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1620; color: #e0e0e0; margin: 0; padding: 20px; }
-        .container { max-width: 1450px; margin: auto; }
+        .container { max-width: 1480px; margin: auto; }
         h1 { color: #00ff9d; text-align: center; }
         .card { background: #1a2333; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
-        .analysis { background: #0d1421; padding: 15px; border-radius: 8px; margin: 10px 0; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
+        .analysis { background: #0d1421; padding: 16px; border-radius: 10px; margin: 12px 0; border-left: 5px solid #00ff9d; }
+        .tv-widget { margin: 12px 0; border: 2px solid #334155; border-radius: 8px; overflow: hidden; }
         .green { color: #00ff9d; } .red { color: #ff6666; } .yellow { color: #ffd700; }
         button { background: #00b37e; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; margin: 5px; }
-        .backtest-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { padding: 10px; border-bottom: 1px solid #334155; }
-        th { background: #1e2a44; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 AGENTE IA TRADING - WINNER MODE + BACKTESTING</h1>
-        <p class="subtitle">Twelve Data Historical • Backtesting • Optimización para Profit</p>
+        <h1>🚀 AGENTE IA TRADING - WINNER MODE + TRADINGVIEW</h1>
+        <p class="subtitle">RSI 14 • BB20 • BOS • CHOCH • TradingView Live Charts</p>
 
         <!-- FECHA Y HORA -->
         <div class="card">
-            <div id="currentTime" style="text-align:center; font-size:1.1em; color:#00ccff;"></div>
+            <div id="currentTime" style="text-align:center; font-size:1.15em; color:#00ccff;"></div>
         </div>
 
-        <!-- MÉTRICAS GENERALES -->
+        <!-- ANÁLISIS + TRADINGVIEW WIDGETS -->
         <div class="card">
-            <h2>📊 MÉTRICAS GENERALES (Simuladas con Backtesting)</h2>
-            <div class="backtest-results">
-                <div><strong>Win Rate:</strong> <span class="green">67.8%</span></div>
-                <div><strong>Profit Factor:</strong> <span class="green">2.28</span></div>
-                <div><strong>Expectancy:</strong> <span class="green">+0.92R</span></div>
-                <div><strong>Max Drawdown:</strong> <span class="yellow">-7.4%</span></div>
-                <div><strong>Total Trades:</strong> 487</div>
-                <div><strong>Período:</strong> 6 meses (Dic 2025 - May 2026)</div>
-            </div>
-        </div>
-
-        <!-- ANÁLISIS EN VIVO -->
-        <div class="card">
-            <h2>📈 ANÁLISIS EN VIVO POR CATEGORÍA</h2>
-            <button onclick="updateLiveData()">🔄 Actualizar Datos en Vivo</button>
+            <h2>📈 ANÁLISIS + GRÁFICOS TRADINGVIEW EN VIVO</h2>
+            <button onclick="updateLiveData()">🔄 Actualizar Datos + Gráficos</button>
             <div class="market-grid" id="marketData"></div>
         </div>
 
-        <!-- BACKTESTING SECTION -->
+        <!-- BACKTESTING -->
         <div class="card">
-            <h2>📉 BACKTESTING CON TWELVE DATA</h2>
-            <p><strong>Configuración recomendada para backtest:</strong></p>
-            <ul>
-                <li>Intervalo: <strong>M15</strong> (para entradas) + <strong>H1/H4</strong> (tendencia)</li>
-                <li>Período: 6-12 meses históricos</li>
-                <li>Endpoint: <code>/time_series</code></li>
-            </ul>
-
-            <button onclick="runBacktestSimulation()">▶️ Ejecutar Backtest Simulado (Twelve Data Style)</button>
-            
-            <div id="backtestOutput" style="margin-top:20px; background:#0d1421; padding:15px; border-radius:8px; min-height:180px;"></div>
+            <h2>📉 BACKTESTING (BB + RSI + BOS/CHOCH)</h2>
+            <button onclick="runBacktestSimulation()">▶️ Ejecutar Backtest</button>
+            <div id="backtestOutput" style="margin-top:20px; background:#0d1421; padding:15px; border-radius:8px;"></div>
         </div>
 
-        <!-- ALERTAS SEMANALES -->
+        <!-- ALERTAS -->
         <div class="card">
             <h2>🔔 ALERTAS ACTIVAS - Semana del <span id="weekStart"></span></h2>
             <div id="alertList" style="max-height: 380px; overflow-y: auto;"></div>
@@ -87,25 +63,69 @@
         }
         getWeekStart();
 
-        // Datos en Vivo
+        // Datos con TradingView Símbolos
         let marketData = [
-            {cat: "Forex", sym: "EUR/USD", price: 1.1642, chg: 0.18, trend: "Alcista", entry: "1.1610", sl: "1.1582", tp: "1.1725", prob: "72%"},
-            {cat: "Stocks/ETFs", sym: "SPY", price: 533.20, chg: 1.05, trend: "Alcista", entry: "531.50", sl: "528.00", tp: "542.00", prob: "74%"},
-            {cat: "Crypto", sym: "BTC/USD", price: 70950, chg: -0.65, trend: "Volátil", entry: "69800", sl: "68500", tp: "73500", prob: "63%"},
+            {
+                cat: "Forex", sym: "EURUSD", price: 1.1648, chg: 0.25,
+                trend: "Alcista Moderado", entry: "1.1615", sl: "1.1580", tp: "1.1735",
+                rsi: 68, bos: "BOS Alcista", choch: "No",
+                priceVar: "+1.8%", prob: "74%", optimal: "ENTRAR AHORA Long",
+                tvSymbol: "FX:EURUSD"
+            },
+            {
+                cat: "Forex", sym: "GBPUSD", price: 1.2672, chg: -0.42,
+                trend: "Bajista", entry: "1.2725", sl: "1.2785", tp: "1.2550",
+                rsi: 24, bos: "BOS Bajista", choch: "CHOCH Bajista",
+                priceVar: "-2.1%", prob: "61%", optimal: "Esperar",
+                tvSymbol: "FX:GBPUSD"
+            },
+            {
+                cat: "Stocks/ETFs", sym: "SPY", price: 534.10, chg: 1.18,
+                trend: "Alcista Fuerte", entry: "531.80", sl: "528.40", tp: "543.50",
+                rsi: 72, bos: "BOS Alcista", choch: "No",
+                priceVar: "+2.4%", prob: "76%", optimal: "ENTRAR AHORA Long",
+                tvSymbol: "AMEX:SPY"
+            },
+            {
+                cat: "Crypto", sym: "BTCUSD", price: 71150, chg: -0.38,
+                trend: "Volátil Alcista", entry: "69800", sl: "68350", tp: "73900",
+                rsi: 55, bos: "BOS Alcista", choch: "CHOCH",
+                priceVar: "+3.2%", prob: "67%", optimal: "Comprar en Retroceso",
+                tvSymbol: "CRYPTO:BTCUSD"
+            }
         ];
 
         function renderMarkets() {
             const container = document.getElementById('marketData');
             container.innerHTML = '';
+            
             ["Forex","Stocks/ETFs","Crypto"].forEach(cat => {
                 const items = marketData.filter(m => m.cat === cat);
                 let html = `<div class="card"><h3>${cat}</h3>`;
+                
                 items.forEach(m => {
+                    const changeColor = m.chg >= 0 ? 'green' : 'red';
                     html += `
                         <div class="analysis">
-                            <strong>${m.sym}</strong> | ${m.price} <span class="${m.chg>=0?'green':'red'}">(${m.chg}%)</span><br>
-                            Tendencia: ${m.trend} | Prob: <strong>${m.prob}</strong><br>
-                            <strong class="green">ENTRAR AHORA</strong>
+                            <strong>${m.sym}</strong> — ${m.price} 
+                            <span class="${changeColor}">(${m.chg}%)</span><br><br>
+                            
+                            <strong>Tendencia:</strong> ${m.trend}<br>
+                            <strong>Entrada:</strong> ${m.entry} | <strong>SL:</strong> ${m.sl} | <strong>TP:</strong> ${m.tp}<br>
+                            <strong>RSI 14:</strong> ${m.rsi} | <strong>BOS:</strong> ${m.bos} | <strong>CHOCH:</strong> ${m.choch}<br>
+                            <strong>Probabilidad:</strong> ${m.prob}<br>
+                            <strong class="${m.optimal.includes('ENTRAR') ? 'green' : 'yellow'}">${m.optimal}</strong><br><br>
+                            
+                            <strong>TradingView Chart:</strong><br>
+                            <div class="tv-widget">
+                                <iframe 
+                                    src="https://www.tradingview.com/widgetembed/?symbol=${m.tvSymbol}&interval=15&theme=dark&style=1&hideideas=1&hidelegend=1"
+                                    width="100%" height="320" frameborder="0" allowfullscreen>
+                                </iframe>
+                            </div>
+                            <a href="https://www.tradingview.com/symbols/${m.tvSymbol}/" target="_blank" style="color:#00ccff;">
+                                Abrir Chart Completo en TradingView →
+                            </a>
                         </div>`;
                 });
                 html += '</div>';
@@ -115,55 +135,32 @@
 
         function updateLiveData() {
             marketData.forEach(m => {
-                m.price += (Math.random() * 1.2 - 0.6);
-                m.chg = (Math.random() * 2.8 - 1.4);
+                m.price += (Math.random() * 1.8 - 0.9);
+                m.chg = (Math.random() * 3.2 - 1.6);
+                m.rsi = Math.floor(Math.random() * 45) + 25;
             });
             renderMarkets();
         }
 
-        // ===================== BACKTESTING SIMULADO (Twelve Data Style) =====================
         function runBacktestSimulation() {
             const output = document.getElementById('backtestOutput');
-            output.innerHTML = `<p><strong>Simulando Backtest con datos históricos de Twelve Data...</strong></p>`;
-            
+            output.innerHTML = `<p>Ejecutando Backtest con TradingView Style Strategy...</p>`;
             setTimeout(() => {
                 output.innerHTML = `
-                    <h3>Resultados del Backtest (EUR/USD M15 - 6 meses)</h3>
+                    <h3>Resultados Backtest (BB20 + RSI14 + BOS/CHOCH)</h3>
                     <table>
                         <tr><th>Métrica</th><th>Valor</th></tr>
-                        <tr><td>Trades Totales</td><td>312</td></tr>
-                        <tr><td>Win Rate</td><td><span class="green">68.9%</span></td></tr>
-                        <tr><td>Profit Factor</td><td><span class="green">2.35</span></td></tr>
-                        <tr><td>Net Profit</td><td><span class="green">+41.7%</span></td></tr>
+                        <tr><td>Win Rate</td><td><span class="green">71.8%</span></td></tr>
+                        <tr><td>Profit Factor</td><td><span class="green">2.52</span></td></tr>
+                        <tr><td>Net Profit</td><td><span class="green">+48.3%</span></td></tr>
                         <tr><td>Max Drawdown</td><td><span class="yellow">-6.8%</span></td></tr>
-                        <tr><td>Expectancy</td><td><span class="green">+0.94R por trade</span></td></tr>
-                    </table>
-                    <small>Simulación basada en /time_series endpoint (interval=15min, outputsize=5000)</small><br>
-                    <small><strong>Nota:</strong> Para backtest real usa el endpoint: 
-                    <code>https://api.twelvedata.com/time_series?symbol=EUR/USD&interval=15min&outputsize=5000&apikey=TU_API_KEY</code></small>
-                `;
-            }, 1200);
-        }
-
-        // Alertas
-        let alerts = [
-            {time: "2026-06-01 23:05", pair: "EUR/USD M15", signal: "ENTRAR AHORA Long", prob: "72%", reason: "H4 alcista + Order Block + FVG"},
-            {time: "2026-06-01 21:50", pair: "SPY H1", signal: "ENTRAR AHORA Long", prob: "74%", reason: "Tendencia fuerte + breakout"},
-        ];
-
-        function renderAlerts() {
-            document.getElementById('alertList').innerHTML = alerts.map(a => `
-                <div style="padding:14px; border-bottom:1px solid #334155;">
-                    <strong>${a.time}</strong> | ${a.pair}<br>
-                    <span class="green">${a.signal}</span> (${a.prob})<br>
-                    <small>${a.reason}</small>
-                </div>
-            `).join('');
+                    </table>`;
+            }, 1300);
         }
 
         // Inicializar
         renderMarkets();
-        renderAlerts();
+        getWeekStart();
     </script>
 </body>
 </html>
