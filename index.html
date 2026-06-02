@@ -3,250 +3,199 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRADING AGENT - BB + RSI + BOS/CHOCH</title>
+  <title>TRADING AGENT - Optimizado</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
-    .mini-chart { height: 28px; }
-    .star { color: #fbbf24; }
+    .star { color: #fbbf24; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+    
+    /* Circular Confidence Gauge */
+    .gauge {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: conic-gradient(var(--color), #1f2937 0deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .gauge::after {
+      content: '';
+      width: 52px;
+      height: 52px;
+      background: #111827;
+      border-radius: 50%;
+      position: absolute;
+    }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
 
   <div class="max-w-7xl mx-auto p-6">
+    
     <!-- HEADER -->
     <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-6">
-      <div>
-        <h1 class="text-3xl font-bold text-emerald-400 flex items-center gap-3">
-          <i class="fas fa-chart-line"></i>
-          TRADING AGENT
-        </h1>
-        <p class="text-gray-400">BB20 + RSI14 + BOS/CHOCH • Optimizado</p>
-      </div>
+      <h1 class="text-3xl font-bold text-emerald-400 flex items-center gap-3">
+        <i class="fas fa-chart-line"></i> TRADING AGENT
+      </h1>
       <div class="text-right">
-        <p class="text-sm text-gray-400">Semana del 1/6/2026</p>
-        <p class="text-emerald-400 text-lg font-semibold">EN VIVO</p>
+        <p class="text-emerald-400 font-semibold">Semana del 1/6/2026 • EN VIVO</p>
       </div>
     </div>
 
     <!-- BACKTESTING -->
-    <div class="bg-gray-900 rounded-2xl p-6 mb-8 border border-gray-800">
-      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-        <i class="fas fa-flask"></i> BACKTESTING
-      </h2>
-      
-      <div class="flex items-center justify-between mb-6">
+    <div class="bg-gray-900 rounded-3xl p-6 mb-10 border border-gray-800">
+      <h2 class="text-xl font-bold mb-6">🔥 BACKTESTING (BB20 + RSI14 + BOS/CHOCH)</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
         <div>
-          <p class="text-gray-400 text-sm">Activo con Mayor Profit</p>
-          <p class="text-3xl font-bold text-emerald-400">BTC/USDT <span class="text-lg text-emerald-500">+48.3%</span></p>
+          <p class="text-gray-400 text-sm">Activo Principal</p>
+          <p class="text-3xl font-bold text-emerald-400">BTC/USDT</p>
         </div>
-        <div class="text-right">
-          <p class="text-gray-400 text-sm mb-2">Cambiar Activo</p>
-          <div class="flex flex-wrap gap-2">
-            <button class="bg-emerald-500 text-black px-4 py-1.5 rounded-xl text-sm font-medium">BTC/USDT</button>
-            <button class="bg-gray-800 hover:bg-gray-700 px-4 py-1.5 rounded-xl text-sm">ETH/USDT</button>
-            <button class="bg-gray-800 hover:bg-gray-700 px-4 py-1.5 rounded-xl text-sm">SOL/USDT</button>
-            <button class="bg-gray-800 hover:bg-gray-700 px-4 py-1.5 rounded-xl text-sm">XAU/USD</button>
-          </div>
+        <div>
+          <p class="text-gray-400 text-sm">Win Rate</p>
+          <p class="text-2xl font-bold">71.8%</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-sm">Net Profit</p>
+          <p class="text-2xl font-bold text-emerald-400">+48.3%</p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-sm">Max Drawdown</p>
+          <p class="text-2xl font-bold text-yellow-400">-6.8%</p>
         </div>
       </div>
-
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b border-gray-800">
-            <th class="text-left py-3 text-gray-400">Métrica</th>
-            <th class="text-right py-3 text-gray-400">Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="border-b border-gray-800">
-            <td class="py-3">Win Rate</td>
-            <td class="text-right font-semibold text-emerald-400">71.8%</td>
-          </tr>
-          <tr class="border-b border-gray-800">
-            <td class="py-3">Profit Factor</td>
-            <td class="text-right font-semibold">2.52</td>
-          </tr>
-          <tr class="border-b border-gray-800">
-            <td class="py-3">Net Profit</td>
-            <td class="text-right font-bold text-emerald-400">+48.3%</td>
-          </tr>
-          <tr>
-            <td class="py-3">Max Drawdown</td>
-            <td class="text-right font-semibold text-yellow-400">-6.8%</td>
-          </tr>
-        </tbody>
-      </table>
     </div>
 
     <!-- WATCHLIST -->
-    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-      <i class="fas fa-list"></i> WATCHLIST OPTIMIZADA
-    </h2>
+    <h2 class="text-2xl font-bold mb-6">📊 WATCHLIST OPTIMIZADA</h2>
 
     <!-- CRYPTO -->
     <div class="mb-10">
-      <h3 class="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
-        🚀 CRYPTO <span class="text-xs bg-emerald-900 text-emerald-400 px-2 py-0.5 rounded-full">TOP</span>
+      <h3 class="text-emerald-400 font-bold text-xl mb-4 flex items-center gap-3">
+        🚀 CRYPTO <span class="bg-emerald-500 text-black text-xs px-3 py-1 rounded-full">TOP</span>
       </h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-gray-900 rounded-2xl p-5 border border-emerald-900">
-          <div class="flex justify-between">
+      
+      <div class="space-y-6">
+        <!-- BTC -->
+        <div class="bg-gray-900 rounded-3xl p-6 border border-emerald-700">
+          <div class="flex items-center justify-between">
             <div>
-              <p class="font-bold">BTC/USDT</p>
-              <p class="text-emerald-400 text-xl font-semibold">67,850</p>
+              <p class="text-2xl font-bold">BTC/USDT</p>
+              <p class="text-emerald-400 text-3xl font-semibold">67,850</p>
+              <p class="text-emerald-400">Buy • 91% Confianza</p>
             </div>
+            
             <div class="text-right">
-              <span class="text-emerald-400 text-sm font-medium">+2.8%</span>
-              <div class="text-2xl star">⭐</div>
+              <div class="gauge" style="--color: #22ff88; transform: rotate(0deg);">
+                <span class="text-xl font-bold text-emerald-400 relative z-10">91%</span>
+              </div>
+              <span class="star text-4xl mt-2 block">⭐</span>
             </div>
           </div>
-          <p class="text-emerald-400 text-sm mt-2">Buy • 91% Confianza</p>
+          
+          <!-- TradingView Chart -->
+          <div class="mt-5 bg-black rounded-2xl overflow-hidden h-64">
+            <iframe width="100%" height="100%" src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=15&theme=dark" frameborder="0"></iframe>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-4 mt-5 text-sm">
+            <div><span class="text-gray-400">Entrada:</span> <span class="font-bold">67,850</span></div>
+            <div><span class="text-emerald-400">TP1:</span> <span class="font-bold">69,500</span></div>
+            <div><span class="text-red-400">SL:</span> <span class="font-bold">66,800</span></div>
+          </div>
         </div>
-        <div class="bg-gray-900 rounded-2xl p-5 border border-emerald-900">
-          <div class="flex justify-between">
+
+        <!-- ETH -->
+        <div class="bg-gray-900 rounded-3xl p-6 border border-emerald-700">
+          <div class="flex items-center justify-between">
             <div>
-              <p class="font-bold">ETH/USDT</p>
-              <p class="text-emerald-400 text-xl font-semibold">3,812</p>
+              <p class="text-2xl font-bold">ETH/USDT</p>
+              <p class="text-emerald-400 text-3xl font-semibold">3,812</p>
+              <p class="text-emerald-400">Buy • 88% Confianza</p>
             </div>
             <div class="text-right">
-              <span class="text-emerald-400 text-sm font-medium">+1.9%</span>
-              <div class="text-2xl star">⭐</div>
+              <div class="gauge" style="--color: #22ff88;">
+                <span class="text-xl font-bold text-emerald-400 relative z-10">88%</span>
+              </div>
+              <span class="star text-4xl mt-2 block">⭐</span>
             </div>
           </div>
-          <p class="text-emerald-400 text-sm mt-2">Buy • 88% Confianza</p>
+          <div class="mt-5 bg-black rounded-2xl overflow-hidden h-64">
+            <iframe width="100%" height="100%" src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:ETHUSDT&interval=15&theme=dark" frameborder="0"></iframe>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mt-5 text-sm">
+            <div><span class="text-gray-400">Entrada:</span> <span class="font-bold">3,812</span></div>
+            <div><span class="text-emerald-400">TP1:</span> <span class="font-bold">3,950</span></div>
+            <div><span class="text-red-400">SL:</span> <span class="font-bold">3,760</span></div>
+          </div>
         </div>
-        <div class="bg-gray-900 rounded-2xl p-5 border border-emerald-900">
-          <div class="flex justify-between">
+
+        <!-- SOL -->
+        <div class="bg-gray-900 rounded-3xl p-6 border border-emerald-700">
+          <div class="flex items-center justify-between">
             <div>
-              <p class="font-bold">SOL/USDT</p>
-              <p class="text-emerald-400 text-xl font-semibold">148.20</p>
+              <p class="text-2xl font-bold">SOL/USDT</p>
+              <p class="text-emerald-400 text-3xl font-semibold">148.20</p>
+              <p class="text-emerald-400">Buy • 86% Confianza</p>
             </div>
             <div class="text-right">
-              <span class="text-emerald-400 text-sm font-medium">+3.4%</span>
-              <div class="text-2xl star">⭐</div>
+              <div class="gauge" style="--color: #22ff88;">
+                <span class="text-xl font-bold text-emerald-400 relative z-10">86%</span>
+              </div>
+              <span class="star text-4xl mt-2 block">⭐</span>
             </div>
           </div>
-          <p class="text-emerald-400 text-sm mt-2">Buy • 86% Confianza</p>
+          <div class="mt-5 bg-black rounded-2xl overflow-hidden h-64">
+            <iframe width="100%" height="100%" src="https://www.tradingview.com/widgetembed/?symbol=BINANCE:SOLUSDT&interval=15&theme=dark" frameborder="0"></iframe>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mt-5 text-sm">
+            <div><span class="text-gray-400">Entrada:</span> <span class="font-bold">148.20</span></div>
+            <div><span class="text-emerald-400">TP1:</span> <span class="font-bold">153.80</span></div>
+            <div><span class="text-red-400">SL:</span> <span class="font-bold">145.50</span></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- OTRAS CATEGORÍAS -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- ORO -->
-      <div>
-        <h3 class="text-amber-400 font-semibold mb-3">💎 ORO / COMMODITIES</h3>
-        <div class="bg-gray-900 rounded-2xl p-5 border border-amber-900">
-          <div class="flex justify-between items-center">
-            <div>
-              <p class="font-bold">XAU/USD</p>
-              <p class="text-amber-400 text-xl font-semibold">2,345</p>
-            </div>
-            <div class="text-right">
-              <span class="text-emerald-400 text-sm">+1.4%</span>
-              <div class="text-2xl star">⭐</div>
-            </div>
+    <!-- ORO -->
+    <div class="mb-10">
+      <h3 class="text-amber-400 font-bold text-xl mb-4">💎 ORO / COMMODITIES</h3>
+      <div class="bg-gray-900 rounded-3xl p-6 border border-amber-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-2xl font-bold">XAU/USD</p>
+            <p class="text-amber-400 text-3xl font-semibold">2,345</p>
+            <p class="text-emerald-400">Buy • 85% Confianza</p>
           </div>
-          <p class="text-emerald-400 text-sm mt-1">Buy • 85% Confianza</p>
+          <div class="text-right">
+            <div class="gauge" style="--color: #22ff88;">
+              <span class="text-xl font-bold text-emerald-400 relative z-10">85%</span>
+            </div>
+            <span class="star text-4xl mt-2 block">⭐</span>
+          </div>
         </div>
-      </div>
-
-      <!-- ÍNDICES -->
-      <div>
-        <h3 class="text-blue-400 font-semibold mb-3">📈 ÍNDICES</h3>
-        <div class="space-y-4">
-          <div class="bg-gray-900 rounded-2xl p-4 flex justify-between items-center">
-            <div>
-              <p class="font-medium">SPX500</p>
-              <p class="text-sm text-emerald-400">Buy @ 5,320</p>
-            </div>
-            <div class="text-right">
-              <span class="text-emerald-400">+0.9%</span>
-              <p class="text-xs text-gray-400">83%</p>
-            </div>
-          </div>
-          <div class="bg-gray-900 rounded-2xl p-4 flex justify-between items-center">
-            <div>
-              <p class="font-medium">NAS100</p>
-              <p class="text-sm text-red-400">Sell @ 19,240</p>
-            </div>
-            <div class="text-right">
-              <span class="text-red-400">-1.1%</span>
-              <p class="text-xs text-gray-400">79%</p>
-            </div>
-          </div>
+        <div class="mt-5 bg-black rounded-2xl overflow-hidden h-64">
+          <iframe width="100%" height="100%" src="https://www.tradingview.com/widgetembed/?symbol=FX:XAUUSD&interval=15&theme=dark" frameborder="0"></iframe>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mt-5 text-sm">
+          <div><span class="text-gray-400">Entrada:</span> <span class="font-bold">2,345</span></div>
+          <div><span class="text-emerald-400">TP1:</span> <span class="font-bold">2,380</span></div>
+          <div><span class="text-red-400">SL:</span> <span class="font-bold">2,330</span></div>
         </div>
       </div>
     </div>
 
     <!-- ALERTAS -->
-    <div class="mt-12 bg-gray-900 rounded-3xl p-8">
-      <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
-        <i class="fas fa-bell"></i> ALERTAS ACTIVAS
-      </h2>
-
-      <div class="space-y-8">
-        <!-- Nuevas -->
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <span class="bg-emerald-500 text-black text-xs font-bold px-3 py-1 rounded-xl">NUEVAS</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-gray-800 rounded-2xl p-5">
-              <p class="font-semibold">BTC/USDT <span class="text-emerald-400">Buy</span></p>
-              <p class="text-sm text-gray-400">67,850 • TP: 69,500 / 71,200 • SL: 66,800</p>
-            </div>
-            <div class="bg-gray-800 rounded-2xl p-5">
-              <p class="font-semibold">ETH/USDT <span class="text-emerald-400">Buy</span></p>
-              <p class="text-sm text-gray-400">3,812 • TP: 3,950 / 4,080 • SL: 3,760</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- En Curso -->
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <span class="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-xl">EN CURSO</span>
-          </div>
-          <div class="text-gray-400 text-sm space-y-2">
-            <p>SOL/USDT • XAU/USD • SPX500 • GBP/JPY</p>
-          </div>
-        </div>
-
-        <!-- Antiguas -->
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-xl">ANTIGUAS</span>
-          </div>
-          <div class="text-gray-400 text-sm space-y-2">
-            <p>EUR/USD • AAPL • NAS100 • USD/JPY</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- BOS / CHOCH EXPLICACIÓN -->
-    <div class="mt-12 bg-gray-900 rounded-3xl p-8">
-      <h2 class="text-2xl font-bold mb-6">📖 BOS y CHOCH</h2>
-      <div class="grid md:grid-cols-2 gap-8">
-        <div>
-          <h3 class="text-emerald-400 font-semibold mb-2">BOS - Break of Structure</h3>
-          <p class="text-gray-400">Rompimiento de estructura anterior. Confirma <strong>continuación</strong> de tendencia.</p>
-        </div>
-        <div>
-          <h3 class="text-amber-400 font-semibold mb-2">CHOCH - Change of Character</h3>
-          <p class="text-gray-400">Cambio de carácter de la tendencia. Primera señal de posible <strong>reversión</strong>.</p>
-        </div>
-      </div>
-      <p class="mt-6 text-gray-400 text-sm">
-        <strong>Regla de Oro:</strong> Espera <strong>Retest</strong> después de CHOCH + confirmación BOS + RSI extremo + Banda BB.
-      </p>
+    <div class="bg-gray-900 rounded-3xl p-8 mt-10">
+      <h2 class="text-2xl font-bold mb-6">🛎️ ALERTAS ACTIVAS</h2>
+      <div class="text-emerald-400 font-medium">Señales con ⭐ listas para entrar con alta confluencia</div>
     </div>
 
     <div class="text-center text-gray-500 text-xs mt-12">
-      TRADING AGENT OPTIMIZADO • Mínimo Riesgo • Máximo Profit • 2026
+      TRADING AGENT OPTIMIZADO • BOS/CHOCH + BB + RSI • 2026
     </div>
   </div>
 
