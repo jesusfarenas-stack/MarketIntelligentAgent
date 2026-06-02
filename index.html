@@ -1,166 +1,254 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 Agente IA Trading - WINNER MODE + TradingView</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f1620; color: #e0e0e0; margin: 0; padding: 20px; }
-        .container { max-width: 1480px; margin: auto; }
-        h1 { color: #00ff9d; text-align: center; }
-        .card { background: #1a2333; border-radius: 12px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
-        .analysis { background: #0d1421; padding: 16px; border-radius: 10px; margin: 12px 0; border-left: 5px solid #00ff9d; }
-        .tv-widget { margin: 12px 0; border: 2px solid #334155; border-radius: 8px; overflow: hidden; }
-        .green { color: #00ff9d; } .red { color: #ff6666; } .yellow { color: #ffd700; }
-        button { background: #00b37e; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; margin: 5px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRADING AGENT - BB + RSI + BOS/CHOCH</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .mini-chart { height: 28px; }
+    .star { color: #fbbf24; }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <h1>🚀 AGENTE IA TRADING - WINNER MODE + TRADINGVIEW</h1>
-        <p class="subtitle">RSI 14 • BB20 • BOS • CHOCH • TradingView Live Charts</p>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
 
-        <!-- FECHA Y HORA -->
-        <div class="card">
-            <div id="currentTime" style="text-align:center; font-size:1.15em; color:#00ccff;"></div>
-        </div>
-
-        <!-- ANÁLISIS + TRADINGVIEW WIDGETS -->
-        <div class="card">
-            <h2>📈 ANÁLISIS + GRÁFICOS TRADINGVIEW EN VIVO</h2>
-            <button onclick="updateLiveData()">🔄 Actualizar Datos + Gráficos</button>
-            <div class="market-grid" id="marketData"></div>
-        </div>
-
-        <!-- BACKTESTING -->
-        <div class="card">
-            <h2>📉 BACKTESTING (BB + RSI + BOS/CHOCH)</h2>
-            <button onclick="runBacktestSimulation()">▶️ Ejecutar Backtest</button>
-            <div id="backtestOutput" style="margin-top:20px; background:#0d1421; padding:15px; border-radius:8px;"></div>
-        </div>
-
-        <!-- ALERTAS -->
-        <div class="card">
-            <h2>🔔 ALERTAS ACTIVAS - Semana del <span id="weekStart"></span></h2>
-            <div id="alertList" style="max-height: 380px; overflow-y: auto;"></div>
-        </div>
+  <div class="max-w-7xl mx-auto p-6">
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-8 border-b border-gray-800 pb-6">
+      <div>
+        <h1 class="text-3xl font-bold text-emerald-400 flex items-center gap-3">
+          <i class="fas fa-chart-line"></i>
+          TRADING AGENT
+        </h1>
+        <p class="text-gray-400">BB20 + RSI14 + BOS/CHOCH • Optimizado</p>
+      </div>
+      <div class="text-right">
+        <p class="text-sm text-gray-400">Semana del 1/6/2026</p>
+        <p class="text-emerald-400 text-lg font-semibold">EN VIVO</p>
+      </div>
     </div>
 
-    <script>
-        // Fecha y Hora
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('currentTime').innerHTML = `<strong>🕒 ${now.toLocaleString('es-ES')}</strong>`;
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+    <!-- BACKTESTING -->
+    <div class="bg-gray-900 rounded-2xl p-6 mb-8 border border-gray-800">
+      <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <i class="fas fa-flask"></i> BACKTESTING
+      </h2>
+      
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <p class="text-gray-400 text-sm">Activo con Mayor Profit</p>
+          <p class="text-3xl font-bold text-emerald-400">BTC/USDT <span class="text-lg text-emerald-500">+48.3%</span></p>
+        </div>
+        <div class="text-right">
+          <p class="text-gray-400 text-sm mb-2">Cambiar Activo</p>
+          <div class="flex flex-wrap gap-2">
+            <button class="bg-emerald-500 text-black px-4 py-1.5 rounded-xl text-sm font-medium">BTC/USDT</button>
+            <button class="bg-gray-800 hover:bg-gray-700 px-4 py-1.5 rounded-xl text-sm">ETH/USDT</button>
+            <button class="bg-gray-800 hover:bg-gray-700 px-4 py-1.5 rounded-xl text-sm">SOL/USDT</button>
+            <button class="bg-gray-800 hover:bg-gray-700 px-4 py-1.5 rounded-xl text-sm">XAU/USD</button>
+          </div>
+        </div>
+      </div>
 
-        function getWeekStart() {
-            const today = new Date();
-            const first = today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1);
-            document.getElementById('weekStart').textContent = new Date(today.setDate(first)).toLocaleDateString('es-ES');
-        }
-        getWeekStart();
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-800">
+            <th class="text-left py-3 text-gray-400">Métrica</th>
+            <th class="text-right py-3 text-gray-400">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-gray-800">
+            <td class="py-3">Win Rate</td>
+            <td class="text-right font-semibold text-emerald-400">71.8%</td>
+          </tr>
+          <tr class="border-b border-gray-800">
+            <td class="py-3">Profit Factor</td>
+            <td class="text-right font-semibold">2.52</td>
+          </tr>
+          <tr class="border-b border-gray-800">
+            <td class="py-3">Net Profit</td>
+            <td class="text-right font-bold text-emerald-400">+48.3%</td>
+          </tr>
+          <tr>
+            <td class="py-3">Max Drawdown</td>
+            <td class="text-right font-semibold text-yellow-400">-6.8%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        // Datos con TradingView Símbolos
-        let marketData = [
-            {
-                cat: "Forex", sym: "EURUSD", price: 1.1648, chg: 0.25,
-                trend: "Alcista Moderado", entry: "1.1615", sl: "1.1580", tp: "1.1735",
-                rsi: 68, bos: "BOS Alcista", choch: "No",
-                priceVar: "+1.8%", prob: "74%", optimal: "ENTRAR AHORA Long",
-                tvSymbol: "FX:EURUSD"
-            },
-            {
-                cat: "Forex", sym: "GBPUSD", price: 1.2672, chg: -0.42,
-                trend: "Bajista", entry: "1.2725", sl: "1.2785", tp: "1.2550",
-                rsi: 24, bos: "BOS Bajista", choch: "CHOCH Bajista",
-                priceVar: "-2.1%", prob: "61%", optimal: "Esperar",
-                tvSymbol: "FX:GBPUSD"
-            },
-            {
-                cat: "Stocks/ETFs", sym: "SPY", price: 534.10, chg: 1.18,
-                trend: "Alcista Fuerte", entry: "531.80", sl: "528.40", tp: "543.50",
-                rsi: 72, bos: "BOS Alcista", choch: "No",
-                priceVar: "+2.4%", prob: "76%", optimal: "ENTRAR AHORA Long",
-                tvSymbol: "AMEX:SPY"
-            },
-            {
-                cat: "Crypto", sym: "BTCUSD", price: 71150, chg: -0.38,
-                trend: "Volátil Alcista", entry: "69800", sl: "68350", tp: "73900",
-                rsi: 55, bos: "BOS Alcista", choch: "CHOCH",
-                priceVar: "+3.2%", prob: "67%", optimal: "Comprar en Retroceso",
-                tvSymbol: "CRYPTO:BTCUSD"
-            }
-        ];
+    <!-- WATCHLIST -->
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+      <i class="fas fa-list"></i> WATCHLIST OPTIMIZADA
+    </h2>
 
-        function renderMarkets() {
-            const container = document.getElementById('marketData');
-            container.innerHTML = '';
-            
-            ["Forex","Stocks/ETFs","Crypto"].forEach(cat => {
-                const items = marketData.filter(m => m.cat === cat);
-                let html = `<div class="card"><h3>${cat}</h3>`;
-                
-                items.forEach(m => {
-                    const changeColor = m.chg >= 0 ? 'green' : 'red';
-                    html += `
-                        <div class="analysis">
-                            <strong>${m.sym}</strong> — ${m.price} 
-                            <span class="${changeColor}">(${m.chg}%)</span><br><br>
-                            
-                            <strong>Tendencia:</strong> ${m.trend}<br>
-                            <strong>Entrada:</strong> ${m.entry} | <strong>SL:</strong> ${m.sl} | <strong>TP:</strong> ${m.tp}<br>
-                            <strong>RSI 14:</strong> ${m.rsi} | <strong>BOS:</strong> ${m.bos} | <strong>CHOCH:</strong> ${m.choch}<br>
-                            <strong>Probabilidad:</strong> ${m.prob}<br>
-                            <strong class="${m.optimal.includes('ENTRAR') ? 'green' : 'yellow'}">${m.optimal}</strong><br><br>
-                            
-                            <strong>TradingView Chart:</strong><br>
-                            <div class="tv-widget">
-                                <iframe 
-                                    src="https://www.tradingview.com/widgetembed/?symbol=${m.tvSymbol}&interval=15&theme=dark&style=1&hideideas=1&hidelegend=1"
-                                    width="100%" height="320" frameborder="0" allowfullscreen>
-                                </iframe>
-                            </div>
-                            <a href="https://www.tradingview.com/symbols/${m.tvSymbol}/" target="_blank" style="color:#00ccff;">
-                                Abrir Chart Completo en TradingView →
-                            </a>
-                        </div>`;
-                });
-                html += '</div>';
-                container.innerHTML += html;
-            });
-        }
+    <!-- CRYPTO -->
+    <div class="mb-10">
+      <h3 class="text-emerald-400 font-semibold mb-3 flex items-center gap-2">
+        🚀 CRYPTO <span class="text-xs bg-emerald-900 text-emerald-400 px-2 py-0.5 rounded-full">TOP</span>
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-900 rounded-2xl p-5 border border-emerald-900">
+          <div class="flex justify-between">
+            <div>
+              <p class="font-bold">BTC/USDT</p>
+              <p class="text-emerald-400 text-xl font-semibold">67,850</p>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400 text-sm font-medium">+2.8%</span>
+              <div class="text-2xl star">⭐</div>
+            </div>
+          </div>
+          <p class="text-emerald-400 text-sm mt-2">Buy • 91% Confianza</p>
+        </div>
+        <div class="bg-gray-900 rounded-2xl p-5 border border-emerald-900">
+          <div class="flex justify-between">
+            <div>
+              <p class="font-bold">ETH/USDT</p>
+              <p class="text-emerald-400 text-xl font-semibold">3,812</p>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400 text-sm font-medium">+1.9%</span>
+              <div class="text-2xl star">⭐</div>
+            </div>
+          </div>
+          <p class="text-emerald-400 text-sm mt-2">Buy • 88% Confianza</p>
+        </div>
+        <div class="bg-gray-900 rounded-2xl p-5 border border-emerald-900">
+          <div class="flex justify-between">
+            <div>
+              <p class="font-bold">SOL/USDT</p>
+              <p class="text-emerald-400 text-xl font-semibold">148.20</p>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400 text-sm font-medium">+3.4%</span>
+              <div class="text-2xl star">⭐</div>
+            </div>
+          </div>
+          <p class="text-emerald-400 text-sm mt-2">Buy • 86% Confianza</p>
+        </div>
+      </div>
+    </div>
 
-        function updateLiveData() {
-            marketData.forEach(m => {
-                m.price += (Math.random() * 1.8 - 0.9);
-                m.chg = (Math.random() * 3.2 - 1.6);
-                m.rsi = Math.floor(Math.random() * 45) + 25;
-            });
-            renderMarkets();
-        }
+    <!-- OTRAS CATEGORÍAS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- ORO -->
+      <div>
+        <h3 class="text-amber-400 font-semibold mb-3">💎 ORO / COMMODITIES</h3>
+        <div class="bg-gray-900 rounded-2xl p-5 border border-amber-900">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="font-bold">XAU/USD</p>
+              <p class="text-amber-400 text-xl font-semibold">2,345</p>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400 text-sm">+1.4%</span>
+              <div class="text-2xl star">⭐</div>
+            </div>
+          </div>
+          <p class="text-emerald-400 text-sm mt-1">Buy • 85% Confianza</p>
+        </div>
+      </div>
 
-        function runBacktestSimulation() {
-            const output = document.getElementById('backtestOutput');
-            output.innerHTML = `<p>Ejecutando Backtest con TradingView Style Strategy...</p>`;
-            setTimeout(() => {
-                output.innerHTML = `
-                    <h3>Resultados Backtest (BB20 + RSI14 + BOS/CHOCH)</h3>
-                    <table>
-                        <tr><th>Métrica</th><th>Valor</th></tr>
-                        <tr><td>Win Rate</td><td><span class="green">71.8%</span></td></tr>
-                        <tr><td>Profit Factor</td><td><span class="green">2.52</span></td></tr>
-                        <tr><td>Net Profit</td><td><span class="green">+48.3%</span></td></tr>
-                        <tr><td>Max Drawdown</td><td><span class="yellow">-6.8%</span></td></tr>
-                    </table>`;
-            }, 1300);
-        }
+      <!-- ÍNDICES -->
+      <div>
+        <h3 class="text-blue-400 font-semibold mb-3">📈 ÍNDICES</h3>
+        <div class="space-y-4">
+          <div class="bg-gray-900 rounded-2xl p-4 flex justify-between items-center">
+            <div>
+              <p class="font-medium">SPX500</p>
+              <p class="text-sm text-emerald-400">Buy @ 5,320</p>
+            </div>
+            <div class="text-right">
+              <span class="text-emerald-400">+0.9%</span>
+              <p class="text-xs text-gray-400">83%</p>
+            </div>
+          </div>
+          <div class="bg-gray-900 rounded-2xl p-4 flex justify-between items-center">
+            <div>
+              <p class="font-medium">NAS100</p>
+              <p class="text-sm text-red-400">Sell @ 19,240</p>
+            </div>
+            <div class="text-right">
+              <span class="text-red-400">-1.1%</span>
+              <p class="text-xs text-gray-400">79%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        // Inicializar
-        renderMarkets();
-        getWeekStart();
-    </script>
+    <!-- ALERTAS -->
+    <div class="mt-12 bg-gray-900 rounded-3xl p-8">
+      <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+        <i class="fas fa-bell"></i> ALERTAS ACTIVAS
+      </h2>
+
+      <div class="space-y-8">
+        <!-- Nuevas -->
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-emerald-500 text-black text-xs font-bold px-3 py-1 rounded-xl">NUEVAS</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-gray-800 rounded-2xl p-5">
+              <p class="font-semibold">BTC/USDT <span class="text-emerald-400">Buy</span></p>
+              <p class="text-sm text-gray-400">67,850 • TP: 69,500 / 71,200 • SL: 66,800</p>
+            </div>
+            <div class="bg-gray-800 rounded-2xl p-5">
+              <p class="font-semibold">ETH/USDT <span class="text-emerald-400">Buy</span></p>
+              <p class="text-sm text-gray-400">3,812 • TP: 3,950 / 4,080 • SL: 3,760</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- En Curso -->
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-xl">EN CURSO</span>
+          </div>
+          <div class="text-gray-400 text-sm space-y-2">
+            <p>SOL/USDT • XAU/USD • SPX500 • GBP/JPY</p>
+          </div>
+        </div>
+
+        <!-- Antiguas -->
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-xl">ANTIGUAS</span>
+          </div>
+          <div class="text-gray-400 text-sm space-y-2">
+            <p>EUR/USD • AAPL • NAS100 • USD/JPY</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOS / CHOCH EXPLICACIÓN -->
+    <div class="mt-12 bg-gray-900 rounded-3xl p-8">
+      <h2 class="text-2xl font-bold mb-6">📖 BOS y CHOCH</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div>
+          <h3 class="text-emerald-400 font-semibold mb-2">BOS - Break of Structure</h3>
+          <p class="text-gray-400">Rompimiento de estructura anterior. Confirma <strong>continuación</strong> de tendencia.</p>
+        </div>
+        <div>
+          <h3 class="text-amber-400 font-semibold mb-2">CHOCH - Change of Character</h3>
+          <p class="text-gray-400">Cambio de carácter de la tendencia. Primera señal de posible <strong>reversión</strong>.</p>
+        </div>
+      </div>
+      <p class="mt-6 text-gray-400 text-sm">
+        <strong>Regla de Oro:</strong> Espera <strong>Retest</strong> después de CHOCH + confirmación BOS + RSI extremo + Banda BB.
+      </p>
+    </div>
+
+    <div class="text-center text-gray-500 text-xs mt-12">
+      TRADING AGENT OPTIMIZADO • Mínimo Riesgo • Máximo Profit • 2026
+    </div>
+  </div>
+
 </body>
 </html>
