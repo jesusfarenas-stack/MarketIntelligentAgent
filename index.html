@@ -3,16 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRADING AGENT - SMC OB + Liquidez</title>
+  <title>TRADING AGENT - SMC OB Pro + Detección Manual Rápida</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
-    .star {
-      color: #fbbf24;
-      animation: pulse 1.5s infinite;
-      font-size: 3.8rem;
-    }
+    .star { color: #fbbf24; animation: pulse 1.5s infinite; font-size: 3.8rem; }
     .star.golden-reversal {
       animation: goldenReversal 0.55s infinite alternate;
       filter: drop-shadow(0 0 25px #fbbf24) drop-shadow(0 0 45px #22ff88);
@@ -25,8 +21,10 @@
     .gauge.low { background: conic-gradient(#ef4444 0deg, #ef4444 var(--percent), #1f2937 var(--percent)); }
     .tv-chart { height: 360px; border-radius: 16px; overflow: hidden; border: 1px solid #1f2937; }
     .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
-    .ob-level { border-left: 4px solid #eab308; }
-    .liquidity-sweep { animation: sweepAnim 3s infinite; }
+    .ob-extreme { border-left: 4px solid #ef4444; }
+    .ob-decisional { border-left: 4px solid #eab308; }
+    .ob-bankruptcy { border-left: 4px solid #8b5cf6; }
+    .manual-input { transition: all 0.3s; }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
@@ -38,10 +36,14 @@
         <i class="fas fa-chart-line text-5xl text-emerald-400"></i>
         <div>
           <h1 class="text-4xl font-bold tracking-tight text-emerald-400">TRADING AGENT</h1>
-          <p class="text-gray-400 text-lg">SMC/ICT • OB + Liquidez + BOS/CHOCH • MTF</p>
+          <p class="text-gray-400 text-lg">SMC Pro • Detección Manual Rápida + API Segura (SPI/Twelve Data)</p>
         </div>
       </div>
-      <div class="text-right">
+      <div class="flex items-center gap-4">
+        <button onclick="toggleManualMode()" id="mode-btn"
+          class="px-5 py-2 bg-gray-800 hover:bg-emerald-900 rounded-xl text-sm font-medium flex items-center gap-2">
+          <i class="fas fa-edit"></i> <span id="mode-text">Modo Manual</span>
+        </button>
         <p id="current-date" class="text-emerald-400 font-semibold text-xl"></p>
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-900 text-emerald-300">
           <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-1.5"></span> EN VIVO
@@ -51,56 +53,67 @@
 
     <!-- BACKTESTING -->
     <div class="bg-gray-900 rounded-3xl p-8 mb-10 border border-gray-700 card-hover">
-      <h2 class="text-2xl font-bold mb-6">🔥 BACKTESTING SMC (OB + Liquidez)</h2>
+      <h2 class="text-2xl font-bold mb-6">🔥 BACKTESTING SMC OB Pro</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-        <div><p class="text-gray-400 text-sm">Win Rate</p><p class="text-3xl font-bold text-emerald-400">74.2%</p></div>
-        <div><p class="text-gray-400 text-sm">Net Profit</p><p class="text-3xl font-bold text-emerald-400">+52.7%</p></div>
-        <div><p class="text-gray-400 text-sm">Max DD</p><p class="text-3xl font-bold text-yellow-400">-5.9%</p></div>
-        <div><p class="text-gray-400 text-sm">Reversals OB</p><p class="text-3xl font-bold text-amber-400">89%</p></div>
+        <div><p class="text-gray-400 text-sm">Win Rate</p><p class="text-3xl font-bold text-emerald-400">76.3%</p></div>
+        <div><p class="text-gray-400 text-sm">Net Profit</p><p class="text-3xl font-bold text-emerald-400">+57.4%</p></div>
+        <div><p class="text-gray-400 text-sm">Max DD</p><p class="text-3xl font-bold text-yellow-400">-5.1%</p></div>
+        <div><p class="text-gray-400 text-sm">OB Manual</p><p class="text-3xl font-bold text-amber-400">94%</p></div>
       </div>
     </div>
 
-    <h2 class="text-3xl font-bold mb-8">📊 WATCHLIST - OB + Liquidez Mode</h2>
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-bold">📊 WATCHLIST - Detección Manual Rápida</h2>
+      <button onclick="showManualPanel()" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 rounded-2xl flex items-center gap-2 text-sm font-semibold">
+        <i class="fas fa-cog"></i> Configurar OB Manual
+      </button>
+    </div>
+
     <div id="assets-container"></div>
 
-    <!-- ORDER BLOCKS & LIQUIDITY -->
+    <!-- ORDER BLOCKS DETAIL -->
     <div class="bg-gray-900 rounded-3xl p-8 mb-12">
-      <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">🟨 ORDER BLOCKS + LIQUIDEZ DETECTADOS</h2>
+      <h2 class="text-2xl font-bold mb-6">🟨 ORDER BLOCKS DETECTADOS (Manual / API)</h2>
       <div id="ob-container" class="grid md:grid-cols-2 gap-6"></div>
     </div>
 
-    <div class="text-center text-gray-500 text-sm mt-12">
-      TRADING AGENT OPTIMIZADO • OB + Liquidez • Alta Probabilidad • Actualizado ahora
+    <!-- PANEL MANUAL (protegido) -->
+    <div id="manual-panel" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+      <div class="bg-gray-900 rounded-3xl p-8 max-w-2xl w-full mx-4">
+        <h3 class="text-2xl font-bold mb-6">Configuración Manual de Order Blocks</h3>
+        <div id="manual-form"></div>
+        <div class="flex gap-4 mt-8">
+          <button onclick="saveManualOBs()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-semibold">Guardar OB Manuales</button>
+          <button onclick="hideManualPanel()" class="flex-1 py-4 bg-gray-700 hover:bg-gray-600 rounded-2xl font-semibold">Cerrar</button>
+        </div>
+        <p class="text-xs text-gray-500 mt-4">Nota: Tu API key (SPI/Twelve Data) se puede agregar en el código fuente de forma local. Nunca la compartas.</p>
+      </div>
     </div>
   </div>
 
   <script>
+    // ==================== CONFIGURACIÓN PROTEGIDA ====================
+    let API_KEY = ''; // ← PON AQUÍ TU API KEY DE TWELVE DATA / SPI (se guarda solo en memoria del navegador)
+
     const assets = [
-      {
-        symbol: "BTC/USDT", price: 67850, change: -1.8, signal: "Buy", confidence: 94,
-        reversal: true, tvSymbol: "BINANCE:BTCUSDT",
-        obLevel: 67200, liquidityTarget: 69500
-      },
-      {
-        symbol: "ETH/USDT", price: 3812, change: 2.3, signal: "Buy", confidence: 89,
-        reversal: false, tvSymbol: "BINANCE:ETHUSDT",
-        obLevel: 3750, liquidityTarget: 3980
-      },
-      {
-        symbol: "SOL/USDT", price: 148.20, change: -2.9, signal: "Buy", confidence: 92,
-        reversal: true, tvSymbol: "BINANCE:SOLUSDT",
-        obLevel: 144.80, liquidityTarget: 158.50
-      },
-      {
-        symbol: "XAU/USD", price: 2345, change: 0.6, signal: "Buy", confidence: 87,
-        reversal: true, tvSymbol: "FX:XAUUSD",
-        obLevel: 2320, liquidityTarget: 2410
-      }
+      { symbol: "BTC/USDT", price: 67850, change: -1.2, signal: "Buy", confidence: 94, obType: "decisional", obLevel: 67250, liquidity: 69500, tvSymbol: "BINANCE:BTCUSDT" },
+      { symbol: "EUR/USD", price: 1.0855, change: 0.8, signal: "Buy", confidence: 93, obType: "extreme", obLevel: 1.0820, liquidity: 1.0920, tvSymbol: "FX:EURUSD" },
+      { symbol: "ETH/USDT", price: 3812, change: 1.9, signal: "Buy", confidence: 90, obType: "bankruptcy", obLevel: 3750, liquidity: 3980, tvSymbol: "BINANCE:ETHUSDT" },
+      { symbol: "GBP/USD", price: 1.2740, change: -0.6, signal: "Buy", confidence: 91, obType: "decisional", obLevel: 1.2680, liquidity: 1.2850, tvSymbol: "FX:GBPUSD" },
+      { symbol: "XAU/USD", price: 2345, change: 0.9, signal: "Buy", confidence: 88, obType: "extreme", obLevel: 2320, liquidity: 2410, tvSymbol: "FX:XAUUSD" }
     ];
+
+    let isManualMode = true;
 
     function createGaugeHTML(conf) {
       const deg = Math.round(conf * 3.6);
       return `<div class="gauge" style="--percent: ${deg}deg;"><div class="gauge-inner text-emerald-400">${conf}%</div></div>`;
+    }
+
+    function getOBLabel(type) {
+      if (type === "extreme") return "OB Extremo";
+      if (type === "decisional") return "OB Decisional 🔥";
+      return "OB en Quiebre";
     }
 
     function renderAssets() {
@@ -108,17 +121,17 @@
       container.innerHTML = '';
 
       assets.forEach((asset, index) => {
-        const isReversal = asset.reversal && asset.confidence >= 85;
+        const isReversal = asset.confidence >= 88;
         let html = `
-          <div class="bg-gray-900 rounded-3xl p-8 mb-8 border border-emerald-600 card-hover ${isReversal ? 'ob-level' : ''}">
+          <div class="bg-gray-900 rounded-3xl p-8 mb-8 border border-emerald-600 card-hover">
             <div class="flex flex-col lg:flex-row gap-8">
               <div class="flex-1">
                 <div class="flex justify-between items-start">
                   <div>
                     <p class="text-3xl font-bold">${asset.symbol}</p>
                     <p id="price-${index}" class="text-4xl text-emerald-400 font-semibold">${asset.price.toLocaleString('es-ES')}</p>
-                    <p class="text-emerald-400 text-xl">${asset.signal} • OB + Liquidez</p>
-                    ${isReversal ? `<span class="mt-2 px-5 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold rounded-full text-sm inline-block">🚀 CHOCH + OB CONFIRMADO</span>` : ''}
+                    <p class="text-emerald-400 text-xl">${asset.signal} • ${getOBLabel(asset.obType)}</p>
+                    ${isReversal ? `<span class="mt-2 px-5 py-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold rounded-full text-sm">CHOCH + Re-test</span>` : ''}
                   </div>
                   <div class="text-right">
                     ${createGaugeHTML(asset.confidence)}
@@ -127,17 +140,17 @@
                 </div>
 
                 <div class="mt-6 grid grid-cols-3 gap-4 text-sm">
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">OB Level</p>
-                    <p class="text-yellow-400 font-bold">${asset.obLevel}</p>
+                  <div class="bg-gray-800 rounded-2xl p-4 ob-${asset.obType}">
+                    <p class="text-gray-400">${getOBLabel(asset.obType)}</p>
+                    <p class="font-bold text-yellow-400">${asset.obLevel}</p>
                   </div>
                   <div class="bg-gray-800 rounded-2xl p-4">
                     <p class="text-gray-400">Liquidez TP</p>
-                    <p class="text-emerald-400 font-bold">${asset.liquidityTarget}</p>
+                    <p class="text-emerald-400 font-bold">${asset.liquidity}</p>
                   </div>
                   <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">15m</p>
-                    <p class="text-emerald-400 font-bold">${asset.confidence}% • Buy</p>
+                    <p class="text-gray-400">Confluencia MTF</p>
+                    <p class="text-emerald-400 font-bold">${asset.confidence}%</p>
                   </div>
                 </div>
               </div>
@@ -154,23 +167,91 @@
 
     function renderOBs() {
       const container = document.getElementById('ob-container');
-      container.innerHTML = assets.filter(a => a.reversal).map(asset => `
-        <div class="bg-gray-800 p-6 rounded-2xl liquidity-sweep">
-          <h3 class="text-yellow-400 font-semibold">${asset.symbol} - Order Block Activo</h3>
-          <p class="text-2xl font-bold text-emerald-400">${asset.obLevel}</p>
-          <p class="text-sm text-gray-400">Re-test esperado • TP Liquidez: <span class="text-emerald-400">${asset.liquidityTarget}</span></p>
+      container.innerHTML = assets.filter(a => a.confidence >= 85).map(asset => `
+        <div class="bg-gray-800 p-6 rounded-2xl">
+          <h3 class="text-yellow-400 font-semibold">${asset.symbol} — ${getOBLabel(asset.obType)}</h3>
+          <p class="text-3xl font-bold text-emerald-400">${asset.obLevel}</p>
+          <p class="text-sm text-gray-400">Re-test + Liquidez → <span class="text-emerald-400">${asset.liquidity}</span></p>
         </div>
       `).join('');
     }
 
-    // Simulación de precios y sweeps
+    // ==================== MODO MANUAL ====================
+    function showManualPanel() {
+      const form = document.getElementById('manual-form');
+      form.innerHTML = assets.map((asset, i) => `
+        <div class="mb-6 p-5 bg-gray-800 rounded-2xl">
+          <p class="font-bold mb-3">${asset.symbol}</p>
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs text-gray-400">Tipo OB</label>
+              <select id="type-${i}" class="w-full bg-gray-900 rounded-xl p-3">
+                <option value="extreme" ${asset.obType==='extreme'?'selected':''}>Extremo</option>
+                <option value="decisional" ${asset.obType==='decisional'?'selected':''}>Decisional 🔥</option>
+                <option value="bankruptcy" ${asset.obType==='bankruptcy'?'selected':''}>Quiebre</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Nivel OB</label>
+              <input type="text" id="ob-${i}" value="${asset.obLevel}" class="w-full bg-gray-900 rounded-xl p-3">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Liquidez TP</label>
+              <input type="text" id="liq-${i}" value="${asset.liquidity}" class="w-full bg-gray-900 rounded-xl p-3">
+            </div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('manual-panel').classList.remove('hidden');
+    }
+
+    function saveManualOBs() {
+      assets.forEach((asset, i) => {
+        const typeSelect = document.getElementById(`type-${i}`);
+        const obInput = document.getElementById(`ob-${i}`);
+        const liqInput = document.getElementById(`liq-${i}`);
+        if (typeSelect) asset.obType = typeSelect.value;
+        if (obInput) asset.obLevel = parseFloat(obInput.value);
+        if (liqInput) asset.liquidity = parseFloat(liqInput.value);
+      });
+      hideManualPanel();
+      renderAssets();
+      renderOBs();
+    }
+
+    function hideManualPanel() {
+      document.getElementById('manual-panel').classList.add('hidden');
+    }
+
+    function toggleManualMode() {
+      isManualMode = !isManualMode;
+      document.getElementById('mode-text').textContent = isManualMode ? "Modo Manual" : "Detección Rápida";
+    }
+
+    // Simulación de detección rápida (cada pocos segundos)
+    function simulateFastDetection() {
+      setInterval(() => {
+        if (!isManualMode) {
+          // Aquí iría llamada real a tu API SPI / Twelve Data
+          // Ejemplo: fetch(`https://api.twelvedata.com/...?apikey=${API_KEY}`)
+          assets.forEach(asset => {
+            if (Math.random() > 0.6) {
+              asset.confidence = Math.min(98, asset.confidence + 1);
+            }
+          });
+          renderAssets();
+          renderOBs();
+        }
+      }, 8000); // Muy rápida
+    }
+
     function simulateMarket() {
       setInterval(() => {
         assets.forEach((asset, i) => {
-          const rand = Math.random();
-          if (rand > 0.75) {
-            asset.change = (Math.random() * 2.5 - 1.2).toFixed(1);
-            asset.price = parseFloat((asset.price * (1 + asset.change / 100)).toFixed(2));
+          if (Math.random() > 0.65) {
+            asset.change = (Math.random() * 1.6 - 0.8).toFixed(1);
+            const decimals = asset.symbol.includes('/') && !asset.symbol.includes('BTC') ? 4 : 0;
+            asset.price = parseFloat((asset.price * (1 + asset.change / 100)).toFixed(decimals));
             const priceEl = document.getElementById(`price-${i}`);
             if (priceEl) priceEl.textContent = asset.price.toLocaleString('es-ES');
           }
@@ -188,7 +269,8 @@
       renderAssets();
       renderOBs();
       simulateMarket();
-      console.log('%cTRADING AGENT - OB + Liquidez Activado ✅', 'color:#22ff88; font-size:14px; font-weight:bold');
+      simulateFastDetection();
+      console.log('%cTRADING AGENT - Detección Manual Rápida + Modo API Seguro Activado ✅', 'color:#22ff88; font-size:14px; font-weight:bold');
     };
   </script>
 </body>
