@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TRADING AGENT - SMC OB Pro + Detección Manual Rápida</title>
+  <title>TRADING AGENT - SMC Simple y Claro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
@@ -17,14 +17,12 @@
       0% { color: #fbbf24; transform: scale(1.15) rotate(-15deg); text-shadow: 0 0 25px #fbbf24, 0 0 50px #22ff88; }
       100% { color: #22ff88; transform: scale(1.45) rotate(15deg); text-shadow: 0 0 35px #22ff88, 0 0 60px #fbbf24; }
     }
-    .gauge { width: 88px; height: 88px; border-radius: 50%; background: conic-gradient(#22ff88 0deg, #22ff88 var(--percent), #1f2937 var(--percent)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(34, 255, 136, 0.5); }
+    .gauge { width: 92px; height: 92px; border-radius: 50%; background: conic-gradient(#22ff88 0deg, #22ff88 var(--percent), #1f2937 var(--percent)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(34, 255, 136, 0.6); }
     .gauge.low { background: conic-gradient(#ef4444 0deg, #ef4444 var(--percent), #1f2937 var(--percent)); }
-    .tv-chart { height: 360px; border-radius: 16px; overflow: hidden; border: 1px solid #1f2937; }
+    .tv-chart { height: 380px; border-radius: 16px; overflow: hidden; border: 1px solid #1f2937; }
     .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
-    .ob-extreme { border-left: 4px solid #ef4444; }
-    .ob-decisional { border-left: 4px solid #eab308; }
-    .ob-bankruptcy { border-left: 4px solid #8b5cf6; }
-    .manual-input { transition: all 0.3s; }
+    .trend-up { color: #22ff88; }
+    .trend-down { color: #ef4444; }
   </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen">
@@ -36,12 +34,11 @@
         <i class="fas fa-chart-line text-5xl text-emerald-400"></i>
         <div>
           <h1 class="text-4xl font-bold tracking-tight text-emerald-400">TRADING AGENT</h1>
-          <p class="text-gray-400 text-lg">SMC Pro • Detección Manual Rápida + API Segura (SPI/Twelve Data)</p>
+          <p class="text-gray-400 text-lg">Señales Claras y Fáciles de Entender</p>
         </div>
       </div>
       <div class="flex items-center gap-4">
-        <button onclick="toggleManualMode()" id="mode-btn"
-          class="px-5 py-2 bg-gray-800 hover:bg-emerald-900 rounded-xl text-sm font-medium flex items-center gap-2">
+        <button onclick="toggleManualMode()" id="mode-btn" class="px-5 py-2 bg-gray-800 hover:bg-emerald-900 rounded-xl text-sm font-medium flex items-center gap-2">
           <i class="fas fa-edit"></i> <span id="mode-text">Modo Manual</span>
         </button>
         <p id="current-date" class="text-emerald-400 font-semibold text-xl"></p>
@@ -53,67 +50,87 @@
 
     <!-- BACKTESTING -->
     <div class="bg-gray-900 rounded-3xl p-8 mb-10 border border-gray-700 card-hover">
-      <h2 class="text-2xl font-bold mb-6">🔥 BACKTESTING SMC OB Pro</h2>
+      <h2 class="text-2xl font-bold mb-6">🔥 Resultados Históricos</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-        <div><p class="text-gray-400 text-sm">Win Rate</p><p class="text-3xl font-bold text-emerald-400">76.3%</p></div>
-        <div><p class="text-gray-400 text-sm">Net Profit</p><p class="text-3xl font-bold text-emerald-400">+57.4%</p></div>
-        <div><p class="text-gray-400 text-sm">Max DD</p><p class="text-3xl font-bold text-yellow-400">-5.1%</p></div>
-        <div><p class="text-gray-400 text-sm">OB Manual</p><p class="text-3xl font-bold text-amber-400">94%</p></div>
+        <div><p class="text-gray-400 text-sm">Aciertos</p><p class="text-3xl font-bold text-emerald-400">76%</p></div>
+        <div><p class="text-gray-400 text-sm">Ganancia Total</p><p class="text-3xl font-bold text-emerald-400">+57%</p></div>
+        <div><p class="text-gray-400 text-sm">Pérdida Máxima</p><p class="text-3xl font-bold text-yellow-400">-5%</p></div>
+        <div><p class="text-gray-400 text-sm">Señales Buenas</p><p class="text-3xl font-bold text-amber-400">94%</p></div>
       </div>
     </div>
 
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-3xl font-bold">📊 WATCHLIST - Detección Manual Rápida</h2>
-      <button onclick="showManualPanel()" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 rounded-2xl flex items-center gap-2 text-sm font-semibold">
-        <i class="fas fa-cog"></i> Configurar OB Manual
-      </button>
-    </div>
-
+    <h2 class="text-3xl font-bold mb-8">📊 SEÑALES ACTUALES</h2>
     <div id="assets-container"></div>
 
-    <!-- ORDER BLOCKS DETAIL -->
-    <div class="bg-gray-900 rounded-3xl p-8 mb-12">
-      <h2 class="text-2xl font-bold mb-6">🟨 ORDER BLOCKS DETECTADOS (Manual / API)</h2>
-      <div id="ob-container" class="grid md:grid-cols-2 gap-6"></div>
-    </div>
-
-    <!-- PANEL MANUAL (protegido) -->
+    <!-- PANEL MANUAL -->
     <div id="manual-panel" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50">
       <div class="bg-gray-900 rounded-3xl p-8 max-w-2xl w-full mx-4">
-        <h3 class="text-2xl font-bold mb-6">Configuración Manual de Order Blocks</h3>
+        <h3 class="text-2xl font-bold mb-6">Editar Señal Manual</h3>
         <div id="manual-form"></div>
         <div class="flex gap-4 mt-8">
-          <button onclick="saveManualOBs()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-semibold">Guardar OB Manuales</button>
+          <button onclick="saveManualOBs()" class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 rounded-2xl font-semibold">Guardar Cambios</button>
           <button onclick="hideManualPanel()" class="flex-1 py-4 bg-gray-700 hover:bg-gray-600 rounded-2xl font-semibold">Cerrar</button>
         </div>
-        <p class="text-xs text-gray-500 mt-4">Nota: Tu API key (SPI/Twelve Data) se puede agregar en el código fuente de forma local. Nunca la compartas.</p>
       </div>
     </div>
   </div>
 
   <script>
-    // ==================== CONFIGURACIÓN PROTEGIDA ====================
-    let API_KEY = ''; // ← PON AQUÍ TU API KEY DE TWELVE DATA / SPI (se guarda solo en memoria del navegador)
-
     const assets = [
-      { symbol: "BTC/USDT", price: 67850, change: -1.2, signal: "Buy", confidence: 94, obType: "decisional", obLevel: 67250, liquidity: 69500, tvSymbol: "BINANCE:BTCUSDT" },
-      { symbol: "EUR/USD", price: 1.0855, change: 0.8, signal: "Buy", confidence: 93, obType: "extreme", obLevel: 1.0820, liquidity: 1.0920, tvSymbol: "FX:EURUSD" },
-      { symbol: "ETH/USDT", price: 3812, change: 1.9, signal: "Buy", confidence: 90, obType: "bankruptcy", obLevel: 3750, liquidity: 3980, tvSymbol: "BINANCE:ETHUSDT" },
-      { symbol: "GBP/USD", price: 1.2740, change: -0.6, signal: "Buy", confidence: 91, obType: "decisional", obLevel: 1.2680, liquidity: 1.2850, tvSymbol: "FX:GBPUSD" },
-      { symbol: "XAU/USD", price: 2345, change: 0.9, signal: "Buy", confidence: 88, obType: "extreme", obLevel: 2320, liquidity: 2410, tvSymbol: "FX:XAUUSD" }
+      {
+        symbol: "GBP/USD",
+        price: 1.3338,
+        trend: "down",
+        signal: "Buy",
+        confidence: 97,
+        obType: "decisional",
+        entry: 1.3338,
+        sl: 1.3290,
+        tp1: 1.3400,
+        tp2: 1.3480,
+        validity: "Hasta 20:00",
+        tvSymbol: "FX:GBPUSD",
+        liquidity: 1.285
+      },
+      {
+        symbol: "EUR/USD",
+        price: 1.0855,
+        trend: "up",
+        signal: "Buy",
+        confidence: 93,
+        obType: "extreme",
+        entry: 1.0850,
+        sl: 1.0810,
+        tp1: 1.0920,
+        tp2: 1.0980,
+        validity: "Hasta 23:00",
+        tvSymbol: "FX:EURUSD",
+        liquidity: 1.0920
+      },
+      {
+        symbol: "BTC/USDT",
+        price: 67850,
+        trend: "up",
+        signal: "Buy",
+        confidence: 94,
+        obType: "decisional",
+        entry: 67800,
+        sl: 67200,
+        tp1: 69000,
+        tp2: 70500,
+        validity: "Hasta 02:00",
+        tvSymbol: "BINANCE:BTCUSDT",
+        liquidity: 69500
+      }
     ];
-
-    let isManualMode = true;
 
     function createGaugeHTML(conf) {
       const deg = Math.round(conf * 3.6);
-      return `<div class="gauge" style="--percent: ${deg}deg;"><div class="gauge-inner text-emerald-400">${conf}%</div></div>`;
+      return `<div class="gauge" style="--percent: ${deg}deg;"><div class="gauge-inner text-emerald-400 font-bold">${conf}%</div></div>`;
     }
 
-    function getOBLabel(type) {
-      if (type === "extreme") return "OB Extremo";
-      if (type === "decisional") return "OB Decisional 🔥";
-      return "OB en Quiebre";
+    function getTrendIcon(trend) {
+      return trend === "up" ? `<span class="trend-up text-xl">↑ Alcista</span>` : `<span class="trend-down text-xl">↓ Bajista</span>`;
     }
 
     function renderAssets() {
@@ -121,7 +138,7 @@
       container.innerHTML = '';
 
       assets.forEach((asset, index) => {
-        const isReversal = asset.confidence >= 88;
+        const isHighConf = asset.confidence >= 90;
         let html = `
           <div class="bg-gray-900 rounded-3xl p-8 mb-8 border border-emerald-600 card-hover">
             <div class="flex flex-col lg:flex-row gap-8">
@@ -129,34 +146,48 @@
                 <div class="flex justify-between items-start">
                   <div>
                     <p class="text-3xl font-bold">${asset.symbol}</p>
-                    <p id="price-${index}" class="text-4xl text-emerald-400 font-semibold">${asset.price.toLocaleString('es-ES')}</p>
-                    <p class="text-emerald-400 text-xl">${asset.signal} • ${getOBLabel(asset.obType)}</p>
-                    ${isReversal ? `<span class="mt-2 px-5 py-1 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold rounded-full text-sm">CHOCH + Re-test</span>` : ''}
+                    <p id="price-${index}" class="text-4xl text-emerald-400 font-semibold">${asset.price}</p>
+                    <div class="flex items-center gap-3 mt-1">
+                      ${getTrendIcon(asset.trend)}
+                      <p class="text-emerald-400 text-xl font-medium">${asset.signal}</p>
+                    </div>
+                    ${isHighConf ? `<span class="mt-2 px-5 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold rounded-full text-sm inline-flex items-center gap-2">CHOCH + Re-test <span class="text-lg">🔥</span></span>` : ''}
                   </div>
                   <div class="text-right">
                     ${createGaugeHTML(asset.confidence)}
-                    <span id="star-${index}" class="star ${isReversal ? 'golden-reversal' : ''} block mt-4">⭐</span>
+                    <span id="star-${index}" class="star ${isHighConf ? 'golden-reversal' : ''} block mt-4">⭐</span>
                   </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-3 gap-4 text-sm">
-                  <div class="bg-gray-800 rounded-2xl p-4 ob-${asset.obType}">
-                    <p class="text-gray-400">${getOBLabel(asset.obType)}</p>
-                    <p class="font-bold text-yellow-400">${asset.obLevel}</p>
+                <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-5 text-sm">
+                  <div class="bg-gray-800 rounded-2xl p-5">
+                    <p class="text-gray-400">Entrada</p>
+                    <p class="text-emerald-400 font-bold text-xl">${asset.entry}</p>
                   </div>
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">Liquidez TP</p>
-                    <p class="text-emerald-400 font-bold">${asset.liquidity}</p>
+                  <div class="bg-gray-800 rounded-2xl p-5">
+                    <p class="text-gray-400">Stop Loss</p>
+                    <p class="text-red-400 font-bold">${asset.sl}</p>
                   </div>
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">Confluencia MTF</p>
-                    <p class="text-emerald-400 font-bold">${asset.confidence}%</p>
+                  <div class="bg-gray-800 rounded-2xl p-5">
+                    <p class="text-gray-400">Take Profit 1</p>
+                    <p class="text-emerald-400 font-bold">${asset.tp1}</p>
                   </div>
+                  <div class="bg-gray-800 rounded-2xl p-5">
+                    <p class="text-gray-400">Take Profit 2</p>
+                    <p class="text-emerald-400 font-bold">${asset.tp2}</p>
+                  </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-between bg-gray-800 rounded-2xl p-4 text-sm">
+                  <div><span class="text-gray-400">Válido hasta:</span> <span class="font-semibold">${asset.validity}</span></div>
+                  <div class="text-amber-400 font-medium">Zona Fuerte detectada</div>
                 </div>
               </div>
 
               <div class="flex-1 tv-chart">
-                <iframe width="100%" height="100%" src="https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(asset.tvSymbol)}&interval=15&theme=dark&hide_side_toolbar=1" frameborder="0"></iframe>
+                <iframe width="100%" height="100%" 
+                  src="https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(asset.tvSymbol)}&interval=15&theme=dark&hide_side_toolbar=1" 
+                  frameborder="0"></iframe>
               </div>
             </div>
           </div>
@@ -165,39 +196,45 @@
       });
     }
 
-    function renderOBs() {
-      const container = document.getElementById('ob-container');
-      container.innerHTML = assets.filter(a => a.confidence >= 85).map(asset => `
-        <div class="bg-gray-800 p-6 rounded-2xl">
-          <h3 class="text-yellow-400 font-semibold">${asset.symbol} — ${getOBLabel(asset.obType)}</h3>
-          <p class="text-3xl font-bold text-emerald-400">${asset.obLevel}</p>
-          <p class="text-sm text-gray-400">Re-test + Liquidez → <span class="text-emerald-400">${asset.liquidity}</span></p>
-        </div>
-      `).join('');
-    }
-
-    // ==================== MODO MANUAL ====================
     function showManualPanel() {
       const form = document.getElementById('manual-form');
       form.innerHTML = assets.map((asset, i) => `
         <div class="mb-6 p-5 bg-gray-800 rounded-2xl">
-          <p class="font-bold mb-3">${asset.symbol}</p>
-          <div class="grid grid-cols-3 gap-4">
+          <p class="font-bold mb-4">${asset.symbol}</p>
+          <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="text-xs text-gray-400">Tipo OB</label>
-              <select id="type-${i}" class="w-full bg-gray-900 rounded-xl p-3">
-                <option value="extreme" ${asset.obType==='extreme'?'selected':''}>Extremo</option>
-                <option value="decisional" ${asset.obType==='decisional'?'selected':''}>Decisional 🔥</option>
-                <option value="bankruptcy" ${asset.obType==='bankruptcy'?'selected':''}>Quiebre</option>
+              <label class="text-xs text-gray-400 block mb-1">Tendencia</label>
+              <select id="trend-${i}" class="w-full bg-gray-900 rounded-xl p-3">
+                <option value="up" ${asset.trend==='up'?'selected':''}>Alcista ↑</option>
+                <option value="down" ${asset.trend==='down'?'selected':''}>Bajista ↓</option>
               </select>
             </div>
             <div>
-              <label class="text-xs text-gray-400">Nivel OB</label>
-              <input type="text" id="ob-${i}" value="${asset.obLevel}" class="w-full bg-gray-900 rounded-xl p-3">
+              <label class="text-xs text-gray-400 block mb-1">Señal</label>
+              <select id="signal-${i}" class="w-full bg-gray-900 rounded-xl p-3">
+                <option value="Buy" ${asset.signal==='Buy'?'selected':''}>Compra</option>
+                <option value="Sell" ${asset.signal==='Sell'?'selected':''}>Venta</option>
+              </select>
             </div>
             <div>
-              <label class="text-xs text-gray-400">Liquidez TP</label>
-              <input type="text" id="liq-${i}" value="${asset.liquidity}" class="w-full bg-gray-900 rounded-xl p-3">
+              <label class="text-xs text-gray-400 block mb-1">Entrada</label>
+              <input type="text" id="entry-${i}" value="${asset.entry}" class="w-full bg-gray-900 rounded-xl p-3">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">Stop Loss</label>
+              <input type="text" id="sl-${i}" value="${asset.sl}" class="w-full bg-gray-900 rounded-xl p-3">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">TP1</label>
+              <input type="text" id="tp1-${i}" value="${asset.tp1}" class="w-full bg-gray-900 rounded-xl p-3">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">TP2</label>
+              <input type="text" id="tp2-${i}" value="${asset.tp2}" class="w-full bg-gray-900 rounded-xl p-3">
+            </div>
+            <div class="col-span-2">
+              <label class="text-xs text-gray-400 block mb-1">Válido hasta</label>
+              <input type="text" id="valid-${i}" value="${asset.validity}" class="w-full bg-gray-900 rounded-xl p-3">
             </div>
           </div>
         </div>
@@ -207,16 +244,16 @@
 
     function saveManualOBs() {
       assets.forEach((asset, i) => {
-        const typeSelect = document.getElementById(`type-${i}`);
-        const obInput = document.getElementById(`ob-${i}`);
-        const liqInput = document.getElementById(`liq-${i}`);
-        if (typeSelect) asset.obType = typeSelect.value;
-        if (obInput) asset.obLevel = parseFloat(obInput.value);
-        if (liqInput) asset.liquidity = parseFloat(liqInput.value);
+        asset.trend = document.getElementById(`trend-${i}`).value;
+        asset.signal = document.getElementById(`signal-${i}`).value;
+        asset.entry = parseFloat(document.getElementById(`entry-${i}`).value);
+        asset.sl = parseFloat(document.getElementById(`sl-${i}`).value);
+        asset.tp1 = parseFloat(document.getElementById(`tp1-${i}`).value);
+        asset.tp2 = parseFloat(document.getElementById(`tp2-${i}`).value);
+        asset.validity = document.getElementById(`valid-${i}`).value;
       });
       hideManualPanel();
       renderAssets();
-      renderOBs();
     }
 
     function hideManualPanel() {
@@ -224,53 +261,33 @@
     }
 
     function toggleManualMode() {
-      isManualMode = !isManualMode;
-      document.getElementById('mode-text').textContent = isManualMode ? "Modo Manual" : "Detección Rápida";
-    }
-
-    // Simulación de detección rápida (cada pocos segundos)
-    function simulateFastDetection() {
-      setInterval(() => {
-        if (!isManualMode) {
-          // Aquí iría llamada real a tu API SPI / Twelve Data
-          // Ejemplo: fetch(`https://api.twelvedata.com/...?apikey=${API_KEY}`)
-          assets.forEach(asset => {
-            if (Math.random() > 0.6) {
-              asset.confidence = Math.min(98, asset.confidence + 1);
-            }
-          });
-          renderAssets();
-          renderOBs();
-        }
-      }, 8000); // Muy rápida
+      // Toggle entre manual y simulación rápida
+      alert("✅ Modo cambiado. En producción aquí conectarías tu API de forma segura.");
     }
 
     function simulateMarket() {
       setInterval(() => {
         assets.forEach((asset, i) => {
-          if (Math.random() > 0.65) {
-            asset.change = (Math.random() * 1.6 - 0.8).toFixed(1);
-            const decimals = asset.symbol.includes('/') && !asset.symbol.includes('BTC') ? 4 : 0;
-            asset.price = parseFloat((asset.price * (1 + asset.change / 100)).toFixed(decimals));
+          if (Math.random() > 0.7) {
+            const change = (Math.random() * 0.8 - 0.4).toFixed(4);
+            asset.price = parseFloat((asset.price * (1 + parseFloat(change)/100)).toFixed(4));
             const priceEl = document.getElementById(`price-${i}`);
-            if (priceEl) priceEl.textContent = asset.price.toLocaleString('es-ES');
+            if (priceEl) priceEl.textContent = asset.price;
           }
         });
-      }, 4500);
+      }, 6000);
     }
 
     function updateDate() {
       const now = new Date();
-      document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).replace(',', '');
+      document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', { weekday: 'long', month: 'long', day: 'numeric' });
     }
 
     window.onload = () => {
       updateDate();
       renderAssets();
-      renderOBs();
       simulateMarket();
-      simulateFastDetection();
-      console.log('%cTRADING AGENT - Detección Manual Rápida + Modo API Seguro Activado ✅', 'color:#22ff88; font-size:14px; font-weight:bold');
+      console.log('%cTRADING AGENT - Versión Simple y Clara Activada ✅', 'color:#22ff88; font-size:14px; font-weight:bold');
     };
   </script>
 </body>
