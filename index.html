@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>TRADING AGENT PRO - Auto Precio y Tendencia</title>
+  <title>TRADING AGENT PRO - Watchlist Auto</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -24,21 +24,8 @@
       transform: none !important;
     }
 
-    .star {
-      color: #fbbf24;
-      animation: none !important;
-      font-size: 3.6rem;
-      transform: none !important;
-      text-shadow: none !important;
-      filter: none !important;
-    }
-
-    .star.golden-reversal {
-      animation: none !important;
-      transform: none !important;
-      filter: none !important;
-      color: #fbbf24;
-      text-shadow: none !important;
+    input, select {
+      outline: none;
     }
 
     .gauge {
@@ -49,37 +36,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 30px rgba(34, 255, 136, 0.45);
+      box-shadow: 0 0 28px rgba(34, 255, 136, 0.35);
+      flex-shrink: 0;
     }
 
     .gauge.mid {
       background: conic-gradient(#facc15 0deg, #facc15 var(--percent), #1f2937 var(--percent));
-      box-shadow: 0 0 30px rgba(250, 204, 21, 0.35);
+      box-shadow: 0 0 28px rgba(250, 204, 21, 0.28);
     }
 
     .gauge.low {
       background: conic-gradient(#ef4444 0deg, #ef4444 var(--percent), #1f2937 var(--percent));
-      box-shadow: 0 0 30px rgba(239, 68, 68, 0.35);
-    }
-
-    .tv-chart {
-      height: 520px;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid #1f2937;
-      background: #020617;
-    }
-
-    .card-hover {
-      transition: none !important;
-      transform: none !important;
-      box-shadow: none;
-    }
-
-    .card-hover:hover {
-      transition: none !important;
-      transform: none !important;
-      box-shadow: none !important;
+      box-shadow: 0 0 28px rgba(239, 68, 68, 0.28);
     }
 
     .trend-up { color: #22ff88; }
@@ -88,31 +56,30 @@
 
     .decision-buy {
       background: linear-gradient(135deg, rgba(34,255,136,.18), rgba(16,185,129,.08));
-      border: 1px solid rgba(34,255,136,.5);
+      border: 1px solid rgba(34,255,136,.45);
     }
 
     .decision-sell {
       background: linear-gradient(135deg, rgba(239,68,68,.18), rgba(127,29,29,.08));
-      border: 1px solid rgba(239,68,68,.5);
+      border: 1px solid rgba(239,68,68,.45);
     }
 
     .decision-wait {
       background: linear-gradient(135deg, rgba(250,204,21,.18), rgba(113,63,18,.08));
-      border: 1px solid rgba(250,204,21,.5);
+      border: 1px solid rgba(250,204,21,.45);
     }
 
     .decision-no {
       background: linear-gradient(135deg, rgba(107,114,128,.18), rgba(31,41,55,.08));
-      border: 1px solid rgba(107,114,128,.5);
+      border: 1px solid rgba(107,114,128,.45);
     }
 
-    .decision-invalid {
-      background: linear-gradient(135deg, rgba(168,85,247,.18), rgba(76,29,149,.08));
-      border: 1px solid rgba(168,85,247,.5);
-    }
-
-    input, select {
-      outline: none;
+    .tv-chart {
+      height: 360px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #1f2937;
+      background: #020617;
     }
   </style>
 </head>
@@ -120,353 +87,261 @@
 <body class="bg-gray-950 text-gray-100 min-h-screen">
   <div class="max-w-7xl mx-auto p-4 md:p-6">
 
-    <!-- HEADER -->
-    <div class="flex flex-col xl:flex-row justify-between gap-5 items-start xl:items-center mb-6 border-b border-gray-800 pb-6">
-      <div class="flex items-center gap-4">
-        <i class="fas fa-chart-line text-5xl text-emerald-400"></i>
-
+    <!-- TOP API PANEL -->
+    <div class="bg-gray-900 rounded-3xl p-5 md:p-6 mb-6 border border-amber-600">
+      <div class="flex flex-col xl:flex-row gap-5 justify-between">
         <div>
-          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-emerald-400">
-            TRADING AGENT PRO
-          </h1>
-          <p class="text-gray-400 text-base md:text-lg">
-            Dashboard profesional asistido: Forex, Crypto, ETF, Stocks, Metales e Índices
-          </p>
+          <div class="flex items-center gap-4">
+            <i class="fas fa-chart-line text-5xl text-emerald-400"></i>
+            <div>
+              <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-emerald-400">
+                TRADING AGENT PRO
+              </h1>
+              <p class="text-gray-400">
+                Watchlist automática con precio, tendencia y oportunidad %
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 w-full xl:w-[680px]">
+          <div>
+            <label class="text-sm text-gray-400">API Key de Twelve Data</label>
+            <input id="market-api-key" type="password" placeholder="Pega aquí tu API Key"
+              class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white"
+              onchange="saveMarketApiKey(); updateAllMarketData();" />
+          </div>
+
+          <div>
+            <label class="text-sm text-gray-400">Timeframe</label>
+            <select id="global-timeframe" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white"
+              onchange="saveTimeframe(); updateAllMarketData();">
+              <option>5m</option>
+              <option selected>15m</option>
+              <option>30m</option>
+              <option>1H</option>
+              <option>4H</option>
+              <option>Diario</option>
+            </select>
+          </div>
+
+          <div class="flex items-end">
+            <button onclick="updateAllMarketData()"
+              class="w-full bg-amber-600 hover:bg-amber-500 rounded-xl px-5 py-3 font-bold flex items-center justify-center gap-2">
+              <i class="fas fa-rotate"></i>
+              Actualizar todo
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <p id="current-date" class="text-emerald-400 font-semibold text-lg"></p>
+      <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <p id="market-fetch-status" class="text-amber-300 font-semibold">
+          Pega tu API Key para actualizar todos los precios.
+        </p>
 
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900 text-amber-300">
-          <span class="w-2 h-2 bg-amber-400 rounded-full mr-1.5"></span>
-          API + TRADINGVIEW
-        </span>
+        <p id="last-update" class="text-gray-400 text-sm">
+          Última actualización: pendiente
+        </p>
       </div>
     </div>
 
-    <!-- CAPITAL PANEL -->
-    <div class="bg-gray-900 rounded-3xl p-6 mb-6 border border-red-500/40">
-      <div class="flex flex-col lg:flex-row justify-between gap-6">
-        <div>
-          <h2 class="text-2xl font-bold flex items-center gap-3">
-            💰 Capital de Proyección
-            <span class="text-xs px-3 py-1 rounded-full bg-red-900 text-red-300">
-              Riesgo agresivo 10%
-            </span>
-          </h2>
+    <!-- ADD SYMBOL PANEL -->
+    <div class="bg-gray-900 rounded-3xl p-5 mb-6 border border-gray-800">
+      <h2 class="text-xl font-bold mb-4">➕ Agregar activo a la watchlist</h2>
 
-          <p class="text-gray-400 mt-2">
-            Este módulo calcula escenarios ideales. Tú actualizas el capital después de ganar o perder.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full lg:w-auto">
-          <div class="bg-gray-800 rounded-2xl p-4">
-            <p class="text-gray-400 text-sm">Capital actual</p>
-            <input id="capital-input" type="number" value="200" step="1"
-              class="w-full bg-transparent text-emerald-400 text-2xl font-bold"
-              onchange="updateCapital()" />
-          </div>
-
-          <div class="bg-gray-800 rounded-2xl p-4">
-            <p class="text-gray-400 text-sm">Riesgo</p>
-            <p class="text-red-400 text-2xl font-bold">10%</p>
-          </div>
-
-          <div class="bg-gray-800 rounded-2xl p-4">
-            <p class="text-gray-400 text-sm">Pérdida máxima</p>
-            <p id="risk-dollar" class="text-red-400 text-2xl font-bold">$20.00</p>
-          </div>
-
-          <div class="bg-gray-800 rounded-2xl p-4">
-            <p class="text-gray-400 text-sm">Regla premium</p>
-            <p class="text-amber-400 text-lg font-bold">R/R mínimo 1:2</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-5 bg-red-950/30 border border-red-800 rounded-2xl p-4 text-sm text-red-200">
-        ⚠️ Riesgo alto activado: con $200, una operación perdida baja el capital a $180.
-        Usar solo cuando el timing sea excelente o bueno, el mercado no esté lateral y el R/R sea mínimo 1:2.
-      </div>
-    </div>
-
-    <!-- MANUAL / AUTO ANALYZER -->
-    <div class="bg-gray-900 rounded-3xl p-6 mb-8 border border-emerald-600 card-hover">
-      <div class="flex flex-col lg:flex-row justify-between gap-5 mb-5">
-        <div>
-          <h2 class="text-2xl font-bold flex items-center gap-3">
-            🧠 Modo Asistido de Análisis
-            <span class="text-xs bg-emerald-900 text-emerald-300 px-3 py-1 rounded-full">
-              Precio + Tendencia automática
-            </span>
-          </h2>
-
-          <p class="text-gray-400 mt-2">
-            Elige categoría e item. El agente puede buscar precio y tendencia. Tú defines entrada, SL, TP, ADX y estructura.
-          </p>
-
-          <p class="text-amber-300 text-sm mt-2">
-            Nota: el precio y la tendencia vienen de API. El gráfico de TradingView es visual. La entrada, SL, TP, ADX y SMC siguen siendo manuales.
-          </p>
-        </div>
-      </div>
-
-      <!-- API PANEL -->
-      <div class="mt-4 grid md:grid-cols-3 gap-4 bg-gray-800/70 rounded-2xl p-4 border border-amber-700/40 mb-5">
-        <div>
-          <label class="text-sm text-gray-400">API Key de mercado</label>
-          <input id="market-api-key" type="password" placeholder="Pega aquí tu API Key de Twelve Data"
-            class="w-full bg-gray-900 rounded-xl px-4 py-3 text-white"
-            onchange="saveMarketApiKey()" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Estado de búsqueda</label>
-          <p id="market-fetch-status" class="text-amber-300 font-semibold mt-3">
-            Listo para buscar precio y tendencia
-          </p>
-        </div>
-
-        <div class="flex items-end">
-          <p class="text-xs text-gray-400">
-            El agente usa EMA20 / EMA50 para clasificar tendencia alcista, bajista o lateral.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-2 xl:grid-cols-6 gap-4">
-        <div>
-          <label class="text-sm text-gray-400">Item / Símbolo</label>
-          <input id="manual-symbol" value="SOXL" placeholder="Ej: SOXL, EUR/USD, BTC/USDT, AAPL, XAU/USD"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white" />
-        </div>
-
+      <div class="grid md:grid-cols-4 gap-4">
         <div>
           <label class="text-sm text-gray-400">Categoría</label>
-          <select id="manual-category" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
+          <select id="new-category" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
             <option>ETF</option>
+            <option>Stock</option>
             <option>Forex</option>
             <option>Crypto</option>
-            <option>Stock</option>
             <option>Metal</option>
             <option>Índice</option>
           </select>
         </div>
 
         <div>
-          <label class="text-sm text-gray-400">Señal</label>
-          <select id="manual-signal" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
-            <option>Buy</option>
-            <option>Sell</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Timeframe</label>
-          <select id="manual-timeframe" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
-            <option>5m</option>
-            <option selected>15m</option>
-            <option>30m</option>
-            <option>1H</option>
-            <option>4H</option>
-            <option>Diario</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Precio actual</label>
-          <input id="manual-price" type="number" value="45.00" step="0.0001"
+          <label class="text-sm text-gray-400">Item / símbolo</label>
+          <input id="new-symbol" placeholder="Ej: SOXL, AAPL, EUR/USD, BTC/USDT"
             class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white" />
         </div>
 
         <div>
-          <label class="text-sm text-gray-400">TradingView</label>
-          <input id="manual-tv" value="AMEX:SOXL"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white" />
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-2 xl:grid-cols-6 gap-4 mt-4">
-        <div>
-          <label class="text-sm text-gray-400">Entrada ideal</label>
-          <input id="manual-entry" type="number" value="44.80" step="0.0001"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-emerald-400 font-bold" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Stop Loss</label>
-          <input id="manual-sl" type="number" value="42.80" step="0.0001"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-red-400 font-bold" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">TP1</label>
-          <input id="manual-tp1" type="number" value="49.00" step="0.0001"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-emerald-400 font-bold" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">TP2</label>
-          <input id="manual-tp2" type="number" value="52.00" step="0.0001"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-emerald-400 font-bold" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">TP3</label>
-          <input id="manual-tp3" type="number" value="56.00" step="0.0001"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-emerald-400 font-bold" />
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">ADX / fuerza</label>
-          <input id="manual-adx" type="number" value="28" step="1"
-            class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white" />
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-2 xl:grid-cols-5 gap-4 mt-4">
-        <div>
-          <label class="text-sm text-gray-400">Estructura SMC</label>
-          <select id="manual-structure" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
-            <option selected>CHOCH + Re-test</option>
-            <option>BOS confirmado</option>
-            <option>Solo pullback</option>
-            <option>Sin confirmación</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Tendencia</label>
-          <select id="manual-trend" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
-            <option selected>up</option>
-            <option>down</option>
-            <option>flat</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Mercado lateral</label>
-          <select id="manual-lateral" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white">
-            <option selected>No</option>
-            <option>Sí</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-sm text-gray-400">Validez</label>
-          <input id="manual-validity" value="2 horas"
+          <label class="text-sm text-gray-400">TradingView opcional</label>
+          <input id="new-tv-symbol" placeholder="Ej: AMEX:SOXL"
             class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white" />
         </div>
 
-        <div class="flex flex-col gap-3 mt-6 md:mt-0">
-          <button onclick="fetchAutoMarketData()"
-            class="bg-amber-600 hover:bg-amber-500 rounded-xl px-5 py-3 font-bold flex items-center justify-center gap-2">
-            <i class="fas fa-satellite-dish"></i>
-            Buscar precio y tendencia
-          </button>
-
-          <button onclick="analyzeManualAsset()"
-            class="bg-emerald-600 hover:bg-emerald-500 rounded-xl px-5 py-3 font-bold flex items-center justify-center gap-2">
-            <i class="fas fa-magnifying-glass-chart"></i>
-            Analizar ahora
+        <div class="flex items-end">
+          <button onclick="addAssetToWatchlist()"
+            class="w-full bg-emerald-600 hover:bg-emerald-500 rounded-xl px-5 py-3 font-bold">
+            Agregar
           </button>
         </div>
       </div>
     </div>
-
-    <!-- SYSTEM SUMMARY -->
-    <div class="bg-gray-900 rounded-3xl p-5 mb-8 border border-gray-700 card-hover">
-      <h2 class="text-xl font-bold mb-4">🔥 Resumen del Sistema</h2>
-
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-5 text-center">
-        <div>
-          <p class="text-gray-400 text-sm">Calidad objetivo</p>
-          <p class="text-2xl font-bold text-emerald-400">Premium</p>
-        </div>
-
-        <div>
-          <p class="text-gray-400 text-sm">Filtro clave</p>
-          <p class="text-2xl font-bold text-yellow-400">Timing</p>
-        </div>
-
-        <div>
-          <p class="text-gray-400 text-sm">R/R mínimo</p>
-          <p class="text-2xl font-bold text-emerald-400">1:2</p>
-        </div>
-
-        <div>
-          <p class="text-gray-400 text-sm">Evitar</p>
-          <p class="text-2xl font-bold text-red-400">Lateral</p>
-        </div>
-      </div>
-
-      <div class="mt-5 grid md:grid-cols-4 gap-3 text-sm">
-        <div class="bg-gray-800 rounded-xl p-3">
-          <p class="text-emerald-400 font-bold">80 - 100</p>
-          <p class="text-gray-400">Setup fuerte</p>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl p-3">
-          <p class="text-yellow-400 font-bold">65 - 79</p>
-          <p class="text-gray-400">Esperar confirmación</p>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl p-3">
-          <p class="text-orange-400 font-bold">50 - 64</p>
-          <p class="text-gray-400">Débil</p>
-        </div>
-
-        <div class="bg-gray-800 rounded-xl p-3">
-          <p class="text-red-400 font-bold">0 - 49</p>
-          <p class="text-gray-400">No operar</p>
-        </div>
-      </div>
-    </div>
-
-    <h2 class="text-3xl font-bold mb-6">📊 SEÑALES ACTUALES</h2>
-    <div id="assets-container"></div>
 
     <!-- WATCHLIST -->
-    <div class="mt-14">
+    <div class="mb-8">
       <h2 class="text-3xl font-bold mb-6 flex flex-wrap items-center gap-3">
-        ⭐ Watchlist Inteligente
+        ⭐ Watchlist automática
         <span class="text-sm font-normal bg-amber-900 text-amber-300 px-4 py-1 rounded-full">
-          Ordenado por oportunidad real
+          Ordenada por oportunidad %
         </span>
       </h2>
 
-      <div id="watchlist" class="bg-gray-900 rounded-3xl p-6 border border-gray-800"></div>
-    </div>
-
-    <!-- HISTORY -->
-    <div class="mt-14 mb-12">
-      <h2 class="text-3xl font-bold mb-6">📒 Historial Manual</h2>
-
-      <div class="bg-gray-900 rounded-3xl p-6 border border-gray-800">
-        <div class="grid md:grid-cols-2 gap-4 mb-5">
-          <div>
-            <label class="text-sm text-gray-400">Registrar resultado para</label>
-            <select id="history-symbol-select" class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white"></select>
-          </div>
-
-          <div class="flex flex-wrap gap-3 items-end">
-            <button onclick="registerResult('TP1')" class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 font-semibold">Ganó TP1</button>
-            <button onclick="registerResult('TP2')" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold">Ganó TP2</button>
-            <button onclick="registerResult('TP3')" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-semibold">Ganó TP3</button>
-            <button onclick="registerResult('SL')" class="px-4 py-2 rounded-xl bg-red-700 hover:bg-red-600 font-semibold">Perdió SL</button>
-            <button onclick="clearHistory()" class="px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 font-semibold">Limpiar historial</button>
-          </div>
-        </div>
-
-        <div id="history-table" class="overflow-x-auto"></div>
-      </div>
+      <div id="watchlist-container" class="space-y-6"></div>
     </div>
   </div>
 
   <script>
-    const RISK_PERCENT = 10;
+    const DEFAULT_ASSETS = [
+      {
+        symbol: "SOXL",
+        category: "ETF",
+        tvSymbol: "AMEX:SOXL",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "QQQ",
+        category: "ETF",
+        tvSymbol: "NASDAQ:QQQ",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "SPY",
+        category: "ETF",
+        tvSymbol: "AMEX:SPY",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "AAPL",
+        category: "Stock",
+        tvSymbol: "NASDAQ:AAPL",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "NVDA",
+        category: "Stock",
+        tvSymbol: "NASDAQ:NVDA",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "EUR/USD",
+        category: "Forex",
+        tvSymbol: "FX:EURUSD",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "GBP/USD",
+        category: "Forex",
+        tvSymbol: "FX:GBPUSD",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "BTC/USDT",
+        category: "Crypto",
+        tvSymbol: "BINANCE:BTCUSDT",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "ETH/USDT",
+        category: "Crypto",
+        tvSymbol: "BINANCE:ETHUSDT",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      },
+      {
+        symbol: "XAU/USD",
+        category: "Metal",
+        tvSymbol: "OANDA:XAUUSD",
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Esperando API Key.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      }
+    ];
+
+    let assets = loadAssets();
 
     function safeParseJSON(value, fallback) {
       try {
@@ -485,112 +360,13 @@
         .replaceAll("'", "&#039;");
     }
 
-    let currentCapital = Number(localStorage.getItem("agentCapital")) || 200;
-    let tradeHistory = safeParseJSON(localStorage.getItem("tradeHistory"), []);
-
-    let assets = [
-      {
-        symbol: "SOXL",
-        category: "ETF",
-        price: 45.00,
-        trend: "up",
-        signal: "Buy",
-        entry: 44.80,
-        sl: 42.80,
-        tp1: 49.00,
-        tp2: 52.00,
-        tp3: 56.00,
-        validity: "2 horas",
-        tvSymbol: "AMEX:SOXL",
-        adx: 28,
-        structure: "CHOCH + Re-test",
-        lateral: false,
-        timeframe: "15m"
-      },
-      {
-        symbol: "EUR/USD",
-        category: "Forex",
-        price: 1.0855,
-        trend: "up",
-        signal: "Buy",
-        entry: 1.0850,
-        sl: 1.0810,
-        tp1: 1.0920,
-        tp2: 1.0980,
-        tp3: 1.1050,
-        validity: "23:00",
-        tvSymbol: "FX:EURUSD",
-        adx: 25,
-        structure: "BOS confirmado",
-        lateral: false,
-        timeframe: "15m"
-      },
-      {
-        symbol: "BTC/USDT",
-        category: "Crypto",
-        price: 67850,
-        trend: "up",
-        signal: "Buy",
-        entry: 67800,
-        sl: 67200,
-        tp1: 69000,
-        tp2: 70500,
-        tp3: 72000,
-        validity: "02:00",
-        tvSymbol: "BINANCE:BTCUSDT",
-        adx: 30,
-        structure: "CHOCH + Re-test",
-        lateral: false,
-        timeframe: "15m"
-      },
-      {
-        symbol: "GBP/USD",
-        category: "Forex",
-        price: 1.3338,
-        trend: "down",
-        signal: "Sell",
-        entry: 1.3340,
-        sl: 1.3385,
-        tp1: 1.3260,
-        tp2: 1.3200,
-        tp3: 1.3120,
-        validity: "20:00",
-        tvSymbol: "FX:GBPUSD",
-        adx: 22,
-        structure: "Solo pullback",
-        lateral: false,
-        timeframe: "15m"
-      }
-    ];
-
-    function money(n) {
-      return "$" + Number(n || 0).toFixed(2);
+    function loadAssets() {
+      const saved = safeParseJSON(localStorage.getItem("autoWatchlistAssets"), null);
+      return Array.isArray(saved) && saved.length ? saved : DEFAULT_ASSETS;
     }
 
-    function updateCapital() {
-      const value = Number(document.getElementById("capital-input").value);
-      currentCapital = value > 0 ? value : 200;
-
-      localStorage.setItem("agentCapital", currentCapital);
-
-      updateRiskDollar();
-      renderAssets();
-      renderWatchlist();
-      renderHistorySelector();
-      renderHistory();
-    }
-
-    function updateRiskDollar() {
-      const risk = currentCapital * (RISK_PERCENT / 100);
-      document.getElementById("risk-dollar").textContent = money(risk);
-    }
-
-    function getRiskDollar() {
-      return currentCapital * (RISK_PERCENT / 100);
-    }
-
-    function isBuy(asset) {
-      return String(asset.signal).toLowerCase() === "buy";
+    function saveAssets() {
+      localStorage.setItem("autoWatchlistAssets", JSON.stringify(assets));
     }
 
     function saveMarketApiKey() {
@@ -604,6 +380,18 @@
       if (input) input.value = savedKey;
     }
 
+    function saveTimeframe() {
+      const timeframe = document.getElementById("global-timeframe").value;
+      localStorage.setItem("globalTimeframe", timeframe);
+    }
+
+    function loadTimeframe() {
+      const saved = localStorage.getItem("globalTimeframe");
+      if (saved) {
+        document.getElementById("global-timeframe").value = saved;
+      }
+    }
+
     function setMarketStatus(message, type = "info") {
       const el = document.getElementById("market-fetch-status");
       if (!el) return;
@@ -611,12 +399,38 @@
       el.textContent = message;
 
       if (type === "success") {
-        el.className = "text-emerald-300 font-semibold mt-3";
+        el.className = "text-emerald-300 font-semibold";
       } else if (type === "error") {
-        el.className = "text-red-300 font-semibold mt-3";
+        el.className = "text-red-300 font-semibold";
       } else {
-        el.className = "text-amber-300 font-semibold mt-3";
+        el.className = "text-amber-300 font-semibold";
       }
+    }
+
+    function updateLastUpdate() {
+      const now = new Date();
+      document.getElementById("last-update").textContent =
+        "Última actualización: " + now.toLocaleString("es-US");
+    }
+
+    function twelveDataIntervalFromTimeframe(timeframe) {
+      if (timeframe === "5m") return "5min";
+      if (timeframe === "15m") return "15min";
+      if (timeframe === "30m") return "30min";
+      if (timeframe === "1H") return "1h";
+      if (timeframe === "4H") return "4h";
+      if (timeframe === "Diario") return "1day";
+      return "15min";
+    }
+
+    function tvIntervalFromTimeframe(timeframe) {
+      if (timeframe === "5m") return "5";
+      if (timeframe === "15m") return "15";
+      if (timeframe === "30m") return "30";
+      if (timeframe === "1H") return "60";
+      if (timeframe === "4H") return "240";
+      if (timeframe === "Diario") return "D";
+      return "15";
     }
 
     function normalizeMarketSymbol(category, item) {
@@ -635,12 +449,8 @@
 
       if (cleanCategory === "crypto") {
         if (cleanItem.includes("/")) return cleanItem;
-        if (cleanItem.endsWith("USDT")) {
-          return cleanItem.replace("USDT", "/USDT");
-        }
-        if (cleanItem.endsWith("USD")) {
-          return cleanItem.replace("USD", "/USD");
-        }
+        if (cleanItem.endsWith("USDT")) return cleanItem.replace("USDT", "/USDT");
+        if (cleanItem.endsWith("USD")) return cleanItem.replace("USD", "/USD");
         return cleanItem + "/USDT";
       }
 
@@ -659,13 +469,8 @@
       const cleanCategory = String(category || "").toLowerCase();
       const cleanSymbol = String(symbol || "").toUpperCase();
 
-      if (cleanCategory === "forex") {
-        return "FX:" + cleanSymbol.replace("/", "");
-      }
-
-      if (cleanCategory === "crypto") {
-        return "BINANCE:" + cleanSymbol.replace("/", "");
-      }
+      if (cleanCategory === "forex") return "FX:" + cleanSymbol.replace("/", "");
+      if (cleanCategory === "crypto") return "BINANCE:" + cleanSymbol.replace("/", "");
 
       if (cleanCategory === "metal") {
         if (cleanSymbol === "XAU/USD") return "OANDA:XAUUSD";
@@ -673,39 +478,10 @@
         return "OANDA:" + cleanSymbol.replace("/", "");
       }
 
-      if (cleanCategory === "etf") {
-        return "AMEX:" + cleanSymbol;
-      }
-
-      if (cleanCategory === "stock") {
-        return "NASDAQ:" + cleanSymbol;
-      }
-
-      if (cleanCategory === "índice" || cleanCategory === "indice") {
-        return cleanSymbol;
-      }
+      if (cleanCategory === "etf") return "AMEX:" + cleanSymbol;
+      if (cleanCategory === "stock") return "NASDAQ:" + cleanSymbol;
 
       return cleanSymbol;
-    }
-
-    function tvIntervalFromTimeframe(timeframe) {
-      if (timeframe === "5m") return "5";
-      if (timeframe === "15m") return "15";
-      if (timeframe === "30m") return "30";
-      if (timeframe === "1H") return "60";
-      if (timeframe === "4H") return "240";
-      if (timeframe === "Diario") return "D";
-      return "15";
-    }
-
-    function twelveDataIntervalFromTimeframe(timeframe) {
-      if (timeframe === "5m") return "5min";
-      if (timeframe === "15m") return "15min";
-      if (timeframe === "30m") return "30min";
-      if (timeframe === "1H") return "1h";
-      if (timeframe === "4H") return "4h";
-      if (timeframe === "Diario") return "1day";
-      return "15min";
     }
 
     function calculateEMA(values, period) {
@@ -721,12 +497,21 @@
       return ema;
     }
 
-    function detectAutoTrend(closes) {
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function analyzeMarket(closes) {
       if (!closes || closes.length < 55) {
         return {
           trend: "flat",
-          signal: "Buy",
-          reason: "No hay suficientes velas para confirmar tendencia."
+          signal: "ESPERAR",
+          score: 15,
+          status: "Datos insuficientes",
+          reason: "No hay suficientes velas para confirmar tendencia.",
+          changePercent: 0,
+          ema20: null,
+          ema50: null
         };
       }
 
@@ -734,82 +519,90 @@
       const ema50 = calculateEMA(closes, 50);
       const lastClose = closes[closes.length - 1];
       const previousClose = closes[closes.length - 5] || closes[closes.length - 2];
+      const firstClose = closes[0];
 
-      if (!ema20 || !ema50 || !lastClose || !previousClose) {
-        return {
-          trend: "flat",
-          signal: "Buy",
-          reason: "Datos insuficientes para tendencia automática."
-        };
+      const changePercent = ((lastClose - firstClose) / firstClose) * 100;
+      const shortMomentum = ((lastClose - previousClose) / previousClose) * 100;
+      const emaSpread = ema50 ? Math.abs((ema20 - ema50) / ema50) * 100 : 0;
+
+      let trend = "flat";
+      let signal = "ESPERAR";
+      let status = "ESPERAR";
+      let reason = "Mercado mixto o lateral. EMAs sin alineación clara.";
+      let score = 35;
+
+      const bullish = lastClose > ema20 && ema20 > ema50 && shortMomentum > 0;
+      const bearish = lastClose < ema20 && ema20 < ema50 && shortMomentum < 0;
+
+      if (bullish) {
+        trend = "up";
+        signal = "BUY";
+        status = "COMPRAR";
+        reason = "Tendencia alcista: precio sobre EMA20, EMA20 sobre EMA50 y momentum positivo.";
+        score = 62 + emaSpread * 6 + Math.abs(shortMomentum) * 8;
+      } else if (bearish) {
+        trend = "down";
+        signal = "SELL";
+        status = "VENDER";
+        reason = "Tendencia bajista: precio bajo EMA20, EMA20 bajo EMA50 y momentum negativo.";
+        score = 62 + emaSpread * 6 + Math.abs(shortMomentum) * 8;
+      } else {
+        trend = "flat";
+        signal = "ESPERAR";
+        status = "ESPERAR";
+        reason = "No hay tendencia limpia. Esperar rompimiento o mejor estructura.";
+        score = 25 + Math.min(Math.abs(shortMomentum) * 5, 20);
       }
 
-      const slopeUp = lastClose > previousClose;
-      const slopeDown = lastClose < previousClose;
-
-      if (lastClose > ema20 && ema20 > ema50 && slopeUp) {
-        return {
-          trend: "up",
-          signal: "Buy",
-          reason: "Tendencia alcista: precio sobre EMA20 y EMA20 sobre EMA50."
-        };
+      if (Math.abs(shortMomentum) < 0.05) {
+        score -= 10;
+        reason += " Momentum bajo.";
       }
 
-      if (lastClose < ema20 && ema20 < ema50 && slopeDown) {
-        return {
-          trend: "down",
-          signal: "Sell",
-          reason: "Tendencia bajista: precio bajo EMA20 y EMA20 bajo EMA50."
-        };
+      if (emaSpread < 0.10) {
+        score -= 8;
+        reason += " EMAs muy juntas.";
       }
+
+      score = Math.round(clamp(score, 0, 100));
 
       return {
-        trend: "flat",
-        signal: "Buy",
-        reason: "Mercado mixto o lateral: EMAs sin alineación clara."
+        trend,
+        signal,
+        score,
+        status,
+        reason,
+        changePercent,
+        ema20,
+        ema50
       };
     }
 
-    async function fetchAutoMarketData() {
-      const apiKey = document.getElementById("market-api-key").value.trim();
-      const rawItem = document.getElementById("manual-symbol").value.trim();
-      const category = document.getElementById("manual-category").value;
-      const timeframe = document.getElementById("manual-timeframe").value;
+    async function fetchAssetData(asset, apiKey, interval) {
+      const symbol = normalizeMarketSymbol(asset.category, asset.symbol);
 
-      if (!apiKey) {
-        setMarketStatus("Falta API Key.", "error");
-        alert("Primero pega tu API Key de Twelve Data.");
-        return;
-      }
-
-      if (!rawItem) {
-        setMarketStatus("Falta item o símbolo.", "error");
-        alert("Escribe un item. Ej: SOXL, EUR/USD, BTC/USDT, AAPL.");
-        return;
-      }
-
-      saveMarketApiKey();
-
-      const marketSymbol = normalizeMarketSymbol(category, rawItem);
-      const interval = twelveDataIntervalFromTimeframe(timeframe);
-
-      setMarketStatus("Buscando precio y tendencia...", "info");
+      const url =
+        "https://api.twelvedata.com/time_series" +
+        "?symbol=" + encodeURIComponent(symbol) +
+        "&interval=" + encodeURIComponent(interval) +
+        "&outputsize=80" +
+        "&apikey=" + encodeURIComponent(apiKey);
 
       try {
-        const url =
-          "https://api.twelvedata.com/time_series" +
-          "?symbol=" + encodeURIComponent(marketSymbol) +
-          "&interval=" + encodeURIComponent(interval) +
-          "&outputsize=80" +
-          "&apikey=" + encodeURIComponent(apiKey);
-
         const response = await fetch(url);
         const data = await response.json();
 
         if (data.status === "error" || data.code || !data.values) {
-          const message = data.message || "No se pudo obtener información del mercado.";
-          setMarketStatus(message, "error");
-          alert("Error de API: " + message);
-          return;
+          return {
+            ...asset,
+            symbol,
+            status: "Error",
+            reason: data.message || "No se pudo obtener información.",
+            score: 0,
+            price: null,
+            trend: "flat",
+            signal: "ESPERAR"
+          };
         }
 
         const values = data.values.slice().reverse();
@@ -819,581 +612,241 @@
           .filter(value => Number.isFinite(value));
 
         if (!closes.length) {
-          setMarketStatus("No se encontraron cierres válidos.", "error");
-          return;
+          return {
+            ...asset,
+            symbol,
+            status: "Error",
+            reason: "No se encontraron precios válidos.",
+            score: 0,
+            price: null,
+            trend: "flat",
+            signal: "ESPERAR"
+          };
         }
 
+        const analysis = analyzeMarket(closes);
         const lastPrice = closes[closes.length - 1];
-        const autoTrend = detectAutoTrend(closes);
 
-        document.getElementById("manual-symbol").value = marketSymbol;
-        document.getElementById("manual-price").value = lastPrice.toFixed(5);
-        document.getElementById("manual-trend").value = autoTrend.trend;
-        document.getElementById("manual-signal").value = autoTrend.signal;
-        document.getElementById("manual-tv").value = tradingViewSymbolFromCategory(category, marketSymbol);
-
-        if (autoTrend.trend === "flat") {
-          document.getElementById("manual-lateral").value = "Sí";
-        } else {
-          document.getElementById("manual-lateral").value = "No";
-        }
-
-        setMarketStatus(
-          "Precio actualizado: " + lastPrice.toFixed(5) + " | Tendencia: " + autoTrend.trend,
-          "success"
-        );
-
-        alert(
-          "Precio encontrado: " + lastPrice.toFixed(5) +
-          "\nTendencia automática: " + autoTrend.trend +
-          "\nSeñal sugerida: " + autoTrend.signal +
-          "\n\n" + autoTrend.reason
-        );
-
+        return {
+          ...asset,
+          symbol,
+          price: lastPrice,
+          trend: analysis.trend,
+          signal: analysis.signal,
+          score: analysis.score,
+          status: analysis.status,
+          reason: analysis.reason,
+          changePercent: analysis.changePercent,
+          ema20: analysis.ema20,
+          ema50: analysis.ema50,
+          tvSymbol: asset.tvSymbol || tradingViewSymbolFromCategory(asset.category, symbol)
+        };
       } catch (error) {
-        setMarketStatus("Error de conexión con la API.", "error");
-        alert("No se pudo conectar con la API. Revisa internet, API Key o símbolo.");
-      }
-    }
-
-    function validateTradeSetup(asset) {
-      const entry = Number(asset.entry);
-      const sl = Number(asset.sl);
-      const tp1 = Number(asset.tp1);
-      const tp2 = Number(asset.tp2);
-      const tp3 = Number(asset.tp3);
-      const price = Number(asset.price);
-
-      if (!price || !entry || !sl || !tp1 || !tp2 || !tp3) {
         return {
-          valid: false,
-          reason: "Faltan datos numéricos en precio, entrada, SL o TP."
+          ...asset,
+          symbol,
+          status: "Error",
+          reason: "Error de conexión con la API.",
+          score: 0,
+          price: null,
+          trend: "flat",
+          signal: "ESPERAR"
         };
       }
-
-      if (isBuy(asset)) {
-        if (!(sl < entry && tp1 > entry && tp2 > entry && tp3 > entry)) {
-          return {
-            valid: false,
-            reason: "Configuración inválida para Buy: SL debe estar debajo de entrada y los TP arriba."
-          };
-        }
-      } else {
-        if (!(sl > entry && tp1 < entry && tp2 < entry && tp3 < entry)) {
-          return {
-            valid: false,
-            reason: "Configuración inválida para Sell: SL debe estar arriba de entrada y los TP abajo."
-          };
-        }
-      }
-
-      return {
-        valid: true,
-        reason: "Configuración válida."
-      };
     }
 
-    function calculateRR(asset, target) {
-      const validation = validateTradeSetup(asset);
-      if (!validation.valid) return 0;
+    async function updateAllMarketData() {
+      const apiKey = document.getElementById("market-api-key").value.trim();
+      const timeframe = document.getElementById("global-timeframe").value;
+      const interval = twelveDataIntervalFromTimeframe(timeframe);
 
-      const entry = Number(asset.entry);
-      const sl = Number(asset.sl);
-      const tp = Number(target);
-
-      let risk;
-      let reward;
-
-      if (isBuy(asset)) {
-        risk = entry - sl;
-        reward = tp - entry;
-      } else {
-        risk = sl - entry;
-        reward = entry - tp;
+      if (!apiKey) {
+        setMarketStatus("Falta API Key. Pégala arriba para actualizar precios.", "error");
+        renderWatchlist();
+        return;
       }
 
-      if (risk <= 0 || reward <= 0) return 0;
-      return reward / risk;
+      saveMarketApiKey();
+      saveTimeframe();
+
+      setMarketStatus("Actualizando todos los precios...", "info");
+
+      const updatedAssets = [];
+
+      for (let i = 0; i < assets.length; i++) {
+        setMarketStatus("Actualizando " + assets[i].symbol + " (" + (i + 1) + "/" + assets.length + ")...", "info");
+
+        const updated = await fetchAssetData(assets[i], apiKey, interval);
+        updatedAssets.push(updated);
+      }
+
+      assets = updatedAssets.sort((a, b) => Number(b.score) - Number(a.score));
+
+      saveAssets();
+      renderWatchlist();
+      updateLastUpdate();
+
+      setMarketStatus("Todos los precios fueron actualizados y ordenados por oportunidad.", "success");
     }
 
-    function calculateProfitPercent(asset, tp) {
-      const entry = Number(asset.entry);
-      const target = Number(tp);
+    function addAssetToWatchlist() {
+      const category = document.getElementById("new-category").value;
+      const rawSymbol = document.getElementById("new-symbol").value.trim();
+      const rawTvSymbol = document.getElementById("new-tv-symbol").value.trim();
 
-      if (!entry || !target) return "0.00";
-
-      if (isBuy(asset)) {
-        return (((target - entry) / entry) * 100).toFixed(2);
+      if (!rawSymbol) {
+        alert("Escribe un símbolo. Ej: SOXL, AAPL, EUR/USD, BTC/USDT.");
+        return;
       }
 
-      return (((entry - target) / entry) * 100).toFixed(2);
+      const symbol = normalizeMarketSymbol(category, rawSymbol);
+      const tvSymbol = rawTvSymbol || tradingViewSymbolFromCategory(category, symbol);
+
+      const exists = assets.some(asset => asset.symbol.toUpperCase() === symbol.toUpperCase());
+
+      if (exists) {
+        alert("Ese activo ya está en la watchlist.");
+        return;
+      }
+
+      assets.push({
+        symbol,
+        category,
+        tvSymbol,
+        price: null,
+        trend: "flat",
+        signal: "ESPERAR",
+        score: 0,
+        status: "Pendiente",
+        reason: "Agregado. Actualiza para buscar precio.",
+        changePercent: 0,
+        ema20: null,
+        ema50: null
+      });
+
+      document.getElementById("new-symbol").value = "";
+      document.getElementById("new-tv-symbol").value = "";
+
+      saveAssets();
+      renderWatchlist();
     }
 
-    function forexPipSize(symbol) {
-      return String(symbol).includes("JPY") ? 0.01 : 0.0001;
-    }
-
-    function calculateTiming(asset) {
-      const validation = validateTradeSetup(asset);
-
-      if (!validation.valid) {
-        return {
-          status: "Inválido",
-          action: validation.reason,
-          level: 0,
-          distanceLabel: "N/A"
-        };
-      }
-
-      const price = Number(asset.price);
-      const entry = Number(asset.entry);
-      const tp1 = Number(asset.tp1);
-      const category = String(asset.category).toLowerCase();
-      const distanceAbs = Math.abs(price - entry);
-
-      let distanceLabel = "";
-      let status = "";
-      let action = "";
-      let level = 0;
-
-      const rr1 = calculateRR(asset, asset.tp1);
-      let nearTP = false;
-
-      if (isBuy(asset)) {
-        const totalMove = tp1 - entry;
-        const currentMove = price - entry;
-        nearTP = totalMove > 0 && currentMove / totalMove >= 0.80;
-      } else {
-        const totalMove = entry - tp1;
-        const currentMove = entry - price;
-        nearTP = totalMove > 0 && currentMove / totalMove >= 0.80;
-      }
-
-      if (category === "forex") {
-        const pips = distanceAbs / forexPipSize(asset.symbol);
-        distanceLabel = pips.toFixed(1) + " pips";
-
-        if (pips <= 5) {
-          status = "Excelente";
-          action = "Entrada permitida si la vela confirma.";
-          level = 4;
-        } else if (pips <= 12) {
-          status = "Bueno";
-          action = "Entrada posible con cuidado o mini pullback.";
-          level = 3;
-        } else if (pips <= 25) {
-          status = "Tarde";
-          action = "No perseguir precio. Esperar retroceso.";
-          level = 2;
-        } else {
-          status = "Inválido";
-          action = "La operación ya se fue. No entrar.";
-          level = 1;
-        }
-      } else {
-        const percent = Math.abs((price - entry) / entry) * 100;
-        distanceLabel = percent.toFixed(2) + "%";
-
-        let excellent = 0.20;
-        let good = 0.50;
-        let late = 1.20;
-
-        if (category === "crypto") {
-          excellent = 0.15;
-          good = 0.35;
-          late = 0.80;
-        }
-
-        if (percent <= excellent) {
-          status = "Excelente";
-          action = "Entrada permitida si confirma estructura.";
-          level = 4;
-        } else if (percent <= good) {
-          status = "Bueno";
-          action = "Entrada posible con menor tamaño o pullback corto.";
-          level = 3;
-        } else if (percent <= late) {
-          status = "Tarde";
-          action = "No perseguir. Esperar retroceso a entrada.";
-          level = 2;
-        } else {
-          status = "Inválido";
-          action = "Precio demasiado lejos de la entrada ideal.";
-          level = 1;
-        }
-      }
-
-      if (nearTP) {
-        status = "Inválido";
-        action = "Precio demasiado cerca del TP1. No entrar tarde.";
-        level = 1;
-      }
-
-      if (rr1 < 2) {
-        action += " R/R menor a 1:2, no es setup premium.";
-      }
-
-      return {
-        status,
-        action,
-        level,
-        distanceLabel
-      };
-    }
-
-    function structureScore(asset) {
-      if (asset.structure === "CHOCH + Re-test") return 25;
-      if (asset.structure === "BOS confirmado") return 23;
-      if (asset.structure === "Solo pullback") return 15;
-      return 6;
-    }
-
-    function trendScore(asset) {
-      if (asset.trend === "flat") return 5;
-      if (asset.signal === "Buy" && asset.trend === "up") return 20;
-      if (asset.signal === "Sell" && asset.trend === "down") return 20;
-      return 10;
-    }
-
-    function adxScore(asset) {
-      const adx = Number(asset.adx);
-
-      if (adx >= 28) return 20;
-      if (adx >= 22) return 15;
-      if (adx >= 18) return 9;
-
-      return 4;
-    }
-
-    function rrScore(asset) {
-      const rr = calculateRR(asset, asset.tp1);
-
-      if (rr >= 3) return 20;
-      if (rr >= 2) return 16;
-      if (rr >= 1.5) return 9;
-
-      return 3;
-    }
-
-    function timingScore(asset) {
-      const timing = calculateTiming(asset);
-
-      if (timing.level === 4) return 15;
-      if (timing.level === 3) return 11;
-      if (timing.level === 2) return 5;
-
-      return 0;
-    }
-
-    function calculateScore(asset) {
-      const validation = validateTradeSetup(asset);
-
-      if (!validation.valid) return 0;
-
-      let score =
-        structureScore(asset) +
-        trendScore(asset) +
-        adxScore(asset) +
-        rrScore(asset) +
-        timingScore(asset);
-
-      if (asset.lateral) score -= 30;
-      if (Number(asset.adx) < 18) score -= 15;
-
-      return Math.max(0, Math.min(100, Math.round(score)));
-    }
-
-    function getDecision(asset) {
-      const validation = validateTradeSetup(asset);
-
-      if (!validation.valid) {
-        return {
-          label: "CONFIGURACIÓN INVÁLIDA",
-          icon: "🟣",
-          className: "decision-invalid",
-          reason: validation.reason
-        };
-      }
-
-      const timing = calculateTiming(asset);
-      const rr1 = calculateRR(asset, asset.tp1);
-      const score = calculateScore(asset);
-
-      if (asset.lateral || asset.trend === "flat" || Number(asset.adx) < 18) {
-        return {
-          label: "NO OPERAR",
-          icon: "⚫",
-          className: "decision-no",
-          reason: "Mercado lateral o sin fuerza. Esperar rompimiento claro."
-        };
-      }
-
-      if (rr1 < 2) {
-        return {
-          label: "ESPERAR",
-          icon: "🟡",
-          className: "decision-wait",
-          reason: "El R/R no llega a 1:2. No es entrada premium."
-        };
-      }
-
-      if (timing.status === "Inválido") {
-        return {
-          label: "NO OPERAR",
-          icon: "⚫",
-          className: "decision-no",
-          reason: "Timing inválido. La entrada ya pasó o está cerca del TP."
-        };
-      }
-
-      if (timing.status === "Tarde") {
-        return {
-          label: "ESPERAR",
-          icon: "🟡",
-          className: "decision-wait",
-          reason: "Entrada tarde. Esperar retroceso a zona ideal."
-        };
-      }
-
-      if (score >= 75 && asset.signal === "Buy") {
-        return {
-          label: "COMPRAR",
-          icon: "✅",
-          className: "decision-buy",
-          reason: "Timing válido, estructura fuerte y R/R mínimo 1:2."
-        };
-      }
-
-      if (score >= 75 && asset.signal === "Sell") {
-        return {
-          label: "VENDER",
-          icon: "🔴",
-          className: "decision-sell",
-          reason: "Timing válido, estructura bajista y R/R mínimo 1:2."
-        };
-      }
-
-      return {
-        label: "ESPERAR",
-        icon: "🟡",
-        className: "decision-wait",
-        reason: "Falta confirmación suficiente para entrada premium."
-      };
+    function removeAsset(symbol) {
+      assets = assets.filter(asset => asset.symbol !== symbol);
+      saveAssets();
+      renderWatchlist();
     }
 
     function createGaugeHTML(score) {
-      const deg = Math.round(score * 3.6);
-      const cls = score >= 75 ? "" : score >= 55 ? "mid" : "low";
+      const safeScore = Math.round(clamp(Number(score) || 0, 0, 100));
+      const deg = Math.round(safeScore * 3.6);
+      const cls = safeScore >= 75 ? "" : safeScore >= 55 ? "mid" : "low";
 
       return `
         <div class="gauge ${cls}" style="--percent: ${deg}deg;">
-          <div class="gauge-inner text-white font-bold">${score}%</div>
+          <div class="text-white font-bold">${safeScore}%</div>
         </div>
       `;
     }
 
-    function getTrendIcon(trend) {
-      if (trend === "up") return `<span class="trend-up text-lg">↑ Alcista</span>`;
-      if (trend === "down") return `<span class="trend-down text-lg">↓ Bajista</span>`;
-      return `<span class="trend-flat text-lg">↔ Lateral</span>`;
+    function getTrendLabel(trend) {
+      if (trend === "up") return `<span class="trend-up font-bold">↑ Alcista</span>`;
+      if (trend === "down") return `<span class="trend-down font-bold">↓ Bajista</span>`;
+      return `<span class="trend-flat font-bold">↔ Lateral / Mixto</span>`;
     }
 
-    function capitalProjection(asset) {
-      const risk = getRiskDollar();
-
-      const rr1 = calculateRR(asset, asset.tp1);
-      const rr2 = calculateRR(asset, asset.tp2);
-      const rr3 = calculateRR(asset, asset.tp3);
-
-      return {
-        sl: currentCapital - risk,
-        tp1Gain: risk * rr1,
-        tp2Gain: risk * rr2,
-        tp3Gain: risk * rr3,
-        tp1: currentCapital + risk * rr1,
-        tp2: currentCapital + risk * rr2,
-        tp3: currentCapital + risk * rr3,
-        rr1,
-        rr2,
-        rr3
-      };
+    function decisionClass(status) {
+      if (status === "COMPRAR") return "decision-buy";
+      if (status === "VENDER") return "decision-sell";
+      if (status === "ESPERAR") return "decision-wait";
+      return "decision-no";
     }
 
-    function shouldShowGoldenStar(asset) {
-      const validation = validateTradeSetup(asset);
-      if (!validation.valid) return false;
+    function formatPrice(price) {
+      if (price === null || price === undefined || Number.isNaN(Number(price))) return "Pendiente";
+      const n = Number(price);
 
-      const timing = calculateTiming(asset);
-      const rr1 = calculateRR(asset, asset.tp1);
-      const score = calculateScore(asset);
+      if (n >= 1000) return n.toFixed(2);
+      if (n >= 10) return n.toFixed(2);
+      if (n >= 1) return n.toFixed(4);
 
-      return (
-        score >= 80 &&
-        rr1 >= 2 &&
-        !asset.lateral &&
-        Number(asset.adx) >= 22 &&
-        (timing.status === "Excelente" || timing.status === "Bueno")
-      );
+      return n.toFixed(6);
     }
 
-    function renderAssets() {
-      const container = document.getElementById("assets-container");
-      container.innerHTML = "";
+    function renderWatchlist() {
+      const container = document.getElementById("watchlist-container");
+      const timeframe = document.getElementById("global-timeframe")?.value || "15m";
+      const tvInterval = tvIntervalFromTimeframe(timeframe);
 
-      assets.forEach((asset, index) => {
-        const score = calculateScore(asset);
-        const decision = getDecision(asset);
-        const timing = calculateTiming(asset);
-        const projection = capitalProjection(asset);
-        const goldenStar = shouldShowGoldenStar(asset);
-        const tvInterval = tvIntervalFromTimeframe(asset.timeframe);
+      const sorted = [...assets].sort((a, b) => Number(b.score) - Number(a.score));
 
-        const symbol = escapeHTML(asset.symbol);
-        const category = escapeHTML(asset.category);
-        const signal = escapeHTML(asset.signal);
-        const timeframe = escapeHTML(asset.timeframe);
-        const structure = escapeHTML(asset.structure);
-        const validity = escapeHTML(asset.validity);
+      container.innerHTML = sorted.map((asset, index) => {
+        const score = Number(asset.score) || 0;
+        const status = asset.status || "Pendiente";
+        const cls = decisionClass(status);
+        const price = formatPrice(asset.price);
+        const change = Number(asset.changePercent || 0);
+        const changeClass = change >= 0 ? "text-emerald-400" : "text-red-400";
 
-        const html = `
-          <div class="bg-gray-900 rounded-3xl p-6 md:p-8 mb-8 border border-gray-700 card-hover">
-            <div class="grid xl:grid-cols-2 gap-8">
+        return `
+          <div class="${cls} rounded-3xl p-5 md:p-6">
+            <div class="grid xl:grid-cols-[1fr_420px] gap-6">
               <div>
-                <div class="${decision.className} rounded-3xl p-5 mb-6">
-                  <div class="flex flex-col md:flex-row justify-between gap-5">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                  <div class="flex items-center gap-4">
+                    <div class="text-3xl font-black text-gray-500">#${index + 1}</div>
+                    ${createGaugeHTML(score)}
                     <div>
-                      <p class="text-gray-400 text-sm">DECISIÓN DEL AGENTE</p>
-                      <h3 class="text-4xl font-bold mt-1">${decision.icon} ${escapeHTML(decision.label)}</h3>
-                      <p class="text-gray-300 mt-2">${escapeHTML(decision.reason)}</p>
+                      <h3 class="text-3xl font-bold">${escapeHTML(asset.symbol)}</h3>
+                      <div class="flex flex-wrap gap-2 mt-2">
+                        <span class="px-3 py-1 rounded-full text-xs bg-gray-900/70 text-gray-300">${escapeHTML(asset.category)}</span>
+                        <span class="px-3 py-1 rounded-full text-xs bg-gray-900/70 text-gray-300">${escapeHTML(timeframe)}</span>
+                        <span class="px-3 py-1 rounded-full text-xs bg-gray-900/70 text-gray-300">${escapeHTML(asset.signal)}</span>
+                      </div>
                     </div>
+                  </div>
 
-                    <div class="text-right">
-                      ${createGaugeHTML(score)}
-                      <span class="star ${goldenStar ? "golden-reversal" : ""} block mt-4">
-                        ${goldenStar ? "⭐" : "☆"}
-                      </span>
-                    </div>
+                  <div class="text-left md:text-right">
+                    <p class="text-gray-400 text-sm">Decisión</p>
+                    <p class="text-3xl font-bold">${escapeHTML(status)}</p>
                   </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row justify-between gap-5">
-                  <div>
-                    <p class="text-3xl font-bold">${symbol}</p>
-                    <p id="price-${index}" class="text-4xl text-emerald-400 font-semibold">${escapeHTML(asset.price)}</p>
-
-                    <div class="flex flex-wrap items-center gap-3 mt-2">
-                      ${getTrendIcon(asset.trend)}
-                      <p class="${asset.signal === "Buy" ? "text-emerald-400" : "text-red-400"} text-xl font-medium">${signal}</p>
-                      <span class="px-3 py-1 rounded-full text-xs bg-gray-800 text-gray-300">${category}</span>
-                      <span class="px-3 py-1 rounded-full text-xs bg-gray-800 text-gray-300">${timeframe}</span>
-                    </div>
-
-                    <div class="mt-3 flex flex-wrap gap-2">
-                      <span class="px-4 py-1.5 bg-amber-900/70 text-amber-300 font-bold rounded-full text-sm">
-                        ${structure}
-                      </span>
-
-                      <span class="px-4 py-1.5 ${asset.lateral ? "bg-red-900 text-red-300" : "bg-emerald-900 text-emerald-300"} font-bold rounded-full text-sm">
-                        ${asset.lateral ? "Mercado lateral" : "No lateral"}
-                      </span>
-
-                      <span class="px-4 py-1.5 bg-gray-800 text-gray-300 font-bold rounded-full text-sm">
-                        ADX ${escapeHTML(asset.adx)}
-                      </span>
-                    </div>
+                <div class="grid md:grid-cols-4 gap-4 mt-6">
+                  <div class="bg-gray-900/70 rounded-2xl p-4">
+                    <p class="text-gray-400 text-sm">Precio</p>
+                    <p class="text-emerald-400 text-2xl font-bold">${price}</p>
                   </div>
-                </div>
 
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div class="bg-gray-800 rounded-2xl p-5">
-                    <p class="text-gray-400">Timing exacto</p>
-                    <p class="${timing.status === "Excelente" || timing.status === "Bueno" ? "text-emerald-400" : timing.status === "Tarde" ? "text-yellow-400" : "text-red-400"} font-bold text-2xl">
-                      ${escapeHTML(timing.status)}
+                  <div class="bg-gray-900/70 rounded-2xl p-4">
+                    <p class="text-gray-400 text-sm">Tendencia</p>
+                    <p class="text-xl">${getTrendLabel(asset.trend)}</p>
+                  </div>
+
+                  <div class="bg-gray-900/70 rounded-2xl p-4">
+                    <p class="text-gray-400 text-sm">Cambio ventana</p>
+                    <p class="${changeClass} text-2xl font-bold">${change.toFixed(2)}%</p>
+                  </div>
+
+                  <div class="bg-gray-900/70 rounded-2xl p-4">
+                    <p class="text-gray-400 text-sm">EMA20 / EMA50</p>
+                    <p class="text-sm text-gray-300">
+                      ${asset.ema20 ? formatPrice(asset.ema20) : "N/A"} /
+                      ${asset.ema50 ? formatPrice(asset.ema50) : "N/A"}
                     </p>
-                    <p class="text-sm text-gray-400">Distancia: ${escapeHTML(timing.distanceLabel)}</p>
-                    <p class="text-sm text-gray-300 mt-2">${escapeHTML(timing.action)}</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-5">
-                    <p class="text-gray-400">R/R TP1</p>
-                    <p class="${projection.rr1 >= 2 ? "text-emerald-400" : "text-red-400"} font-bold text-2xl">
-                      1:${projection.rr1.toFixed(2)}
-                    </p>
-                    <p class="text-sm text-gray-400">Mínimo requerido: 1:2</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-5">
-                    <p class="text-gray-400">Score profesional</p>
-                    <p class="${score >= 75 ? "text-emerald-400" : score >= 55 ? "text-yellow-400" : "text-red-400"} font-bold text-2xl">
-                      ${score}/100
-                    </p>
-                    <p class="text-sm text-gray-400">Estructura + fuerza + timing + R/R</p>
                   </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">Entrada</p>
-                    <p class="text-emerald-400 font-bold text-lg">${escapeHTML(asset.entry)}</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">SL</p>
-                    <p class="text-red-400 font-bold text-lg">${escapeHTML(asset.sl)}</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">TP1</p>
-                    <p class="text-emerald-400 font-bold text-lg">${escapeHTML(asset.tp1)}</p>
-                    <p class="text-xs text-emerald-400">+${calculateProfitPercent(asset, asset.tp1)}%</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">TP2</p>
-                    <p class="text-emerald-400 font-bold text-lg">${escapeHTML(asset.tp2)}</p>
-                    <p class="text-xs text-emerald-400">+${calculateProfitPercent(asset, asset.tp2)}%</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">TP3</p>
-                    <p class="text-emerald-400 font-bold text-lg">${escapeHTML(asset.tp3)}</p>
-                    <p class="text-xs text-emerald-400">+${calculateProfitPercent(asset, asset.tp3)}%</p>
-                  </div>
-
-                  <div class="bg-gray-800 rounded-2xl p-4">
-                    <p class="text-gray-400">Válido</p>
-                    <p class="font-bold text-lg">${validity}</p>
-                  </div>
+                <div class="mt-5 bg-gray-900/70 rounded-2xl p-4">
+                  <p class="text-gray-400 text-sm">Lectura del agente</p>
+                  <p class="text-gray-200 mt-1">${escapeHTML(asset.reason)}</p>
                 </div>
 
-                <div class="mt-6 bg-gray-800 rounded-2xl p-5">
-                  <h4 class="text-xl font-bold mb-4">💵 Proyección ideal con capital ${money(currentCapital)} y riesgo 10%</h4>
-
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-gray-900 rounded-xl p-4">
-                      <p class="text-gray-400 text-sm">Si toca SL</p>
-                      <p class="text-red-400 text-xl font-bold">${money(projection.sl)}</p>
-                      <p class="text-xs text-red-300">-${money(getRiskDollar())}</p>
-                    </div>
-
-                    <div class="bg-gray-900 rounded-xl p-4">
-                      <p class="text-gray-400 text-sm">Si gana TP1</p>
-                      <p class="text-emerald-400 text-xl font-bold">${money(projection.tp1)}</p>
-                      <p class="text-xs text-emerald-300">+${money(projection.tp1Gain)}</p>
-                    </div>
-
-                    <div class="bg-gray-900 rounded-xl p-4">
-                      <p class="text-gray-400 text-sm">Si gana TP2</p>
-                      <p class="text-emerald-400 text-xl font-bold">${money(projection.tp2)}</p>
-                      <p class="text-xs text-emerald-300">+${money(projection.tp2Gain)}</p>
-                    </div>
-
-                    <div class="bg-gray-900 rounded-xl p-4">
-                      <p class="text-gray-400 text-sm">Si gana TP3</p>
-                      <p class="text-emerald-400 text-xl font-bold">${money(projection.tp3)}</p>
-                      <p class="text-xs text-emerald-300">+${money(projection.tp3Gain)}</p>
-                    </div>
-                  </div>
+                <div class="mt-4 flex flex-wrap gap-3">
+                  <button onclick="removeAsset('${escapeHTML(asset.symbol)}')"
+                    class="px-4 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-sm font-semibold">
+                    Eliminar
+                  </button>
                 </div>
               </div>
 
@@ -1406,263 +859,22 @@
                     frameborder="0">
                   </iframe>
                 </div>
-
-                <div class="mt-4 bg-gray-900 border border-amber-800 rounded-2xl p-4 text-sm text-amber-200">
-                  Gráfico en timeframe ${timeframe}. La decisión usa el precio guardado en el agente y los datos técnicos que tú defines.
-                </div>
               </div>
             </div>
           </div>
         `;
-
-        container.innerHTML += html;
-      });
-    }
-
-    function renderWatchlist() {
-      const sorted = [...assets].sort((a, b) => calculateScore(b) - calculateScore(a));
-
-      let html = `
-        <div class="grid lg:grid-cols-3 gap-5">
-          <div>
-            <h3 class="text-xl font-bold text-emerald-400 mb-4">✅ Listos / Premium</h3>
-            <div class="space-y-3">
-      `;
-
-      sorted
-        .filter(a => getDecision(a).label === "COMPRAR" || getDecision(a).label === "VENDER")
-        .forEach(a => {
-          html += watchItem(a);
-        });
-
-      html += `
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-bold text-yellow-400 mb-4">🟡 Esperar confirmación</h3>
-            <div class="space-y-3">
-      `;
-
-      sorted
-        .filter(a => getDecision(a).label === "ESPERAR")
-        .forEach(a => {
-          html += watchItem(a);
-        });
-
-      html += `
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-bold text-red-400 mb-4">⚫ No tocar / Inválidos</h3>
-            <div class="space-y-3">
-      `;
-
-      sorted
-        .filter(a => getDecision(a).label === "NO OPERAR" || getDecision(a).label === "CONFIGURACIÓN INVÁLIDA")
-        .forEach(a => {
-          html += watchItem(a);
-        });
-
-      html += `
-            </div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById("watchlist").innerHTML = html;
-    }
-
-    function watchItem(asset) {
-      const score = calculateScore(asset);
-      const timing = calculateTiming(asset);
-      const decision = getDecision(asset);
-      const rr = calculateRR(asset, asset.tp1);
-
-      return `
-        <div class="bg-gray-800 rounded-2xl p-4">
-          <div class="flex justify-between gap-3">
-            <div>
-              <p class="font-bold">${escapeHTML(asset.symbol)}</p>
-              <p class="text-sm text-gray-400">${escapeHTML(asset.category)} • ${escapeHTML(asset.signal)} • ${escapeHTML(asset.timeframe)}</p>
-              <p class="text-xs text-gray-400 mt-1">Timing: ${escapeHTML(timing.status)} • R/R 1:${rr.toFixed(2)}</p>
-            </div>
-
-            <div class="text-right">
-              <p class="${score >= 75 ? "text-emerald-400" : score >= 55 ? "text-yellow-400" : "text-red-400"} font-bold">${score}%</p>
-              <p class="text-xs text-gray-400">${escapeHTML(decision.label)}</p>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function analyzeManualAsset() {
-      const newAsset = {
-        symbol: document.getElementById("manual-symbol").value.trim() || "MANUAL",
-        category: document.getElementById("manual-category").value,
-        signal: document.getElementById("manual-signal").value,
-        timeframe: document.getElementById("manual-timeframe").value,
-        price: Number(document.getElementById("manual-price").value),
-        entry: Number(document.getElementById("manual-entry").value),
-        sl: Number(document.getElementById("manual-sl").value),
-        tp1: Number(document.getElementById("manual-tp1").value),
-        tp2: Number(document.getElementById("manual-tp2").value),
-        tp3: Number(document.getElementById("manual-tp3").value),
-        tvSymbol: document.getElementById("manual-tv").value.trim() || "AMEX:SOXL",
-        adx: Number(document.getElementById("manual-adx").value),
-        structure: document.getElementById("manual-structure").value,
-        trend: document.getElementById("manual-trend").value,
-        lateral: document.getElementById("manual-lateral").value === "Sí",
-        validity: document.getElementById("manual-validity").value.trim() || "2 horas"
-      };
-
-      assets = [
-        newAsset,
-        ...assets.filter(a => a.symbol !== newAsset.symbol)
-      ];
-
-      renderAssets();
-      renderWatchlist();
-      renderHistorySelector();
-    }
-
-    function renderHistorySelector() {
-      const select = document.getElementById("history-symbol-select");
-      if (!select) return;
-
-      const previousValue = select.value;
-
-      select.innerHTML = assets.map(asset => {
-        return `<option value="${escapeHTML(asset.symbol)}">${escapeHTML(asset.symbol)} - ${escapeHTML(asset.category)} - ${escapeHTML(asset.signal)}</option>`;
       }).join("");
-
-      if ([...select.options].some(option => option.value === previousValue)) {
-        select.value = previousValue;
-      }
-    }
-
-    function registerResult(type) {
-      if (!assets.length) return;
-
-      const selectedSymbol = document.getElementById("history-symbol-select").value;
-      const asset = assets.find(a => a.symbol === selectedSymbol) || assets[0];
-
-      const validation = validateTradeSetup(asset);
-
-      if (!validation.valid) {
-        alert("No se puede registrar resultado: " + validation.reason);
-        return;
-      }
-
-      const projection = capitalProjection(asset);
-
-      let pnl = 0;
-
-      if (type === "SL") pnl = -getRiskDollar();
-      if (type === "TP1") pnl = projection.tp1Gain;
-      if (type === "TP2") pnl = projection.tp2Gain;
-      if (type === "TP3") pnl = projection.tp3Gain;
-
-      currentCapital += pnl;
-
-      document.getElementById("capital-input").value = currentCapital.toFixed(2);
-      localStorage.setItem("agentCapital", currentCapital);
-
-      tradeHistory.unshift({
-        date: new Date().toLocaleString("es-US"),
-        symbol: asset.symbol,
-        result: type,
-        pnl: pnl,
-        capital: currentCapital
-      });
-
-      localStorage.setItem("tradeHistory", JSON.stringify(tradeHistory));
-
-      updateRiskDollar();
-      renderAssets();
-      renderWatchlist();
-      renderHistorySelector();
-      renderHistory();
-    }
-
-    function renderHistory() {
-      if (!tradeHistory.length) {
-        document.getElementById("history-table").innerHTML = `
-          <p class="text-gray-400">Todavía no hay operaciones registradas.</p>
-        `;
-        return;
-      }
-
-      let html = `
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-700 text-gray-400">
-              <th class="text-left py-3">Fecha</th>
-              <th class="text-left py-3">Activo</th>
-              <th class="text-left py-3">Resultado</th>
-              <th class="text-right py-3">Ganancia/Pérdida</th>
-              <th class="text-right py-3">Capital</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      tradeHistory.forEach(t => {
-        html += `
-          <tr class="border-b border-gray-800">
-            <td class="py-3 text-gray-300">${escapeHTML(t.date)}</td>
-            <td class="py-3 font-bold">${escapeHTML(t.symbol)}</td>
-            <td class="py-3">${escapeHTML(t.result)}</td>
-            <td class="py-3 text-right ${Number(t.pnl) >= 0 ? "text-emerald-400" : "text-red-400"} font-bold">
-              ${Number(t.pnl) >= 0 ? "+" : ""}${money(t.pnl)}
-            </td>
-            <td class="py-3 text-right font-bold">${money(t.capital)}</td>
-          </tr>
-        `;
-      });
-
-      html += `
-          </tbody>
-        </table>
-      `;
-
-      document.getElementById("history-table").innerHTML = html;
-    }
-
-    function clearHistory() {
-      tradeHistory = [];
-      localStorage.removeItem("tradeHistory");
-      renderHistory();
-    }
-
-    function updateDate() {
-      const now = new Date();
-
-      document.getElementById("current-date").textContent =
-        now.toLocaleDateString("es-ES", {
-          weekday: "long",
-          month: "long",
-          day: "numeric"
-        });
     }
 
     window.onload = () => {
-      document.getElementById("capital-input").value = currentCapital;
-
       loadMarketApiKey();
-      updateDate();
-      updateRiskDollar();
-      renderAssets();
+      loadTimeframe();
       renderWatchlist();
-      renderHistorySelector();
-      renderHistory();
 
-      console.log(
-        "%cTRADING AGENT PRO - Versión con precio y tendencia automática ✅",
-        "color:#22ff88; font-size:14px; font-weight:bold"
-      );
+      const savedKey = localStorage.getItem("marketApiKey") || "";
+      if (savedKey) {
+        updateAllMarketData();
+      }
     };
   </script>
 </body>
