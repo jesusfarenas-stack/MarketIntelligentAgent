@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>TRADING AGENT PRO - Watchlist Auto</title>
+  <title>INTELLIGENT TRADING AGENT - Watchlist Auto</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -95,10 +95,10 @@
             <i class="fas fa-chart-line text-5xl text-emerald-400"></i>
             <div>
               <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-emerald-400">
-                TRADING AGENT PRO
+                INTELLIGENT TRADING AGENT
               </h1>
-              <p class="text-gray-400">
-                Watchlist automática con precio, tendencia y oportunidad %
+              <p class="text-gray-400 text-sm md:text-base mt-1">
+                create by FJA
               </p>
             </div>
           </div>
@@ -137,7 +137,7 @@
 
       <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <p id="market-fetch-status" class="text-amber-300 font-semibold">
-          Pega tu API Key para actualizar todos los precios.
+          Pega tu API Key para actualizar precios.
         </p>
 
         <p id="last-update" class="text-gray-400 text-sm">
@@ -186,11 +186,8 @@
 
     <!-- WATCHLIST -->
     <div class="mb-8">
-      <h2 class="text-3xl font-bold mb-6 flex flex-wrap items-center gap-3">
+      <h2 class="text-3xl font-bold mb-6">
         ⭐ Watchlist automática
-        <span class="text-sm font-normal bg-amber-900 text-amber-300 px-4 py-1 rounded-full">
-          Ordenada por oportunidad %
-        </span>
       </h2>
 
       <div id="watchlist-container" class="space-y-6"></div>
@@ -396,6 +393,12 @@
       const el = document.getElementById("market-fetch-status");
       if (!el) return;
 
+      if (!message) {
+        el.textContent = "";
+        el.className = "hidden";
+        return;
+      }
+
       el.textContent = message;
 
       if (type === "success") {
@@ -507,11 +510,12 @@
           trend: "flat",
           signal: "ESPERAR",
           score: 15,
-          status: "Datos insuficientes",
+          status: "ESPERAR",
           reason: "No hay suficientes velas para confirmar tendencia.",
           changePercent: 0,
           ema20: null,
-          ema50: null
+          ema50: null,
+          direction: "neutral"
         };
       }
 
@@ -528,40 +532,85 @@
       let trend = "flat";
       let signal = "ESPERAR";
       let status = "ESPERAR";
-      let reason = "Mercado mixto o lateral. EMAs sin alineación clara.";
-      let score = 35;
+      let reason = "Mercado mixto o lateral. No hay ventaja clara para Buy ni Sell.";
+      let score = 30;
+      let direction = "neutral";
 
-      const bullish = lastClose > ema20 && ema20 > ema50 && shortMomentum > 0;
-      const bearish = lastClose < ema20 && ema20 < ema50 && shortMomentum < 0;
+      const bullish =
+        lastClose > ema20 &&
+        ema20 > ema50 &&
+        shortMomentum > 0;
+
+      const bearish =
+        lastClose < ema20 &&
+        ema20 < ema50 &&
+        shortMomentum < 0;
 
       if (bullish) {
         trend = "up";
         signal = "BUY";
-        status = "COMPRAR";
-        reason = "Tendencia alcista: precio sobre EMA20, EMA20 sobre EMA50 y momentum positivo.";
-        score = 62 + emaSpread * 6 + Math.abs(shortMomentum) * 8;
-      } else if (bearish) {
+        status = "BUY";
+        direction = "buy";
+        reason = "Oportunidad BUY: precio sobre EMA20, EMA20 sobre EMA50 y momentum positivo.";
+        score =
+          60 +
+          Math.min(emaSpread * 7, 18) +
+          Math.min(Math.abs(shortMomentum) * 10, 22);
+      }
+
+      if (bearish) {
         trend = "down";
         signal = "SELL";
-        status = "VENDER";
-        reason = "Tendencia bajista: precio bajo EMA20, EMA20 bajo EMA50 y momentum negativo.";
-        score = 62 + emaSpread * 6 + Math.abs(shortMomentum) * 8;
-      } else {
-        trend = "flat";
-        signal = "ESPERAR";
-        status = "ESPERAR";
-        reason = "No hay tendencia limpia. Esperar rompimiento o mejor estructura.";
-        score = 25 + Math.min(Math.abs(shortMomentum) * 5, 20);
+        status = "SELL";
+        direction = "sell";
+        reason = "Oportunidad SELL: precio bajo EMA20, EMA20 bajo EMA50 y momentum negativo.";
+        score =
+          60 +
+          Math.min(emaSpread * 7, 18) +
+          Math.min(Math.abs(shortMomentum) * 10, 22);
+      }
+
+      if (!bullish && !bearish) {
+        const weakBuy =
+          lastClose > ema20 &&
+          shortMomentum > 0;
+
+        const weakSell =
+          lastClose < ema20 &&
+          shortMomentum < 0;
+
+        if (weakBuy) {
+          trend = "up";
+          signal = "BUY DÉBIL";
+          status = "ESPERAR";
+          direction = "buy";
+          reason = "Buy débil: hay presión alcista, pero falta confirmación completa de EMA20 sobre EMA50.";
+          score = 45 + Math.min(Math.abs(shortMomentum) * 8, 15);
+        } else if (weakSell) {
+          trend = "down";
+          signal = "SELL DÉBIL";
+          status = "ESPERAR";
+          direction = "sell";
+          reason = "Sell débil: hay presión bajista, pero falta confirmación completa de EMA20 bajo EMA50.";
+          score = 45 + Math.min(Math.abs(shortMomentum) * 8, 15);
+        } else {
+          trend = "flat";
+          signal = "ESPERAR";
+          status = "ESPERAR";
+          direction = "neutral";
+          reason = "Mercado lateral o mixto. Esperar rompimiento claro antes de Buy o Sell.";
+          score = 25;
+        }
       }
 
       if (Math.abs(shortMomentum) < 0.05) {
         score -= 10;
-        reason += " Momentum bajo.";
+        reason += " Momentum muy bajo.";
       }
 
       if (emaSpread < 0.10) {
         score -= 8;
-        reason += " EMAs muy juntas.";
+        reason += " EMAs muy juntas, posible lateralidad.";
       }
 
       score = Math.round(clamp(score, 0, 100));
@@ -574,7 +623,8 @@
         reason,
         changePercent,
         ema20,
-        ema50
+        ema50,
+        direction
       };
     }
 
@@ -639,6 +689,7 @@
           changePercent: analysis.changePercent,
           ema20: analysis.ema20,
           ema50: analysis.ema50,
+          direction: analysis.direction,
           tvSymbol: asset.tvSymbol || tradingViewSymbolFromCategory(asset.category, symbol)
         };
       } catch (error) {
@@ -669,7 +720,7 @@
       saveMarketApiKey();
       saveTimeframe();
 
-      setMarketStatus("Actualizando todos los precios...", "info");
+      setMarketStatus("Actualizando precios...", "info");
 
       const updatedAssets = [];
 
@@ -686,7 +737,7 @@
       renderWatchlist();
       updateLastUpdate();
 
-      setMarketStatus("Todos los precios fueron actualizados y ordenados por oportunidad.", "success");
+      setMarketStatus("", "success");
     }
 
     function addAssetToWatchlist() {
@@ -721,7 +772,8 @@
         reason: "Agregado. Actualiza para buscar precio.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral"
       });
 
       document.getElementById("new-symbol").value = "";
@@ -756,10 +808,19 @@
     }
 
     function decisionClass(status) {
-      if (status === "COMPRAR") return "decision-buy";
-      if (status === "VENDER") return "decision-sell";
+      if (status === "BUY") return "decision-buy";
+      if (status === "SELL") return "decision-sell";
       if (status === "ESPERAR") return "decision-wait";
       return "decision-no";
+    }
+
+    function formatDecision(status) {
+      if (status === "BUY") return "✅ BUY";
+      if (status === "SELL") return "🔴 SELL";
+      if (status === "ESPERAR") return "🟡 ESPERAR";
+      if (status === "Error") return "⚫ ERROR";
+      if (status === "Pendiente") return "⚫ PENDIENTE";
+      return escapeHTML(status);
     }
 
     function formatPrice(price) {
@@ -808,7 +869,7 @@
 
                   <div class="text-left md:text-right">
                     <p class="text-gray-400 text-sm">Decisión</p>
-                    <p class="text-3xl font-bold">${escapeHTML(status)}</p>
+                    <p class="text-3xl font-bold">${formatDecision(status)}</p>
                   </div>
                 </div>
 
