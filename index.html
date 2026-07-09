@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>INTELLIGENT TRADING AGENT - Watchlist Auto</title>
+  <title>INTELLIGENT TRADING AGENT - Watchlist Auto SMC</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -208,7 +208,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "QQQ",
@@ -222,7 +224,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "SPY",
@@ -236,7 +240,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "AAPL",
@@ -250,7 +256,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "NVDA",
@@ -264,7 +272,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "EUR/USD",
@@ -278,7 +288,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "GBP/USD",
@@ -292,7 +304,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "BTC/USDT",
@@ -306,7 +320,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "ETH/USDT",
@@ -320,7 +336,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       },
       {
         symbol: "XAU/USD",
@@ -334,7 +352,9 @@
         reason: "Esperando API Key.",
         changePercent: 0,
         ema20: null,
-        ema50: null
+        ema50: null,
+        direction: "neutral",
+        smc: null
       }
     ];
 
@@ -500,22 +520,306 @@
       return ema;
     }
 
+    function calculateATR(candles, period = 14) {
+      if (!candles || candles.length < period + 1) return 0;
+
+      const trs = [];
+
+      for (let i = 1; i < candles.length; i++) {
+        const high = candles[i].high;
+        const low = candles[i].low;
+        const prevClose = candles[i - 1].close;
+
+        const tr = Math.max(
+          high - low,
+          Math.abs(high - prevClose),
+          Math.abs(low - prevClose)
+        );
+
+        trs.push(tr);
+      }
+
+      const recent = trs.slice(-period);
+      return recent.reduce((sum, value) => sum + value, 0) / recent.length;
+    }
+
+    function findSwings(candles, lookback = 2) {
+      const swings = [];
+
+      for (let i = lookback; i < candles.length - lookback; i++) {
+        let isSwingHigh = true;
+        let isSwingLow = true;
+
+        for (let j = i - lookback; j <= i + lookback; j++) {
+          if (j === i) continue;
+
+          if (candles[i].high <= candles[j].high) {
+            isSwingHigh = false;
+          }
+
+          if (candles[i].low >= candles[j].low) {
+            isSwingLow = false;
+          }
+        }
+
+        if (isSwingHigh) {
+          swings.push({
+            index: i,
+            type: "high",
+            price: candles[i].high
+          });
+        }
+
+        if (isSwingLow) {
+          swings.push({
+            index: i,
+            type: "low",
+            price: candles[i].low
+          });
+        }
+      }
+
+      return swings;
+    }
+
+    function detectStructureEvent(candles) {
+      const swings = findSwings(candles, 2);
+
+      if (swings.length < 4) {
+        return {
+          event: "Sin estructura clara",
+          direction: "neutral",
+          breakIndex: null,
+          brokenLevel: null
+        };
+      }
+
+      let previousDirection = "neutral";
+      let lastEvent = {
+        event: "Sin BOS/CHoCH",
+        direction: "neutral",
+        breakIndex: null,
+        brokenLevel: null
+      };
+
+      for (let i = 5; i < candles.length; i++) {
+        const previousSwings = swings.filter(s => s.index < i);
+
+        const lastSwingHigh = [...previousSwings].reverse().find(s => s.type === "high");
+        const lastSwingLow = [...previousSwings].reverse().find(s => s.type === "low");
+
+        if (!lastSwingHigh || !lastSwingLow) continue;
+
+        const close = candles[i].close;
+
+        if (close > lastSwingHigh.price) {
+          const event =
+            previousDirection === "sell"
+              ? "CHoCH alcista"
+              : "BOS alcista";
+
+          previousDirection = "buy";
+
+          lastEvent = {
+            event,
+            direction: "buy",
+            breakIndex: i,
+            brokenLevel: lastSwingHigh.price
+          };
+        }
+
+        if (close < lastSwingLow.price) {
+          const event =
+            previousDirection === "buy"
+              ? "CHoCH bajista"
+              : "BOS bajista";
+
+          previousDirection = "sell";
+
+          lastEvent = {
+            event,
+            direction: "sell",
+            breakIndex: i,
+            brokenLevel: lastSwingLow.price
+          };
+        }
+      }
+
+      return lastEvent;
+    }
+
+    function findOrderBlock(candles, structureEvent) {
+      if (!structureEvent || structureEvent.breakIndex === null) return null;
+
+      const breakIndex = structureEvent.breakIndex;
+      const direction = structureEvent.direction;
+      const start = Math.max(0, breakIndex - 12);
+
+      if (direction === "buy") {
+        for (let i = breakIndex - 1; i >= start; i--) {
+          const candle = candles[i];
+          const bearishCandle = candle.close < candle.open;
+
+          if (bearishCandle) {
+            return {
+              type: "bullish",
+              index: i,
+              low: candle.low,
+              high: candle.open,
+              label: "Order Block alcista"
+            };
+          }
+        }
+      }
+
+      if (direction === "sell") {
+        for (let i = breakIndex - 1; i >= start; i--) {
+          const candle = candles[i];
+          const bullishCandle = candle.close > candle.open;
+
+          if (bullishCandle) {
+            return {
+              type: "bearish",
+              index: i,
+              low: candle.open,
+              high: candle.high,
+              label: "Order Block bajista"
+            };
+          }
+        }
+      }
+
+      return null;
+    }
+
+    function analyzeOrderBlockTouch(candles, orderBlock, breakIndex) {
+      if (!orderBlock || breakIndex === null) {
+        return {
+          firstTouch: false,
+          movedAway: false,
+          touches: 0,
+          status: "Sin Order Block"
+        };
+      }
+
+      const atr = calculateATR(candles, 14);
+      let touches = 0;
+      let firstTouchIndex = null;
+
+      for (let i = breakIndex + 1; i < candles.length; i++) {
+        const candle = candles[i];
+
+        const touched =
+          candle.low <= orderBlock.high &&
+          candle.high >= orderBlock.low;
+
+        if (touched) {
+          touches++;
+
+          if (firstTouchIndex === null) {
+            firstTouchIndex = i;
+          }
+        }
+      }
+
+      if (firstTouchIndex === null) {
+        return {
+          firstTouch: false,
+          movedAway: false,
+          touches,
+          status: "Order Block creado, esperando primer toque"
+        };
+      }
+
+      const candlesAfterTouch = candles.slice(firstTouchIndex);
+      let movedAway = false;
+
+      if (orderBlock.type === "bullish") {
+        const maxHigh = Math.max(...candlesAfterTouch.map(c => c.high));
+        movedAway = maxHigh - orderBlock.high >= atr * 0.5;
+      }
+
+      if (orderBlock.type === "bearish") {
+        const minLow = Math.min(...candlesAfterTouch.map(c => c.low));
+        movedAway = orderBlock.low - minLow >= atr * 0.5;
+      }
+
+      let status = "";
+
+      if (touches === 1 && movedAway) {
+        status = "Primer toque confirmado y precio se alejó";
+      } else if (touches === 1 && !movedAway) {
+        status = "Primer toque detectado, falta alejamiento";
+      } else if (touches > 1) {
+        status = "Order Block ya fue tocado varias veces";
+      } else {
+        status = "Esperando reacción";
+      }
+
+      return {
+        firstTouch: touches === 1,
+        movedAway,
+        touches,
+        status
+      };
+    }
+
+    function analyzeSMC(candles) {
+      const structureEvent = detectStructureEvent(candles);
+      const orderBlock = findOrderBlock(candles, structureEvent);
+
+      if (!orderBlock) {
+        return {
+          event: structureEvent.event,
+          direction: structureEvent.direction,
+          orderBlock: null,
+          obStatus: "No se encontró Order Block válido"
+        };
+      }
+
+      const obTouch = analyzeOrderBlockTouch(
+        candles,
+        orderBlock,
+        structureEvent.breakIndex
+      );
+
+      return {
+        event: structureEvent.event,
+        direction: structureEvent.direction,
+        orderBlock: {
+          ...orderBlock,
+          firstTouch: obTouch.firstTouch,
+          movedAway: obTouch.movedAway,
+          touches: obTouch.touches,
+          status: obTouch.status
+        },
+        obStatus: obTouch.status
+      };
+    }
+
     function clamp(value, min, max) {
       return Math.max(min, Math.min(max, value));
     }
 
-    function analyzeMarket(closes) {
-      if (!closes || closes.length < 55) {
+    function analyzeMarket(candles) {
+      const closes = candles.map(c => c.close);
+
+      if (!candles || candles.length < 55) {
         return {
           trend: "flat",
           signal: "ESPERAR",
           score: 15,
           status: "ESPERAR",
-          reason: "No hay suficientes velas para confirmar tendencia.",
+          reason: "No hay suficientes velas para confirmar tendencia, BOS, CHoCH u Order Block.",
           changePercent: 0,
           ema20: null,
           ema50: null,
-          direction: "neutral"
+          direction: "neutral",
+          smc: {
+            event: "Sin datos",
+            orderBlock: null,
+            obStatus: "Sin datos"
+          }
         };
       }
 
@@ -529,6 +833,8 @@
       const shortMomentum = ((lastClose - previousClose) / previousClose) * 100;
       const emaSpread = ema50 ? Math.abs((ema20 - ema50) / ema50) * 100 : 0;
 
+      const smc = analyzeSMC(candles);
+
       let trend = "flat";
       let signal = "ESPERAR";
       let status = "ESPERAR";
@@ -536,81 +842,132 @@
       let score = 30;
       let direction = "neutral";
 
-      const bullish =
+      const bullishEMA =
         lastClose > ema20 &&
         ema20 > ema50 &&
         shortMomentum > 0;
 
-      const bearish =
+      const bearishEMA =
         lastClose < ema20 &&
         ema20 < ema50 &&
         shortMomentum < 0;
 
-      if (bullish) {
+      const bullishSMC =
+        smc.direction === "buy" &&
+        (
+          smc.event === "BOS alcista" ||
+          smc.event === "CHoCH alcista"
+        );
+
+      const bearishSMC =
+        smc.direction === "sell" &&
+        (
+          smc.event === "BOS bajista" ||
+          smc.event === "CHoCH bajista"
+        );
+
+      const bullishOB =
+        smc.orderBlock &&
+        smc.orderBlock.type === "bullish" &&
+        smc.orderBlock.firstTouch &&
+        smc.orderBlock.movedAway;
+
+      const bearishOB =
+        smc.orderBlock &&
+        smc.orderBlock.type === "bearish" &&
+        smc.orderBlock.firstTouch &&
+        smc.orderBlock.movedAway;
+
+      if (bullishEMA && bullishSMC) {
         trend = "up";
         signal = "BUY";
         status = "BUY";
         direction = "buy";
-        reason = "Oportunidad BUY: precio sobre EMA20, EMA20 sobre EMA50 y momentum positivo.";
+        reason = "BUY fuerte: EMA alcista + " + smc.event + ".";
         score =
-          60 +
+          62 +
           Math.min(emaSpread * 7, 18) +
           Math.min(Math.abs(shortMomentum) * 10, 22);
+
+        if (bullishOB) {
+          score += 15;
+          reason += " Order Block alcista tocado por primera vez y respetado.";
+        } else if (smc.orderBlock && smc.orderBlock.type === "bullish") {
+          score += 7;
+          reason += " Order Block alcista detectado.";
+        }
       }
 
-      if (bearish) {
+      if (bearishEMA && bearishSMC) {
         trend = "down";
         signal = "SELL";
         status = "SELL";
         direction = "sell";
-        reason = "Oportunidad SELL: precio bajo EMA20, EMA20 bajo EMA50 y momentum negativo.";
+        reason = "SELL fuerte: EMA bajista + " + smc.event + ".";
         score =
-          60 +
+          62 +
           Math.min(emaSpread * 7, 18) +
           Math.min(Math.abs(shortMomentum) * 10, 22);
-      }
 
-      if (!bullish && !bearish) {
-        const weakBuy =
-          lastClose > ema20 &&
-          shortMomentum > 0;
-
-        const weakSell =
-          lastClose < ema20 &&
-          shortMomentum < 0;
-
-        if (weakBuy) {
-          trend = "up";
-          signal = "BUY DÉBIL";
-          status = "ESPERAR";
-          direction = "buy";
-          reason = "Buy débil: hay presión alcista, pero falta confirmación completa de EMA20 sobre EMA50.";
-          score = 45 + Math.min(Math.abs(shortMomentum) * 8, 15);
-        } else if (weakSell) {
-          trend = "down";
-          signal = "SELL DÉBIL";
-          status = "ESPERAR";
-          direction = "sell";
-          reason = "Sell débil: hay presión bajista, pero falta confirmación completa de EMA20 bajo EMA50.";
-          score = 45 + Math.min(Math.abs(shortMomentum) * 8, 15);
-        } else {
-          trend = "flat";
-          signal = "ESPERAR";
-          status = "ESPERAR";
-          direction = "neutral";
-          reason = "Mercado lateral o mixto. Esperar rompimiento claro antes de Buy o Sell.";
-          score = 25;
+        if (bearishOB) {
+          score += 15;
+          reason += " Order Block bajista tocado por primera vez y respetado.";
+        } else if (smc.orderBlock && smc.orderBlock.type === "bearish") {
+          score += 7;
+          reason += " Order Block bajista detectado.";
         }
       }
 
+      if (!bullishEMA && bullishSMC && bullishOB) {
+        trend = "up";
+        signal = "BUY";
+        status = "BUY";
+        direction = "buy";
+        reason = "BUY por SMC: " + smc.event + " + Order Block alcista respetado.";
+        score = 72;
+      }
+
+      if (!bearishEMA && bearishSMC && bearishOB) {
+        trend = "down";
+        signal = "SELL";
+        status = "SELL";
+        direction = "sell";
+        reason = "SELL por SMC: " + smc.event + " + Order Block bajista respetado.";
+        score = 72;
+      }
+
+      if (
+        status === "ESPERAR" &&
+        bullishSMC &&
+        !bullishOB
+      ) {
+        trend = "up";
+        signal = "BUY DÉBIL";
+        direction = "buy";
+        reason = "Hay " + smc.event + ", pero falta primer toque y rechazo del Order Block.";
+        score = 48;
+      }
+
+      if (
+        status === "ESPERAR" &&
+        bearishSMC &&
+        !bearishOB
+      ) {
+        trend = "down";
+        signal = "SELL DÉBIL";
+        direction = "sell";
+        reason = "Hay " + smc.event + ", pero falta primer toque y rechazo del Order Block.";
+        score = 48;
+      }
+
       if (Math.abs(shortMomentum) < 0.05) {
-        score -= 10;
-        reason += " Momentum muy bajo.";
+        score -= 8;
+        reason += " Momentum bajo.";
       }
 
       if (emaSpread < 0.10) {
-        score -= 8;
-        reason += " EMAs muy juntas, posible lateralidad.";
+        score -= 6;
+        reason += " EMAs muy juntas.";
       }
 
       score = Math.round(clamp(score, 0, 100));
@@ -624,7 +981,8 @@
         changePercent,
         ema20,
         ema50,
-        direction
+        direction,
+        smc
       };
     }
 
@@ -651,17 +1009,28 @@
             score: 0,
             price: null,
             trend: "flat",
-            signal: "ESPERAR"
+            signal: "ESPERAR",
+            smc: null
           };
         }
 
         const values = data.values.slice().reverse();
 
-        const closes = values
-          .map(candle => Number(candle.close))
-          .filter(value => Number.isFinite(value));
+        const candles = values
+          .map(candle => ({
+            open: Number(candle.open),
+            high: Number(candle.high),
+            low: Number(candle.low),
+            close: Number(candle.close)
+          }))
+          .filter(candle =>
+            Number.isFinite(candle.open) &&
+            Number.isFinite(candle.high) &&
+            Number.isFinite(candle.low) &&
+            Number.isFinite(candle.close)
+          );
 
-        if (!closes.length) {
+        if (!candles.length) {
           return {
             ...asset,
             symbol,
@@ -670,12 +1039,13 @@
             score: 0,
             price: null,
             trend: "flat",
-            signal: "ESPERAR"
+            signal: "ESPERAR",
+            smc: null
           };
         }
 
-        const analysis = analyzeMarket(closes);
-        const lastPrice = closes[closes.length - 1];
+        const analysis = analyzeMarket(candles);
+        const lastPrice = candles[candles.length - 1].close;
 
         return {
           ...asset,
@@ -690,6 +1060,7 @@
           ema20: analysis.ema20,
           ema50: analysis.ema50,
           direction: analysis.direction,
+          smc: analysis.smc,
           tvSymbol: asset.tvSymbol || tradingViewSymbolFromCategory(asset.category, symbol)
         };
       } catch (error) {
@@ -701,7 +1072,8 @@
           score: 0,
           price: null,
           trend: "flat",
-          signal: "ESPERAR"
+          signal: "ESPERAR",
+          smc: null
         };
       }
     }
@@ -773,7 +1145,8 @@
         changePercent: 0,
         ema20: null,
         ema50: null,
-        direction: "neutral"
+        direction: "neutral",
+        smc: null
       });
 
       document.getElementById("new-symbol").value = "";
@@ -832,6 +1205,68 @@
       if (n >= 1) return n.toFixed(4);
 
       return n.toFixed(6);
+    }
+
+    function renderSMCBlock(asset) {
+      if (!asset.smc) {
+        return `
+          <div class="mt-4 bg-gray-900/70 rounded-2xl p-4">
+            <p class="text-gray-400 text-sm">SMC</p>
+            <p class="text-gray-300">Esperando actualización.</p>
+          </div>
+        `;
+      }
+
+      const ob = asset.smc.orderBlock;
+
+      if (!ob) {
+        return `
+          <div class="mt-4 bg-gray-900/70 rounded-2xl p-4">
+            <p class="text-gray-400 text-sm">SMC</p>
+            <p class="text-gray-200">${escapeHTML(asset.smc.event)}</p>
+            <p class="text-gray-400 text-sm mt-1">${escapeHTML(asset.smc.obStatus)}</p>
+          </div>
+        `;
+      }
+
+      const obType =
+        ob.type === "bullish"
+          ? "Order Block alcista"
+          : "Order Block bajista";
+
+      const obColor =
+        ob.type === "bullish"
+          ? "text-emerald-400"
+          : "text-red-400";
+
+      return `
+        <div class="mt-4 bg-gray-900/70 rounded-2xl p-4">
+          <p class="text-gray-400 text-sm">SMC</p>
+
+          <div class="grid md:grid-cols-3 gap-3 mt-2">
+            <div>
+              <p class="text-gray-400 text-xs">Estructura</p>
+              <p class="text-white font-bold">${escapeHTML(asset.smc.event)}</p>
+            </div>
+
+            <div>
+              <p class="text-gray-400 text-xs">Order Block</p>
+              <p class="${obColor} font-bold">${obType}</p>
+              <p class="text-gray-400 text-xs">
+                Zona: ${formatPrice(ob.low)} - ${formatPrice(ob.high)}
+              </p>
+            </div>
+
+            <div>
+              <p class="text-gray-400 text-xs">Toque / reacción</p>
+              <p class="text-gray-200 font-bold">${escapeHTML(ob.status)}</p>
+              <p class="text-gray-400 text-xs">
+                Toques: ${ob.touches}
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function renderWatchlist() {
@@ -902,6 +1337,8 @@
                   <p class="text-gray-400 text-sm">Lectura del agente</p>
                   <p class="text-gray-200 mt-1">${escapeHTML(asset.reason)}</p>
                 </div>
+
+                ${renderSMCBlock(asset)}
 
                 <div class="mt-4 flex flex-wrap gap-3">
                   <button onclick="removeAsset('${escapeHTML(asset.symbol)}')"
