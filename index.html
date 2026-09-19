@@ -1,4200 +1,698 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>INTELLIGENT TRADING AGENT - SMC Multi-Timeframe</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
-  <style>
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-    }
-
-    * {
-      scroll-behavior: auto !important;
-    }
-
-    *, *::before, *::after {
-      animation: none !important;
-      transition: none !important;
-      transform: none !important;
-    }
-
-    input, select {
-      outline: none;
-    }
-
-    .gauge {
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
-      background: conic-gradient(
-        #22ff88 0deg,
-        #22ff88 var(--percent),
-        #1f2937 var(--percent)
-      );
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 28px rgba(34, 255, 136, 0.35);
-      flex-shrink: 0;
-    }
-
-    .gauge.mid {
-      background: conic-gradient(
-        #facc15 0deg,
-        #facc15 var(--percent),
-        #1f2937 var(--percent)
-      );
-      box-shadow: 0 0 28px rgba(250, 204, 21, 0.28);
-    }
-
-    .gauge.low {
-      background: conic-gradient(
-        #ef4444 0deg,
-        #ef4444 var(--percent),
-        #1f2937 var(--percent)
-      );
-      box-shadow: 0 0 28px rgba(239, 68, 68, 0.28);
-    }
-
-    .trend-up {
-      color: #22ff88;
-    }
-
-    .trend-down {
-      color: #ef4444;
-    }
-
-    .trend-flat {
-      color: #facc15;
-    }
-
-    .decision-buy {
-      background: linear-gradient(
-        135deg,
-        rgba(34,255,136,.18),
-        rgba(16,185,129,.08)
-      );
-      border: 1px solid rgba(34,255,136,.45);
-    }
-
-    .decision-sell {
-      background: linear-gradient(
-        135deg,
-        rgba(239,68,68,.18),
-        rgba(127,29,29,.08)
-      );
-      border: 1px solid rgba(239,68,68,.45);
-    }
-
-    .decision-wait {
-      background: linear-gradient(
-        135deg,
-        rgba(250,204,21,.18),
-        rgba(113,63,18,.08)
-      );
-      border: 1px solid rgba(250,204,21,.45);
-    }
-
-    .decision-no {
-      background: linear-gradient(
-        135deg,
-        rgba(107,114,128,.18),
-        rgba(31,41,55,.08)
-      );
-      border: 1px solid rgba(107,114,128,.45);
-    }
-
-    .tv-chart {
-      height: 360px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid #1f2937;
-      background: #020617;
-    }
-
-    .tf-card {
-      background: rgba(17,24,39,.78);
-      border: 1px solid #1f2937;
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    .pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      background: rgba(17,24,39,.72);
-      color: #d1d5db;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FJA TRADING AGENT PRO</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<style>
+body{font-family:Inter,system-ui,sans-serif;background:#030712}
+*{box-sizing:border-box}
+.card{background:#111827;border:1px solid #1f2937;border-radius:22px}
+.panel{background:#0b1220;border:1px solid #1f2937;border-radius:18px}
+input,select{outline:none}
+.trend-meter{width:260px;height:135px;overflow:hidden;position:relative}
+.trend-arc{width:260px;height:260px;border-radius:50%;background:conic-gradient(from 270deg,#7f1d1d 0deg,#ef4444 55deg,#f97316 82deg,#374151 90deg,#22c55e 125deg,#00ff88 180deg,#111827 180deg,#111827 360deg);position:absolute;top:0;left:0}
+.trend-inner{width:190px;height:190px;border-radius:50%;background:#0b1220;position:absolute;top:35px;left:35px}
+.needle{position:absolute;width:95px;height:4px;background:white;left:130px;top:128px;transform-origin:0 50%;transform:rotate(-90deg);border-radius:4px;box-shadow:0 0 10px rgba(255,255,255,.8)}
+.needle-center{width:16px;height:16px;border-radius:50%;background:white;position:absolute;left:122px;top:121px}
+.opportunity{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(#22c55e 0deg,#22c55e var(--deg),#1f2937 var(--deg),#1f2937 360deg)}
+.opportunity-inner{width:98px;height:98px;border-radius:50%;background:#0b1220;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.buy{color:#22ff88}.sell{color:#ff4d4d}.wait{color:#facc15}
+.signal-buy{border:1px solid rgba(34,255,136,.5);background:rgba(34,255,136,.08)}
+.signal-sell{border:1px solid rgba(239,68,68,.5);background:rgba(239,68,68,.08)}
+.signal-wait{border:1px solid rgba(250,204,21,.4);background:rgba(250,204,21,.06)}
+.tv{height:430px;border-radius:18px;overflow:hidden;border:1px solid #1f2937}
+.small-pill{padding:5px 10px;border-radius:999px;background:#1f2937;font-size:12px}
+</style>
 </head>
+<body class="text-gray-100 min-h-screen">
+<div class="max-w-7xl mx-auto p-4 md:p-6">
 
-<body class="bg-gray-950 text-gray-100 min-h-screen">
+<!-- HEADER -->
+<div class="card p-5 mb-5 border-amber-600">
+<div class="flex flex-col xl:flex-row gap-5 justify-between">
+<div>
+<div class="flex items-center gap-3">
+<i class="fa-solid fa-chart-line text-4xl text-emerald-400"></i>
+<div>
+<h1 class="text-3xl font-black text-emerald-400">FJA TRADING AGENT PRO</h1>
+<p class="text-gray-400 text-sm">SMC + Trend + Momentum + Retest Strategy (Optimized)</p>
+</div>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-3 xl:w-[560px]">
+<div>
+<label class="text-xs text-gray-400">Twelve Data API Key</label>
+<input id="apiKey" type="password" placeholder="API Key" class="w-full bg-gray-800 rounded-xl px-4 py-3" onchange="saveKey()">
+</div>
+<div class="flex items-end">
+<button onclick="updateMarket()" class="w-full bg-amber-600 rounded-xl px-4 py-3 font-bold">
+<i class="fa-solid fa-rotate mr-2"></i> ANALIZAR AHORA
+</button>
+</div>
+</div>
+</div>
+<div class="mt-4 flex flex-wrap gap-3 items-center">
+<span id="status" class="text-amber-300 text-sm">Esperando actualización</span>
+<span class="text-gray-600">|</span>
+<span id="lastUpdate" class="text-gray-400 text-sm">Sin actualizar</span>
+</div>
+</div>
 
-  <div class="max-w-7xl mx-auto p-4 md:p-6">
+<!-- SELECTORES -->
+<div class="card p-5 mb-5">
+<h2 class="font-bold text-xl mb-4"><i class="fa-solid fa-sliders mr-2 text-emerald-400"></i> Mercado</h2>
+<div class="grid md:grid-cols-3 gap-4">
+<div>
+<label class="text-sm text-gray-400">Tipo</label>
+<select id="marketType" onchange="changeMarketType()" class="w-full bg-gray-800 rounded-xl p-3 mt-1">
+<option value="Forex">Forex</option>
+<option value="Crypto">Bitcoin</option>
+</select>
+</div>
+<div>
+<label class="text-sm text-gray-400">Activo</label>
+<select id="symbol" class="w-full bg-gray-800 rounded-xl p-3 mt-1">
+<option value="EUR/USD">EUR/USD</option>
+<option value="GBP/USD">GBP/USD</option>
+</select>
+</div>
+<div>
+<label class="text-sm text-gray-400">Temporalidad</label>
+<select id="timeframe" class="w-full bg-gray-800 rounded-xl p-3 mt-1">
+<option value="10m">10 minutos</option>
+<option value="15m" selected>15 minutos</option>
+<option value="1H">1 hora</option>
+<option value="4H">4 horas</option>
+</select>
+</div>
+</div>
+</div>
 
-    <!-- HEADER / API -->
-    <div class="bg-gray-900 rounded-3xl p-5 md:p-6 mb-6 border border-amber-600">
+<!-- MAIN SIGNAL -->
+<div id="signalBox" class="card signal-wait p-5 mb-5">
+<div class="grid lg:grid-cols-3 gap-6 items-center">
+<div class="text-center">
+<p class="text-gray-400 font-semibold mb-3">DIRECCIÓN DE TENDENCIA</p>
+<div class="flex justify-center">
+<div class="trend-meter">
+<div class="trend-arc"></div>
+<div class="trend-inner"></div>
+<div id="trendNeedle" class="needle"></div>
+<div class="needle-center"></div>
+</div>
+</div>
+<div class="flex justify-between max-w-[260px] mx-auto text-xs">
+<span class="text-red-400">-100 BAJISTA</span>
+<span class="text-green-400">+100 ALCISTA</span>
+</div>
+<p id="trendValue" class="text-3xl font-black mt-2 wait">0</p>
+<p id="trendText" class="font-bold text-gray-300">NEUTRAL</p>
+</div>
+<div class="text-center">
+<p class="text-gray-400 font-semibold mb-3">OPORTUNIDAD</p>
+<div class="flex justify-center">
+<div id="opportunityGauge" class="opportunity" style="--deg:0deg">
+<div class="opportunity-inner">
+<span id="opportunityScore" class="text-3xl font-black">0</span>
+<span class="text-xs text-gray-500">/100</span>
+</div>
+</div>
+</div>
+<p id="opportunityText" class="font-bold mt-3 text-red-400">NO OPERAR</p>
+<p id="opportunityDescription" class="text-xs text-gray-500 mt-1">Esperando datos</p>
+</div>
+<div class="text-center">
+<p class="text-gray-400 font-semibold">SEÑAL DEL AGENTE</p>
+<p id="decision" class="text-5xl font-black mt-4 wait">ESPERAR</p>
+<p id="symbolDisplay" class="text-2xl font-bold mt-3">EUR/USD</p>
+<p id="tfDisplay" class="text-gray-400">15 minutos</p>
+<div class="mt-4">
+<p class="text-gray-500 text-xs">Precio actual</p>
+<p id="price" class="text-3xl font-bold text-emerald-400">--</p>
+</div>
+</div>
+</div>
+</div>
 
-      <div class="flex flex-col xl:flex-row gap-5 justify-between">
+<!-- RITMO -->
+<div class="grid lg:grid-cols-4 gap-4 mb-5">
+<div class="panel p-4"><p class="text-gray-500 text-sm">Ritmo de mercado</p><p id="rhythm" class="text-xl font-bold mt-2">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-sm">Momentum</p><p id="momentum" class="text-xl font-bold mt-2">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-sm">Actividad / expansión</p><p id="activity" class="text-xl font-bold mt-2">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-sm">Estructura</p><p id="structure" class="text-xl font-bold mt-2">--</p></div>
+</div>
 
-        <div class="flex items-center gap-4">
+<!-- INDICADORES -->
+<div class="card p-5 mb-5">
+<h2 class="text-xl font-bold mb-4">Confirmaciones</h2>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="panel p-4"><p class="text-gray-500 text-xs">EMA 20</p><p id="ema20" class="font-bold text-lg">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">EMA 50</p><p id="ema50" class="font-bold text-lg">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">RSI 14</p><p id="rsi" class="font-bold text-lg">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">MACD</p><p id="macd" class="font-bold text-lg">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">BOS / CHoCH</p><p id="bos" class="font-bold">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">Barrido de liquidez</p><p id="liquidity" class="font-bold">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">Order Block</p><p id="orderBlock" class="font-bold">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">Fair Value Gap</p><p id="fvg" class="font-bold">--</p></div>
+</div>
+</div>
 
-          <i class="fas fa-chart-line text-5xl text-emerald-400"></i>
+<!-- TIKTOK STRATEGY -->
+<div class="card p-5 mb-5">
+<div class="flex items-center justify-between gap-4 flex-wrap">
+<div>
+<h2 class="text-xl font-bold">🎯 Confirmación de entrada</h2>
+<p class="text-gray-400 text-sm mt-1">Ruptura + retesteo + rechazo + momentum</p>
+</div>
+<div><span id="entryStatus" class="small-pill text-yellow-300">ESPERANDO SETUP</span></div>
+</div>
+<div class="grid md:grid-cols-4 gap-4 mt-5">
+<div class="panel p-4"><p class="text-gray-500 text-xs">Ruptura estructura</p><p id="entryBreak" class="font-bold mt-1">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">Retesteo</p><p id="entryRetest" class="font-bold mt-1">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">Momentum</p><p id="entryMomentum" class="font-bold mt-1">--</p></div>
+<div class="panel p-4"><p class="text-gray-500 text-xs">Filtro tendencia</p><p id="entryTrend" class="font-bold mt-1">--</p></div>
+</div>
+</div>
 
-          <div>
+<!-- SCORE BREAKDOWN -->
+<div class="card p-5 mb-5">
+<h2 class="text-xl font-bold mb-4">¿Por qué da esta lectura?</h2>
+<div id="scoreReasons" class="space-y-2 text-sm text-gray-300">Esperando análisis.</div>
+</div>
 
-            <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-emerald-400">
-              INTELLIGENT TRADING AGENT
-            </h1>
-
-            <p class="text-gray-400 text-sm md:text-base mt-1">
-              SMC Multi-Timeframe · BTC/USDT · EUR/USD · GBP/USD · create by FJA
-            </p>
-
-          </div>
-
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-4 w-full xl:w-[560px]">
-
-          <div>
-
-            <label class="text-sm text-gray-400">
-              API Key de Twelve Data
-            </label>
-
-            <input
-              id="market-api-key"
-              type="password"
-              placeholder="Pega aquí tu API Key"
-              class="w-full bg-gray-800 rounded-xl px-4 py-3 text-white"
-              onchange="saveMarketApiKey();"
-            />
-
-          </div>
-
-          <div class="flex items-end">
-
-            <button
-              onclick="updateAllMarketData()"
-              class="w-full bg-amber-600 hover:bg-amber-500 rounded-xl px-5 py-3 font-bold flex items-center justify-center gap-2"
-            >
-              <i class="fas fa-rotate"></i>
-              Actualizar 15m · 1H · 4H
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-
-        <p
-          id="market-fetch-status"
-          class="text-amber-300 font-semibold"
-        >
-          Pega tu API Key para actualizar los tres mercados.
-        </p>
-
-        <p
-          id="last-update"
-          class="text-gray-400 text-sm"
-        >
-          Última actualización: pendiente
-        </p>
-
-      </div>
-
-      <!-- TIMEFRAME WEIGHTS -->
-      <div class="mt-4 grid md:grid-cols-4 gap-3 text-sm">
-
-        <div class="bg-gray-950/50 rounded-xl p-3">
-          <span class="text-gray-400">4H:</span>
-          <span class="font-bold text-white">
-            tendencia principal (45%)
-          </span>
-        </div>
-
-        <div class="bg-gray-950/50 rounded-xl p-3">
-          <span class="text-gray-400">1H:</span>
-          <span class="font-bold text-white">
-            confirmación (35%)
-          </span>
-        </div>
-
-        <div class="bg-gray-950/50 rounded-xl p-3">
-          <span class="text-gray-400">15m:</span>
-          <span class="font-bold text-white">
-            timing (20%)
-          </span>
-        </div>
-
-        <div class="bg-gray-950/50 rounded-xl p-3">
-          <span class="text-gray-400">95+:</span>
-          <span class="font-bold text-white">
-            calidad técnica, no probabilidad
-          </span>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- WATCHLIST -->
-    <div class="mb-8">
-
-      <h2 class="text-3xl font-bold mb-2">
-        ⭐ Lectura automática
-      </h2>
-
-      <p class="text-gray-400 mb-6">
-        Smart Money Concepts + liquidez + ATR/impulso +
-        confluencia multi-timeframe con veto.
-      </p>
-
-      <div
-        id="watchlist-container"
-        class="space-y-6"
-      ></div>
-
-    </div>
-
-  </div>
-
+<!-- TRADINGVIEW -->
+<div class="card p-4">
+<div class="flex justify-between items-center mb-3">
+<h2 class="font-bold">Gráfico</h2>
+<span id="chartLabel" class="text-gray-400 text-sm">EUR/USD · 15m</span>
+</div>
+<div class="tv"><iframe id="tvFrame" width="100%" height="100%" frameborder="0"></iframe></div>
+</div>
+<p class="text-gray-600 text-xs mt-4 text-center">La puntuación 0–100 mide confluencia técnica interna. No representa una probabilidad garantizada de beneficio.</p>
+</div>
 
 <script>
-
-/* =========================================================
-   ACTIVOS
-========================================================= */
-
-const ASSETS = [
-
-  {
-    symbol: "BTC/USDT",
-    category: "Crypto",
-    tvSymbol: "BINANCE:BTCUSDT"
-  },
-
-  {
-    symbol: "EUR/USD",
-    category: "Forex",
-    tvSymbol: "FX:EURUSD"
-  },
-
-  {
-    symbol: "GBP/USD",
-    category: "Forex",
-    tvSymbol: "FX:GBPUSD"
-  }
-
-];
-
-
-/* =========================================================
-   TIMEFRAMES
-========================================================= */
-
-const TIMEFRAMES = [
-
-  {
-    key: "15m",
-    api: "15min",
-    tv: "15",
-    weight: 0.20
-  },
-
-  {
-    key: "1H",
-    api: "1h",
-    tv: "60",
-    weight: 0.35
-  },
-
-  {
-    key: "4H",
-    api: "4h",
-    tv: "240",
-    weight: 0.45
-  }
-
-];
-
-
-let marketState = ASSETS.map(asset => ({
-
-  ...asset,
-
-  timeframes: {},
-
-  global: null
-
-}));
-
-
-/* =========================================================
-   UTILIDADES
-========================================================= */
-
-function clamp(value, min, max) {
-
-  return Math.max(
-    min,
-    Math.min(max, value)
-  );
-
-}
-
-
-function escapeHTML(value) {
-
-  return String(value ?? "")
-
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-}
-
-
-/* =========================================================
-   API KEY
-========================================================= */
-
-function saveMarketApiKey() {
-
-  const key =
-    document
-      .getElementById("market-api-key")
-      .value
-      .trim();
-
-  localStorage.setItem(
-    "marketApiKey",
-    key
-  );
-
-}
-
-
-function loadMarketApiKey() {
-
-  const savedKey =
-    localStorage.getItem("marketApiKey") || "";
-
-  const input =
-    document.getElementById("market-api-key");
-
-  if (input) {
-
-    input.value = savedKey;
-
-  }
-
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-function setMarketStatus(
-  message,
-  type = "info"
-) {
-
-  const el =
-    document.getElementById(
-      "market-fetch-status"
-    );
-
-  if (!el) return;
-
-
-  if (!message) {
-
-    el.textContent = "";
-
-    el.className = "hidden";
-
-    return;
-
-  }
-
-
-  el.textContent = message;
-
-
-  if (type === "success") {
-
-    el.className =
-      "text-emerald-300 font-semibold";
-
-  }
-
-  else if (type === "error") {
-
-    el.className =
-      "text-red-300 font-semibold";
-
-  }
-
-  else {
-
-    el.className =
-      "text-amber-300 font-semibold";
-
-  }
-
-}
-
-
-function updateLastUpdate() {
-
-  document
-    .getElementById("last-update")
-    .textContent =
-
-    "Última actualización: " +
-
-    new Date()
-      .toLocaleString("es-US");
-
-}
-
-
-/* =========================================================
-   NORMALIZAR SIMBOLOS
-========================================================= */
-
-function normalizeMarketSymbol(
-  category,
-  item
-) {
-
-  const clean =
-    String(item || "")
-      .trim()
-      .toUpperCase();
-
-
-  if (category === "Crypto") {
-
-    return clean.includes("/")
-
-      ? clean
-
-      : clean.replace(
-          "USDT",
-          "/USDT"
-        );
-
-  }
-
-
-  if (category === "Forex") {
-
-    return clean.includes("/")
-
-      ? clean
-
-      : clean.slice(0,3) +
-        "/" +
-        clean.slice(3);
-
-  }
-
-
-  return clean;
-
-}
-
-
-/* =========================================================
-   EMA
-========================================================= */
-
-function calculateEMA(
-  values,
-  period
-) {
-
-  if (
-    !values ||
-    values.length < period
-  ) {
-
-    return null;
-
-  }
-
-
-  const k =
-    2 / (period + 1);
-
-
-  let ema =
-
-    values
-      .slice(0, period)
-      .reduce(
-        (a,b) => a+b,
-        0
-      ) / period;
-
-
-  for (
-    let i = period;
-    i < values.length;
-    i++
-  ) {
-
-    ema =
-
-      values[i] * k +
-
-      ema * (1 - k);
-
-  }
-
-
-  return ema;
-
-}
-
-
-/* =========================================================
-   ATR
-========================================================= */
-
-function calculateATR(
-  candles,
-  period = 14
-) {
-
-  if (
-    !candles ||
-    candles.length < period + 1
-  ) {
-
-    return 0;
-
-  }
-
-
-  const trs = [];
-
-
-  for (
-    let i = 1;
-    i < candles.length;
-    i++
-  ) {
-
-    const c =
-      candles[i];
-
-    const p =
-      candles[i - 1];
-
-
-    trs.push(
-
-      Math.max(
-
-        c.high - c.low,
-
-        Math.abs(
-          c.high - p.close
-        ),
-
-        Math.abs(
-          c.low - p.close
-        )
-
-      )
-
-    );
-
-  }
-
-
-  const recent =
-    trs.slice(-period);
-
-
-  return
-
-    recent.reduce(
-      (a,b) => a+b,
-      0
-    ) /
-
-    recent.length;
-
-}
-
-
-/* =========================================================
-   SWINGS CONFIRMADOS
-========================================================= */
-
-function findConfirmedSwings(
-  candles,
-  lookback = 2
-) {
-
-  const swings = [];
-
-
-  for (
-    let i = lookback;
-    i < candles.length - lookback;
-    i++
-  ) {
-
-    let isHigh = true;
-
-    let isLow = true;
-
-
-    for (
-      let j = i - lookback;
-      j <= i + lookback;
-      j++
-    ) {
-
-      if (j === i) continue;
-
-
-      if (
-        candles[i].high <=
-        candles[j].high
-      ) {
-
-        isHigh = false;
-
-      }
-
-
-      if (
-        candles[i].low >=
-        candles[j].low
-      ) {
-
-        isLow = false;
-
-      }
-
-    }
-
-
-    if (isHigh) {
-
-      swings.push({
-
-        id: "H-" + i,
-
-        index: i,
-
-        confirmationIndex:
-          i + lookback,
-
-        type: "high",
-
-        price:
-          candles[i].high
-
-      });
-
-    }
-
-
-    if (isLow) {
-
-      swings.push({
-
-        id: "L-" + i,
-
-        index: i,
-
-        confirmationIndex:
-          i + lookback,
-
-        type: "low",
-
-        price:
-          candles[i].low
-
-      });
-
-    }
-
-  }
-
-
-  return swings;
-
-}
-
-
-/* =========================================================
-   ESTRUCTURA HH HL LH LL
-========================================================= */
-
-function classifyStructure(
-  swings
-) {
-
-  const highs =
-    swings
-      .filter(
-        s => s.type === "high"
-      )
-      .slice(-2);
-
-
-  const lows =
-    swings
-      .filter(
-        s => s.type === "low"
-      )
-      .slice(-2);
-
-
-  if (
-    highs.length < 2 ||
-    lows.length < 2
-  ) {
-
-    return "neutral";
-
-  }
-
-
-  const hh =
-    highs[1].price >
-    highs[0].price;
-
-
-  const lh =
-    highs[1].price <
-    highs[0].price;
-
-
-  const hl =
-    lows[1].price >
-    lows[0].price;
-
-
-  const ll =
-    lows[1].price <
-    lows[0].price;
-
-
-  if (hh && hl) {
-
-    return "buy";
-
-  }
-
-
-  if (lh && ll) {
-
-    return "sell";
-
-  }
-
-
-  return "neutral";
-
-}
-
-
-/* =========================================================
-   BOS / CHOCH
-========================================================= */
-
-function detectStructureEvent(
-  candles
-) {
-
-  const swings =
-    findConfirmedSwings(
-      candles,
-      2
-    );
-
-
-  if (
-    swings.length < 4
-  ) {
-
-    return {
-
-      event:
-        "Sin estructura clara",
-
-      direction:
-        "neutral",
-
-      breakIndex:
-        null,
-
-      brokenLevel:
-        null,
-
-      structureBias:
-        "neutral"
-
-    };
-
-  }
-
-
-  const broken =
-    new Set();
-
-
-  let structuralBias =
-    "neutral";
-
-
-  let lastEvent = {
-
-    event:
-      "Sin BOS/CHoCH",
-
-    direction:
-      "neutral",
-
-    breakIndex:
-      null,
-
-    brokenLevel:
-      null,
-
-    structureBias:
-      "neutral"
-
-  };
-
-
-  for (
-    let i = 1;
-    i < candles.length;
-    i++
-  ) {
-
-    const available =
-      swings.filter(
-
-        s =>
-          s.confirmationIndex < i
-
-      );
-
-
-    if (
-      available.length < 4
-    ) {
-
-      continue;
-
-    }
-
-
-    const inferred =
-      classifyStructure(
-        available
-      );
-
-
-    if (
-      inferred !== "neutral"
-    ) {
-
-      structuralBias =
-        inferred;
-
-    }
-
-
-    const highs =
-      available.filter(
-
-        s =>
-          s.type === "high" &&
-          !broken.has(s.id)
-
-      );
-
-
-    const lows =
-      available.filter(
-
-        s =>
-          s.type === "low" &&
-          !broken.has(s.id)
-
-      );
-
-
-    const lastHigh =
-      highs[
-        highs.length - 1
-      ];
-
-
-    const lastLow =
-      lows[
-        lows.length - 1
-      ];
-
-
-    const close =
-      candles[i].close;
-
-
-    if (
-      lastHigh &&
-      close > lastHigh.price
-    ) {
-
-      const event =
-
-        structuralBias === "sell"
-
-          ? "CHoCH alcista"
-
-          : "BOS alcista";
-
-
-      broken.add(
-        lastHigh.id
-      );
-
-
-      structuralBias =
-        "buy";
-
-
-      lastEvent = {
-
-        event,
-
-        direction:
-          "buy",
-
-        breakIndex:
-          i,
-
-        brokenLevel:
-          lastHigh.price,
-
-        structureBias:
-          structuralBias
-
-      };
-
-    }
-
-
-    if (
-      lastLow &&
-      close < lastLow.price
-    ) {
-
-      const event =
-
-        structuralBias === "buy"
-
-          ? "CHoCH bajista"
-
-          : "BOS bajista";
-
-
-      broken.add(
-        lastLow.id
-      );
-
-
-      structuralBias =
-        "sell";
-
-
-      lastEvent = {
-
-        event,
-
-        direction:
-          "sell",
-
-        breakIndex:
-          i,
-
-        brokenLevel:
-          lastLow.price,
-
-        structureBias:
-          structuralBias
-
-      };
-
-    }
-
-  }
-
-
-  return lastEvent;
-
-}
-
-
-/* =========================================================
-   LIQUIDITY SWEEP
-========================================================= */
-
-function detectLiquiditySweep(
-  candles
-) {
-
-  const swings =
-    findConfirmedSwings(
-      candles,
-      2
-    );
-
-
-  if (
-    swings.length < 3
-  ) {
-
-    return null;
-
-  }
-
-
-  const recentCandlesStart =
-
-    Math.max(
-      0,
-      candles.length - 12
-    );
-
-
-  for (
-    let i =
-      candles.length - 1;
-
-    i >= recentCandlesStart;
-
-    i--
-  ) {
-
-    const available =
-      swings.filter(
-
-        s =>
-          s.confirmationIndex < i
-
-      );
-
-
-    const lastHigh =
-
-      [...available]
-        .reverse()
-        .find(
-          s =>
-            s.type === "high"
-        );
-
-
-    const lastLow =
-
-      [...available]
-        .reverse()
-        .find(
-          s =>
-            s.type === "low"
-        );
-
-
-    const c =
-      candles[i];
-
-
-    if (
-      lastHigh &&
-      c.high >
-        lastHigh.price &&
-      c.close <
-        lastHigh.price
-    ) {
-
-      return {
-
-        type:
-          "buy-side",
-
-        direction:
-          "sell",
-
-        label:
-          "Barrido de liquidez sobre máximos",
-
-        level:
-          lastHigh.price,
-
-        index:
-          i
-
-      };
-
-    }
-
-
-    if (
-      lastLow &&
-      c.low <
-        lastLow.price &&
-      c.close >
-        lastLow.price
-    ) {
-
-      return {
-
-        type:
-          "sell-side",
-
-        direction:
-          "buy",
-
-        label:
-          "Barrido de liquidez bajo mínimos",
-
-        level:
-          lastLow.price,
-
-        index:
-          i
-
-      };
-
-    }
-
-  }
-
-
-  return null;
-
-}
-
-
-/* =========================================================
-   FAIR VALUE GAP
-========================================================= */
-
-function detectFVG(
-  candles
-) {
-
-  for (
-    let i =
-      candles.length - 1;
-
-    i >= 2;
-
-    i--
-  ) {
-
-    const a =
-      candles[i - 2];
-
-
-    const c =
-      candles[i];
-
-
-    if (
-      c.low >
-      a.high
-    ) {
-
-      return {
-
-        type:
-          "bullish",
-
-        direction:
-          "buy",
-
-        low:
-          a.high,
-
-        high:
-          c.low,
-
-        index:
-          i,
-
-        label:
-          "FVG alcista"
-
-      };
-
-    }
-
-
-    if (
-      c.high <
-      a.low
-    ) {
-
-      return {
-
-        type:
-          "bearish",
-
-        direction:
-          "sell",
-
-        low:
-          c.high,
-
-        high:
-          a.low,
-
-        index:
-          i,
-
-        label:
-          "FVG bajista"
-
-      };
-
-    }
-
-  }
-
-
-  return null;
-
-}
-
-
-/* =========================================================
-   CUERPO VELA
-========================================================= */
-
-function candleBody(c) {
-
-  return Math.abs(
-    c.close - c.open
-  );
-
-}
-
-
-/* =========================================================
-   ORDER BLOCK
-========================================================= */
-
-function findOrderBlock(
-  candles,
-  structureEvent,
-  atr
-) {
-
-  if (
-    !structureEvent ||
-    structureEvent.breakIndex === null ||
-    !atr
-  ) {
-
-    return null;
-
-  }
-
-
-  const breakIndex =
-    structureEvent.breakIndex;
-
-
-  const direction =
-    structureEvent.direction;
-
-
-  const breakCandle =
-    candles[breakIndex];
-
-
-  const displacement =
-
-    candleBody(
-      breakCandle
-    ) >= atr * 0.8;
-
-
-  if (!displacement) {
-
-    return null;
-
-  }
-
-
-  const start =
-
-    Math.max(
-      0,
-      breakIndex - 10
-    );
-
-
-  if (
-    direction === "buy"
-  ) {
-
-    for (
-      let i =
-        breakIndex - 1;
-
-      i >= start;
-
-      i--
-    ) {
-
-      const c =
-        candles[i];
-
-
-      if (
-        c.close <
-        c.open
-      ) {
-
-        return {
-
-          type:
-            "bullish",
-
-          direction:
-            "buy",
-
-          index:
-            i,
-
-          low:
-            c.low,
-
-          high:
-            Math.max(
-              c.open,
-              c.close
-            ),
-
-          label:
-            "Order Block alcista",
-
-          displacement:
-            true
-
-        };
-
-      }
-
-    }
-
-  }
-
-
-  if (
-    direction === "sell"
-  ) {
-
-    for (
-      let i =
-        breakIndex - 1;
-
-      i >= start;
-
-      i--
-    ) {
-
-      const c =
-        candles[i];
-
-
-      if (
-        c.close >
-        c.open
-      ) {
-
-        return {
-
-          type:
-            "bearish",
-
-          direction:
-            "sell",
-
-          index:
-            i,
-
-          low:
-            Math.min(
-              c.open,
-              c.close
-            ),
-
-          high:
-            c.high,
-
-          label:
-            "Order Block bajista",
-
-          displacement:
-            true
-
-        };
-
-      }
-
-    }
-
-  }
-
-
-  return null;
-
-}
-
-
-/* =========================================================
-   RETEST ORDER BLOCK
-========================================================= */
-
-function analyzeOrderBlockTouch(
-  candles,
-  orderBlock,
-  breakIndex,
-  atr
-) {
-
-  if (
-    !orderBlock ||
-    breakIndex === null
-  ) {
-
-    return {
-
-      visits:
-        0,
-
-      firstTouch:
-        false,
-
-      reacted:
-        false,
-
-      status:
-        "Sin Order Block"
-
-    };
-
-  }
-
-
-  let visits =
-    0;
-
-
-  let inside =
-    false;
-
-
-  let firstEntry =
-    null;
-
-
-  for (
-    let i =
-      breakIndex + 1;
-
-    i <
-      candles.length;
-
-    i++
-  ) {
-
-    const c =
-      candles[i];
-
-
-    const touching =
-
-      c.low <=
-        orderBlock.high &&
-
-      c.high >=
-        orderBlock.low;
-
-
-    if (
-      touching &&
-      !inside
-    ) {
-
-      visits++;
-
-      inside = true;
-
-
-      if (
-        firstEntry === null
-      ) {
-
-        firstEntry =
-          i;
-
-      }
-
-    }
-
-    else if (
-      !touching &&
-      inside
-    ) {
-
-      inside =
-        false;
-
-    }
-
-  }
-
-
-  if (
-    firstEntry === null
-  ) {
-
-    return {
-
-      visits,
-
-      firstTouch:
-        false,
-
-      reacted:
-        false,
-
-      status:
-        "OB válido; esperando primer retest"
-
-    };
-
-  }
-
-
-  const reactionWindow =
-
-    candles.slice(
-
-      firstEntry,
-
-      Math.min(
-        candles.length,
-        firstEntry + 6
-      )
-
-    );
-
-
-  let reacted =
-    false;
-
-
-  if (
-    orderBlock.direction === "buy"
-  ) {
-
-    const maxHigh =
-
-      Math.max(
-
-        ...reactionWindow
-          .map(
-            c => c.high
-          )
-
-      );
-
-
-    reacted =
-
-      maxHigh -
-        orderBlock.high >=
-
-      atr * 0.5;
-
-  }
-
-  else {
-
-    const minLow =
-
-      Math.min(
-
-        ...reactionWindow
-          .map(
-            c => c.low
-          )
-
-      );
-
-
-    reacted =
-
-      orderBlock.low -
-        minLow >=
-
-      atr * 0.5;
-
-  }
-
-
-  let status =
-
-    "Retest sin reacción suficiente";
-
-
-  if (
-    visits === 1 &&
-    reacted
-  ) {
-
-    status =
-      "Primer retest confirmado y rechazado";
-
-  }
-
-  else if (
-    visits > 1 &&
-    reacted
-  ) {
-
-    status =
-      "OB reaccionó, pero ya tuvo múltiples visitas";
-
-  }
-
-  else if (
-    visits > 1
-  ) {
-
-    status =
-      "OB debilitado por múltiples visitas";
-
-  }
-
-
-  return {
-
-    visits,
-
-    firstTouch:
-      visits === 1,
-
-    reacted,
-
-    status
-
-  };
-
-}
-
-
-/* =========================================================
-   VOLUMEN / RANGO
-========================================================= */
-
-function relativeVolume(
-  candles,
-  period = 20
-) {
-
-  const values =
-
-    candles
-      .map(
-        c => Number(c.volume)
-      )
-      .filter(
-        v =>
-          Number.isFinite(v) &&
-          v > 0
-      );
-
-
-  if (
-    values.length >=
-    period + 1
-  ) {
-
-    const latest =
-
-      Number(
-        candles[
-          candles.length - 1
-        ].volume
-      );
-
-
-    const prev =
-
-      candles
-        .slice(
-          -(period + 1),
-          -1
-        )
-        .map(
-          c => Number(c.volume)
-        )
-        .filter(
-          v =>
-            Number.isFinite(v) &&
-            v > 0
-        );
-
-
-    if (
-
-      Number.isFinite(latest) &&
-
-      latest > 0 &&
-
-      prev.length >=
-        Math.floor(
-          period * 0.7
-        )
-
-    ) {
-
-      const avg =
-
-        prev.reduce(
-          (a,b) => a+b,
-          0
-        ) /
-        prev.length;
-
-
-      return {
-
-        ratio:
-          avg
-            ? latest / avg
-            : 1,
-
-        source:
-          "volume"
-
-      };
-
-    }
-
-  }
-
-
-  const ranges =
-
-    candles
-      .slice(
-        -21,
-        -1
-      )
-      .map(
-        c =>
-          c.high - c.low
-      );
-
-
-  const avgRange =
-
-    ranges.reduce(
-      (a,b) => a+b,
-      0
-    ) /
-
-    Math.max(
-      1,
-      ranges.length
-    );
-
-
-  const last =
-
-    candles[
-      candles.length - 1
-    ];
-
-
-  const lastRange =
-
-    last.high -
-    last.low;
-
-
-  return {
-
-    ratio:
-      avgRange
-        ? lastRange / avgRange
-        : 1,
-
-    source:
-      "range-proxy"
-
-  };
-
-}
-
-
-/* =========================================================
-   SMC COMPLETO
-========================================================= */
-
-function analyzeSMC(
-  candles
-) {
-
-  const atr =
-    calculateATR(
-      candles,
-      14
-    );
-
-
-  const structure =
-    detectStructureEvent(
-      candles
-    );
-
-
-  const liquidity =
-    detectLiquiditySweep(
-      candles
-    );
-
-
-  const fvg =
-    detectFVG(
-      candles
-    );
-
-
-  const ob =
-    findOrderBlock(
-      candles,
-      structure,
-      atr
-    );
-
-
-  const obTouch =
-    analyzeOrderBlockTouch(
-
-      candles,
-
-      ob,
-
-      structure.breakIndex,
-
-      atr
-
-    );
-
-
-  return {
-
-    structure,
-
-    liquidity,
-
-    fvg,
-
-    orderBlock:
-
-      ob
-
-        ? {
-            ...ob,
-            ...obTouch
-          }
-
-        : null,
-
-    atr
-
-  };
-
-}
-
-
-/* =========================================================
-   ANALISIS INDIVIDUAL DE TIMEFRAME
-========================================================= */
-
-function analyzeTimeframe(
-  candles
-) {
-
-  if (
-    !candles ||
-    candles.length < 70
-  ) {
-
-    return {
-
-      direction:
-        "neutral",
-
-      trend:
-        "flat",
-
-      confidence:
-        15,
-
-      signal:
-        "ESPERAR",
-
-      reason:
-        "No hay suficientes velas.",
-
-      price:
-        null,
-
-      ema20:
-        null,
-
-      ema50:
-        null,
-
-      atr:
-        0,
-
-      smc:
-        null,
-
-      momentumATR:
-        0,
-
-      activityRatio:
-        1
-
-    };
-
-  }
-
-
-  const closes =
-    candles.map(
-      c => c.close
-    );
-
-
-  const ema20 =
-    calculateEMA(
-      closes,
-      20
-    );
-
-
-  const ema50 =
-    calculateEMA(
-      closes,
-      50
-    );
-
-
-  const atr =
-    calculateATR(
-      candles,
-      14
-    );
-
-
-  const last =
-
-    candles[
-      candles.length - 1
-    ];
-
-
-  const prior =
-
-    candles[
-      Math.max(
-        0,
-        candles.length - 5
-      )
-    ];
-
-
-  const smc =
-    analyzeSMC(
-      candles
-    );
-
-
-  const activity =
-    relativeVolume(
-      candles
-    );
-
-
-  const momentumATR =
-
-    atr
-
-      ? (
-          last.close -
-          prior.close
-        ) / atr
-
-      : 0;
-
-
-  const emaDistanceATR =
-
-    atr
-
-      ? (
-          ema20 -
-          ema50
-        ) / atr
-
-      : 0;
-
-
-  let buy =
-    0;
-
-
-  let sell =
-    0;
-
-
-  const notes =
-    [];
-
-
-  /* EMA */
-
-  if (
-
-    last.close > ema20 &&
-    ema20 > ema50
-
-  ) {
-
-    buy += 20;
-
-    notes.push(
-      "EMA20>EMA50"
-    );
-
-  }
-
-  else if (
-
-    last.close < ema20 &&
-    ema20 < ema50
-
-  ) {
-
-    sell += 20;
-
-    notes.push(
-      "EMA20<EMA50"
-    );
-
-  }
-
-
-  /* MOMENTUM */
-
-  if (
-    momentumATR > 0.25
-  ) {
-
-    buy +=
-
-      Math.min(
-
-        15,
-
-        8 +
-        Math.abs(
-          momentumATR
-        ) * 4
-
-      );
-
-  }
-
-
-  if (
-    momentumATR < -0.25
-  ) {
-
-    sell +=
-
-      Math.min(
-
-        15,
-
-        8 +
-        Math.abs(
-          momentumATR
-        ) * 4
-
-      );
-
-  }
-
-
-  /* DISTANCIA EMA */
-
-  if (
-    emaDistanceATR >
-    0.15
-  ) {
-
-    buy += 8;
-
-  }
-
-
-  if (
-    emaDistanceATR <
-    -0.15
-  ) {
-
-    sell += 8;
-
-  }
-
-
-  /* BOS / CHOCH */
-
-  if (
-    smc.structure.direction ===
-    "buy"
-  ) {
-
-    buy +=
-
-      smc.structure.event
-        .includes("CHoCH")
-
-        ? 18
-
-        : 15;
-
-
-    notes.push(
-      smc.structure.event
-    );
-
-  }
-
-  else if (
-    smc.structure.direction ===
-    "sell"
-  ) {
-
-    sell +=
-
-      smc.structure.event
-        .includes("CHoCH")
-
-        ? 18
-
-        : 15;
-
-
-    notes.push(
-      smc.structure.event
-    );
-
-  }
-
-
-  /* LIQUIDITY */
-
-  if (
-    smc.liquidity?.direction ===
-    "buy"
-  ) {
-
-    buy += 14;
-
-    notes.push(
-      "liquidity sweep"
-    );
-
-  }
-
-  else if (
-    smc.liquidity?.direction ===
-    "sell"
-  ) {
-
-    sell += 14;
-
-    notes.push(
-      "liquidity sweep"
-    );
-
-  }
-
-
-  /* ORDER BLOCK */
-
-  if (
-    smc.orderBlock?.direction ===
-    "buy"
-  ) {
-
-    buy += 8;
-
-
-    if (
-
-      smc.orderBlock.firstTouch &&
-
-      smc.orderBlock.reacted
-
-    ) {
-
-      buy += 10;
-
-    }
-
-
-    notes.push(
-      "OB alcista"
-    );
-
-  }
-
-  else if (
-    smc.orderBlock?.direction ===
-    "sell"
-  ) {
-
-    sell += 8;
-
-
-    if (
-
-      smc.orderBlock.firstTouch &&
-
-      smc.orderBlock.reacted
-
-    ) {
-
-      sell += 10;
-
-    }
-
-
-    notes.push(
-      "OB bajista"
-    );
-
-  }
-
-
-  /* FAIR VALUE GAP */
-
-  if (
-    smc.fvg?.direction ===
-    "buy"
-  ) {
-
-    buy += 5;
-
-  }
-
-  else if (
-    smc.fvg?.direction ===
-    "sell"
-  ) {
-
-    sell += 5;
-
-  }
-
-
-  /* VOLUMEN / RANGO */
-
-  if (
-    activity.ratio >=
-    1.20
-  ) {
-
-    if (
-      momentumATR > 0
-    ) {
-
-      buy += 7;
-
-    }
-
-
-    if (
-      momentumATR < 0
-    ) {
-
-      sell += 7;
-
-    }
-
-
-    notes.push(
-
-      activity.source ===
-      "volume"
-
-        ? "volumen fuerte"
-
-        : "rango expandido"
-
-    );
-
-  }
-
-
-  buy =
-    clamp(
-      buy,
-      0,
-      100
-    );
-
-
-  sell =
-    clamp(
-      sell,
-      0,
-      100
-    );
-
-
-  let direction =
-    "neutral";
-
-
-  let trend =
-    "flat";
-
-
-  let confidence =
-    Math.max(
-      buy,
-      sell
-    );
-
-
-  let signal =
-    "ESPERAR";
-
-
-  if (
-
-    buy >=
-      sell + 12 &&
-
-    buy >= 45
-
-  ) {
-
-    direction =
-      "buy";
-
-
-    trend =
-      "up";
-
-
-    signal =
-
-      buy >= 75
-
-        ? "BUY"
-
-        : "BUY DÉBIL";
-
-
-    confidence =
-      buy;
-
-  }
-
-  else if (
-
-    sell >=
-      buy + 12 &&
-
-    sell >= 45
-
-  ) {
-
-    direction =
-      "sell";
-
-
-    trend =
-      "down";
-
-
-    signal =
-
-      sell >= 75
-
-        ? "SELL"
-
-        : "SELL DÉBIL";
-
-
-    confidence =
-      sell;
-
-  }
-
-  else {
-
-    confidence =
-
-      clamp(
-
-        45 -
-        Math.abs(
-          buy - sell
-        ),
-
-        20,
-
-        55
-
-      );
-
-  }
-
-
-  return {
-
-    direction,
-
-    trend,
-
-    confidence:
-      Math.round(
-        confidence
-      ),
-
-    buyScore:
-      Math.round(
-        buy
-      ),
-
-    sellScore:
-      Math.round(
-        sell
-      ),
-
-    signal,
-
-    reason:
-
-      notes.length
-
-        ? notes.join(" · ")
-
-        : "Sin confluencia suficiente.",
-
-    price:
-      last.close,
-
-    ema20,
-
-    ema50,
-
-    atr,
-
-    smc,
-
-    momentumATR,
-
-    activityRatio:
-      activity.ratio,
-
-    activitySource:
-      activity.source
-
-  };
-
-}
-
-
-/* =========================================================
-   MULTI TIMEFRAME
-========================================================= */
-
-function aggregateMultiTimeframe(
-  tfMap
-) {
-
-  const m15 =
-    tfMap["15m"];
-
-
-  const h1 =
-    tfMap["1H"];
-
-
-  const h4 =
-    tfMap["4H"];
-
-
-  if (
-    !m15 ||
-    !h1 ||
-    !h4
-  ) {
-
-    return {
-
-      direction:
-        "neutral",
-
-      trend:
-        "flat",
-
-      confidence:
-        0,
-
-      quality:
-        0,
-
-      decision:
-        "ESPERAR",
-
-      label:
-        "Datos incompletos",
-
-      reason:
-        "Faltan timeframes."
-
-    };
-
-  }
-
-
-  const signed =
-    (r) => {
-
-      if (
-        r.direction === "buy"
-      ) {
-
-        return r.confidence;
-
-      }
-
-
-      if (
-        r.direction === "sell"
-      ) {
-
-        return -r.confidence;
-
-      }
-
-
-      return 0;
-
-    };
-
-
-  const weighted =
-
-    signed(m15) * 0.20 +
-
-    signed(h1) * 0.35 +
-
-    signed(h4) * 0.45;
-
-
-  let direction =
-    "neutral";
-
-
-  if (
-    weighted >= 18
-  ) {
-
-    direction =
-      "buy";
-
-  }
-
-
-  if (
-    weighted <= -18
-  ) {
-
-    direction =
-      "sell";
-
-  }
-
-
-  const confidence =
-
-    Math.round(
-
-      clamp(
-        Math.abs(weighted),
-        0,
-        100
-      )
-
-    );
-
-
-  const aligned4h1h =
-
-    h4.direction !==
-      "neutral" &&
-
-    h4.direction ===
-      h1.direction;
-
-
-  const allAligned =
-
-    aligned4h1h &&
-
-    m15.direction ===
-      h4.direction;
-
-
-  /* =====================================================
-     VETO MULTI TIMEFRAME
-  ===================================================== */
-
-  const veto =
-
-    h4.direction !==
-      "neutral" &&
-
-    h1.direction ===
-      h4.direction &&
-
-    m15.direction !==
-      "neutral" &&
-
-    m15.direction !==
-      h4.direction;
-
-
-  let quality =
-    0;
-
-
-  const targetDirection =
-
-    direction !==
-    "neutral"
-
-      ? direction
-
-      : h4.direction;
-
-
-  /* =====================================================
-     CALIDAD SETUP
-  ===================================================== */
-
-  if (
-    h4.direction ===
-    targetDirection
-  ) {
-
-    quality += 20;
-
-  }
-
-
-  if (
-    h1.direction ===
-    targetDirection
-  ) {
-
-    quality += 15;
-
-  }
-
-
-  if (
-    m15.direction ===
-    targetDirection
-  ) {
-
-    quality += 10;
-
-  }
-
-
-  const best =
-    [
-      h4,
-      h1,
-      m15
-    ];
-
-
-  if (
-
-    best.some(
-
-      x =>
-        x.smc?.structure?.direction ===
-        targetDirection
-
-    )
-
-  ) {
-
-    quality += 15;
-
-  }
-
-
-  if (
-
-    best.some(
-
-      x =>
-        x.smc?.liquidity?.direction ===
-        targetDirection
-
-    )
-
-  ) {
-
-    quality += 10;
-
-  }
-
-
-  if (
-
-    best.some(
-
-      x =>
-
-        x.smc?.orderBlock?.direction ===
-          targetDirection &&
-
-        x.smc?.orderBlock?.firstTouch &&
-
-        x.smc?.orderBlock?.reacted
-
-    )
-
-  ) {
-
-    quality += 15;
-
-  }
-
-
-  if (
-
-    best.some(
-
-      x =>
-        x.smc?.fvg?.direction ===
-        targetDirection
-
-    )
-
-  ) {
-
-    quality += 5;
-
-  }
-
-
-  if (
-
-    best.some(
-
-      x =>
-        Math.abs(
-          x.momentumATR
-        ) >= 0.75
-
-    )
-
-  ) {
-
-    quality += 5;
-
-  }
-
-
-  if (
-
-    best.some(
-
-      x =>
-        x.activityRatio >=
-        1.2
-
-    )
-
-  ) {
-
-    quality += 5;
-
-  }
-
-
-  if (
-    allAligned
-  ) {
-
-    quality += 5;
-
-  }
-
-
-  quality =
-
-    Math.round(
-
-      clamp(
-        quality,
-        0,
-        100
-      )
-
-    );
-
-
-  let decision =
-    "ESPERAR";
-
-
-  let label =
-    "SIN VENTAJA CLARA";
-
-
-  let reason =
-    "Los timeframes no están suficientemente alineados.";
-
-
-  if (
-    veto
-  ) {
-
-    decision =
-      "ESPERAR";
-
-
-    label =
-
-      h4.direction ===
-      "buy"
-
-        ? "PULLBACK ALCISTA PRINCIPAL"
-
-        : "PULLBACK BAJISTA PRINCIPAL";
-
-
-    reason =
-      "15m contradice 1H/4H. Se aplica veto multi-timeframe.";
-
-  }
-
-  else if (
-
-    direction ===
-      "buy" &&
-
-    aligned4h1h
-
-  ) {
-
-    decision =
-
-      quality >= 95
-
-        ? "BUY PREMIUM"
-
-        : quality >= 75
-
-          ? "BUY"
-
-          : "ESPERAR BUY";
-
-
-    label =
-      "ALCISTA";
-
-
-    reason =
-
-      allAligned
-
-        ? "4H, 1H y 15m alineados."
-
-        : "4H y 1H alineados; 15m todavía necesita mejor timing.";
-
-  }
-
-  else if (
-
-    direction ===
-      "sell" &&
-
-    aligned4h1h
-
-  ) {
-
-    decision =
-
-      quality >= 95
-
-        ? "SELL PREMIUM"
-
-        : quality >= 75
-
-          ? "SELL"
-
-          : "ESPERAR SELL";
-
-
-    label =
-      "BAJISTA";
-
-
-    reason =
-
-      allAligned
-
-        ? "4H, 1H y 15m alineados."
-
-        : "4H y 1H alineados; 15m todavía necesita mejor timing.";
-
-  }
-
-
-  return {
-
-    direction,
-
-    trend:
-
-      direction ===
-      "buy"
-
-        ? "up"
-
-        : direction ===
-          "sell"
-
-          ? "down"
-
-          : "flat",
-
-    confidence,
-
-    quality,
-
-    decision,
-
-    label,
-
-    reason,
-
-    veto,
-
-    premium:
-
-      quality >= 95 &&
-      !veto &&
-      aligned4h1h
-
-  };
-
-}
-
-
-/* =========================================================
-   FETCH API
-========================================================= */
-
-async function fetchTimeframe(
-  asset,
-  tf,
-  apiKey
-) {
-
-  const symbol =
-
-    normalizeMarketSymbol(
-
-      asset.category,
-
-      asset.symbol
-
-    );
-
-
-  const url =
-
-    "https://api.twelvedata.com/time_series" +
-
-    "?symbol=" +
-      encodeURIComponent(symbol) +
-
-    "&interval=" +
-      encodeURIComponent(tf.api) +
-
-    "&outputsize=140" +
-
-    "&apikey=" +
-      encodeURIComponent(apiKey);
-
-
-  const response =
-    await fetch(url);
-
-
-  const data =
-    await response.json();
-
-
-  if (
-
-    data.status === "error" ||
-
-    data.code ||
-
-    !data.values
-
-  ) {
-
-    throw new Error(
-
-      data.message ||
-
-      "No se pudo obtener información."
-
-    );
-
-  }
-
-
-  const candles =
-
-    data.values
-      .slice()
-      .reverse()
-      .map(
-        c => ({
-
-          open:
-            Number(c.open),
-
-          high:
-            Number(c.high),
-
-          low:
-            Number(c.low),
-
-          close:
-            Number(c.close),
-
-          volume:
-
-            c.volume !== undefined
-
-              ? Number(c.volume)
-
-              : null
-
-        })
-      )
-      .filter(
-
-        c =>
-
-          Number.isFinite(c.open) &&
-
-          Number.isFinite(c.high) &&
-
-          Number.isFinite(c.low) &&
-
-          Number.isFinite(c.close)
-
-      );
-
-
-  return analyzeTimeframe(
-    candles
-  );
-
-}
-
-
-/* =========================================================
-   ACTUALIZAR TODO
-========================================================= */
-
-async function updateAllMarketData() {
-
-  const apiKey =
-
-    document
-      .getElementById(
-        "market-api-key"
-      )
-      .value
-      .trim();
-
-
-  if (!apiKey) {
-
-    setMarketStatus(
-
-      "Falta API Key de Twelve Data.",
-
-      "error"
-
-    );
-
-    return;
-
-  }
-
-
-  saveMarketApiKey();
-
-
-  setMarketStatus(
-
-    "Actualizando 9 lecturas: 3 mercados × 3 timeframes...",
-
-    "info"
-
-  );
-
-
-  const updated =
-    [];
-
-
-  for (
-    let a = 0;
-    a < ASSETS.length;
-    a++
-  ) {
-
-    const asset =
-      ASSETS[a];
-
-
-    const tfResults =
-      {};
-
-
-    for (
-      let t = 0;
-      t < TIMEFRAMES.length;
-      t++
-    ) {
-
-      const tf =
-        TIMEFRAMES[t];
-
-
-      setMarketStatus(
-
-        `Analizando ${asset.symbol} ${tf.key} (${a * 3 + t + 1}/9)...`,
-
-        "info"
-
-      );
-
-
-      try {
-
-        tfResults[tf.key] =
-
-          await fetchTimeframe(
-
-            asset,
-
-            tf,
-
-            apiKey
-
-          );
-
-      }
-
-      catch(error) {
-
-        tfResults[tf.key] = {
-
-          direction:
-            "neutral",
-
-          trend:
-            "flat",
-
-          confidence:
-            0,
-
-          signal:
-            "ERROR",
-
-          reason:
-            error.message,
-
-          price:
-            null,
-
-          ema20:
-            null,
-
-          ema50:
-            null,
-
-          atr:
-            0,
-
-          smc:
-            null,
-
-          momentumATR:
-            0,
-
-          activityRatio:
-            1
-
-        };
-
-      }
-
-    }
-
-
-    updated.push({
-
-      ...asset,
-
-      timeframes:
-        tfResults,
-
-      global:
-
-        aggregateMultiTimeframe(
-          tfResults
-        )
-
-    });
-
-  }
-
-
-  marketState =
-
-    updated.sort(
-
-      (a,b) =>
-
-        (
-          b.global?.quality ||
-          0
-        )
-
-        -
-
-        (
-          a.global?.quality ||
-          0
-        )
-
-    );
-
-
-  renderWatchlist();
-
-
-  updateLastUpdate();
-
-
-  setMarketStatus(
-    "",
-    "success"
-  );
-
-}
-
-
-/* =========================================================
-   FORMATO PRECIO
-========================================================= */
-
-function formatPrice(
-  price
-) {
-
-  if (
-
-    price === null ||
-
-    price === undefined ||
-
-    Number.isNaN(
-      Number(price)
-    )
-
-  ) {
-
-    return "N/A";
-
-  }
-
-
-  const n =
-    Number(price);
-
-
-  if (
-    n >= 1000
-  ) {
-
-    return n.toFixed(2);
-
-  }
-
-
-  if (
-    n >= 10
-  ) {
-
-    return n.toFixed(2);
-
-  }
-
-
-  if (
-    n >= 1
-  ) {
-
-    return n.toFixed(4);
-
-  }
-
-
-  return n.toFixed(6);
-
-}
-
-
-/* =========================================================
-   LABEL TENDENCIA
-========================================================= */
-
-function trendLabel(
-  direction
-) {
-
-  if (
-    direction === "buy"
-  ) {
-
-    return `
-      <span class="trend-up font-bold">
-        ↑ Alcista
-      </span>
-    `;
-
-  }
-
-
-  if (
-    direction === "sell"
-  ) {
-
-    return `
-      <span class="trend-down font-bold">
-        ↓ Bajista
-      </span>
-    `;
-
-  }
-
-
-  return `
-    <span class="trend-flat font-bold">
-      ↔ Mixto
-    </span>
-  `;
-
-}
-
-
-/* =========================================================
-   COLOR DECISION
-========================================================= */
-
-function decisionClass(
-  global
-) {
-
-  if (!global) {
-
-    return "decision-no";
-
-  }
-
-
-  if (
-    global.decision.includes(
-      "BUY"
-    )
-  ) {
-
-    return "decision-buy";
-
-  }
-
-
-  if (
-    global.decision.includes(
-      "SELL"
-    )
-  ) {
-
-    return "decision-sell";
-
-  }
-
-
-  return "decision-wait";
-
-}
-
-
-/* =========================================================
-   GAUGE
-========================================================= */
-
-function createGaugeHTML(
-  score
-) {
-
-  const safeScore =
-
-    Math.round(
-
-      clamp(
-        Number(score) || 0,
-        0,
-        100
-      )
-
-    );
-
-
-  const deg =
-
-    Math.round(
-      safeScore * 3.6
-    );
-
-
-  const cls =
-
-    safeScore >= 95
-
-      ? ""
-
-      : safeScore >= 75
-
-        ? "mid"
-
-        : "low";
-
-
-  return `
-
-    <div
-      class="gauge ${cls}"
-      style="--percent:${deg}deg;"
-    >
-
-      <div class="text-white font-bold">
-        ${safeScore}
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================================
-   RENDER SMC
-========================================================= */
-
-function renderSMC(
-  tf
-) {
-
-  if (
-    !tf?.smc
-  ) {
-
-    return `
-
-      <p class="text-gray-500 text-sm mt-2">
-
-        SMC: sin datos.
-
-      </p>
-
-    `;
-
-  }
-
-
-  const s =
-    tf.smc.structure;
-
-
-  const liq =
-    tf.smc.liquidity;
-
-
-  const ob =
-    tf.smc.orderBlock;
-
-
-  const fvg =
-    tf.smc.fvg;
-
-
-  return `
-
-    <div class="mt-3 text-xs text-gray-300 space-y-1">
-
-      <p>
-
-        <span class="text-gray-500">
-          Estructura:
-        </span>
-
-        ${escapeHTML(
-          s?.event || "N/A"
-        )}
-
-      </p>
-
-
-      <p>
-
-        <span class="text-gray-500">
-          Liquidez:
-        </span>
-
-        ${escapeHTML(
-          liq?.label ||
-          "Sin sweep reciente"
-        )}
-
-      </p>
-
-
-      <p>
-
-        <span class="text-gray-500">
-          Order Block:
-        </span>
-
-        ${escapeHTML(
-          ob?.status ||
-          "No validado"
-        )}
-
-      </p>
-
-
-      <p>
-
-        <span class="text-gray-500">
-          FVG:
-        </span>
-
-        ${escapeHTML(
-          fvg?.label ||
-          "No detectado"
-        )}
-
-      </p>
-
-    </div>
-
-  `;
-
-}
-
-
-/* =========================================================
-   RENDER WATCHLIST
-========================================================= */
-
-function renderWatchlist() {
-
-  const container =
-
-    document
-      .getElementById(
-        "watchlist-container"
-      );
-
-
-  container.innerHTML =
-
-    marketState
-      .map(
-
-        (asset, index) => {
-
-
-          const g =
-
-            asset.global ||
-
-            {
-
-              quality:
-                0,
-
-              confidence:
-                0,
-
-              decision:
-                "PENDIENTE",
-
-              label:
-                "PENDIENTE",
-
-              reason:
-                "Esperando actualización."
-
-            };
-
-
-          const currentPrice =
-
-            asset.timeframes["15m"]?.price ??
-
-            asset.timeframes["1H"]?.price ??
-
-            asset.timeframes["4H"]?.price ??
-
-            null;
-
-
-          return `
-
-          <div
-            class="${decisionClass(g)} rounded-3xl p-5 md:p-6"
-          >
-
-            <div class="grid xl:grid-cols-[1fr_420px] gap-6">
-
-
-              <!-- INFORMACION -->
-
-              <div>
-
-
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
-
-
-                  <div class="flex items-center gap-4">
-
-
-                    <div class="text-3xl font-black text-gray-500">
-
-                      #${index + 1}
-
-                    </div>
-
-
-                    ${createGaugeHTML(
-                      g.quality
-                    )}
-
-
-                    <div>
-
-                      <h3 class="text-3xl font-bold">
-
-                        ${escapeHTML(
-                          asset.symbol
-                        )}
-
-                      </h3>
-
-
-                      <div class="flex flex-wrap gap-2 mt-2">
-
-
-                        <span class="pill">
-
-                          ${escapeHTML(
-                            asset.category
-                          )}
-
-                        </span>
-
-
-                        <span class="pill">
-
-                          SMC avanzado
-
-                        </span>
-
-
-                        <span class="pill">
-
-                          15m + 1H + 4H
-
-                        </span>
-
-
-                        ${
-                          g.premium
-
-                            ? `
-                              <span class="pill text-emerald-300">
-                                PREMIUM 95+
-                              </span>
-                            `
-
-                            : ""
-                        }
-
-
-                      </div>
-
-                    </div>
-
-
-                  </div>
-
-
-                  <div class="text-left md:text-right">
-
-
-                    <p class="text-gray-400 text-sm">
-
-                      Decisión
-
-                    </p>
-
-
-                    <p class="text-3xl font-bold">
-
-                      ${escapeHTML(
-                        g.decision
-                      )}
-
-                    </p>
-
-
-                    <p class="text-gray-300 mt-1">
-
-                      ${escapeHTML(
-                        g.label
-                      )}
-
-                      · Calidad
-
-                      ${g.quality}/100
-
-                    </p>
-
-
-                  </div>
-
-
-                </div>
-
-
-                <!-- TIMEFRAMES -->
-
-                <div class="grid md:grid-cols-3 gap-4 mt-6">
-
-
-                  ${TIMEFRAMES.map(
-
-                    tfMeta => {
-
-
-                      const tf =
-
-                        asset.timeframes[
-                          tfMeta.key
-                        ];
-
-
-                      if (!tf) {
-
-                        return `
-
-                          <div class="tf-card">
-
-                            <p class="text-gray-400">
-                              ${tfMeta.key}
-                            </p>
-
-                            <p class="text-gray-500">
-                              Pendiente
-                            </p>
-
-                          </div>
-
-                        `;
-
-                      }
-
-
-                      return `
-
-                        <div class="tf-card">
-
-
-                          <div class="flex justify-between items-center">
-
-
-                            <p class="text-xl font-bold">
-
-                              ${tfMeta.key}
-
-                            </p>
-
-
-                            <p class="font-bold">
-
-                              ${tf.confidence}%
-
-                            </p>
-
-
-                          </div>
-
-
-                          <p class="mt-2">
-
-                            ${trendLabel(
-                              tf.direction
-                            )}
-
-                          </p>
-
-
-                          <p class="text-gray-400 text-xs mt-1">
-
-                            ${escapeHTML(
-                              tf.signal
-                            )}
-
-                          </p>
-
-
-                          <p class="text-gray-300 text-sm mt-3">
-
-                            ${escapeHTML(
-                              tf.reason
-                            )}
-
-                          </p>
-
-
-                          ${renderSMC(tf)}
-
-
-                        </div>
-
-                      `;
-
-                    }
-
-                  ).join("")}
-
-
-                </div>
-
-
-                <!-- RESUMEN GLOBAL -->
-
-                <div class="grid md:grid-cols-3 gap-4 mt-4">
-
-
-                  <div class="bg-gray-900/70 rounded-2xl p-4">
-
-
-                    <p class="text-gray-400 text-sm">
-
-                      Precio
-
-                    </p>
-
-
-                    <p class="text-emerald-400 text-2xl font-bold">
-
-                      ${formatPrice(
-                        currentPrice
-                      )}
-
-                    </p>
-
-
-                  </div>
-
-
-                  <div class="bg-gray-900/70 rounded-2xl p-4">
-
-
-                    <p class="text-gray-400 text-sm">
-
-                      Tendencia global
-
-                    </p>
-
-
-                    <p class="text-xl">
-
-                      ${trendLabel(
-                        g.direction
-                      )}
-
-                    </p>
-
-
-                    <p class="text-gray-400 text-sm mt-1">
-
-                      Fuerza:
-                      ${g.confidence}%
-
-                    </p>
-
-
-                  </div>
-
-
-                  <div class="bg-gray-900/70 rounded-2xl p-4">
-
-
-                    <p class="text-gray-400 text-sm">
-
-                      Calidad setup
-
-                    </p>
-
-
-                    <p
-                      class="${
-                        g.quality >= 95
-
-                          ? "text-emerald-400"
-
-                          : g.quality >= 75
-
-                            ? "text-yellow-300"
-
-                            : "text-red-300"
-                      } text-2xl font-bold"
-                    >
-
-                      ${g.quality}/100
-
-                    </p>
-
-
-                    <p class="text-gray-500 text-xs">
-
-                      95+ = máxima confluencia interna
-
-                    </p>
-
-
-                  </div>
-
-
-                </div>
-
-
-                <!-- LECTURA AGENTE -->
-
-                <div class="mt-4 bg-gray-900/70 rounded-2xl p-4">
-
-
-                  <p class="text-gray-400 text-sm">
-
-                    Lectura del agente
-
-                  </p>
-
-
-                  <p class="text-gray-200 mt-1">
-
-                    ${escapeHTML(
-                      g.reason
-                    )}
-
-                  </p>
-
-
-                  ${
-                    g.veto
-
-                      ? `
-
-                        <p class="text-yellow-300 font-bold mt-2">
-
-                          ⚠ VETO MTF ACTIVO:
-                          no perseguir señal de 15m
-                          contra 1H/4H.
-
-                        </p>
-
-                      `
-
-                      : ""
-                  }
-
-
-                </div>
-
-
-              </div>
-
-
-              <!-- TRADINGVIEW -->
-
-              <div>
-
-
-                <div class="tv-chart">
-
-
-                  <iframe
-
-                    width="100%"
-
-                    height="100%"
-
-                    src="https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(
-                      asset.tvSymbol
-                    )}&interval=15&theme=dark&hide_side_toolbar=1"
-
-                    frameborder="0">
-
-                  </iframe>
-
-
-                </div>
-
-
-                <p class="text-gray-500 text-xs mt-2">
-
-                  TradingView se muestra en 15m para timing;
-                  la decisión usa también 1H y 4H.
-
-                </p>
-
-
-              </div>
-
-
-            </div>
-
-          </div>
-
-          `;
-
-        }
-
-      )
-      .join("");
-
-}
-
-
-/* =========================================================
-   INICIO
-========================================================= */
-
-window.onload = () => {
-
-  loadMarketApiKey();
-
-  renderWatchlist();
-
-
-  const savedKey =
-
-    localStorage.getItem(
-      "marketApiKey"
-    ) || "";
-
-
-  if (savedKey) {
-
-    updateAllMarketData();
-
-  }
-
+const ASSETS = {
+  "EUR/USD": { category:"Forex", api:"EUR/USD", tv:"FX:EURUSD" },
+  "GBP/USD": { category:"Forex", api:"GBP/USD", tv:"FX:GBPUSD" },
+  "BTC/USDT": { category:"Crypto", api:"BTC/USDT", tv:"BINANCE:BTCUSDT" }
 };
 
-</script>
+const TIMEFRAMES = {
+  "10m": { api:"5min", tv:"10", synthetic:true, label:"10 minutos" },
+  "15m": { api:"15min", tv:"15", synthetic:false, label:"15 minutos" },
+  "1H":  { api:"1h",   tv:"60", synthetic:false, label:"1 hora" },
+  "4H":  { api:"4h",   tv:"240",synthetic:false, label:"4 horas" }
+};
 
+function clamp(v,min,max){ return Math.max(min, Math.min(max,v)); }
+
+function saveKey(){ localStorage.setItem("marketApiKey", document.getElementById("apiKey").value.trim()); }
+function loadKey(){ document.getElementById("apiKey").value = localStorage.getItem("marketApiKey") || ""; }
+
+function changeMarketType(){
+  const type = document.getElementById("marketType").value;
+  const symbol = document.getElementById("symbol");
+  symbol.innerHTML = type === "Forex"
+    ? `<option value="EUR/USD">EUR/USD</option><option value="GBP/USD">GBP/USD</option>`
+    : `<option value="BTC/USDT">BTC/USDT</option>`;
+}
+
+/* ========== INDICATORS (FIXED) ========== */
+function EMA(values, period){
+  if(values.length < period) return null;
+  const k = 2/(period+1);
+  let ema = values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period; i<values.length; i++) ema = values[i]*k + ema*(1-k);
+  return ema;
+}
+
+function EMASeries(values, period){
+  if(values.length < period) return [];
+  let output = new Array(values.length).fill(null);
+  let ema = values.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  output[period-1] = ema;
+  const k = 2/(period+1);
+  for(let i=period; i<values.length; i++){
+    ema = values[i]*k + ema*(1-k);
+    output[i] = ema;
+  }
+  return output;
+}
+
+/* RSI de Wilder (correcto) */
+function RSI(values, period=14){
+  if(values.length < period+1) return 50;
+  let gains = 0, losses = 0;
+  for(let i=1; i<=period; i++){
+    const diff = values[i] - values[i-1];
+    if(diff >= 0) gains += diff; else losses -= diff;
+  }
+  let avgGain = gains / period;
+  let avgLoss = losses / period;
+  for(let i=period+1; i<values.length; i++){
+    const diff = values[i] - values[i-1];
+    const gain = diff > 0 ? diff : 0;
+    const loss = diff < 0 ? -diff : 0;
+    avgGain = (avgGain*(period-1) + gain) / period;
+    avgLoss = (avgLoss*(period-1) + loss) / period;
+  }
+  if(avgLoss === 0) return 100;
+  const rs = avgGain / avgLoss;
+  return 100 - (100 / (1 + rs));
+}
+
+function MACD(values){
+  const e12 = EMASeries(values,12);
+  const e26 = EMASeries(values,26);
+  const macd = [];
+  for(let i=0; i<values.length; i++){
+    if(e12[i] !== null && e26[i] !== null) macd.push(e12[i]-e26[i]);
+  }
+  if(macd.length < 10) return { line:0, signal:0, histogram:0 };
+  const signal = EMA(macd,9);
+  const line = macd[macd.length-1];
+  return { line, signal, histogram: line - signal };
+}
+
+function ATR(candles, period=14){
+  if(candles.length < period+1) return 0;
+  const tr = [];
+  for(let i=1; i<candles.length; i++){
+    tr.push(Math.max(
+      candles[i].high - candles[i].low,
+      Math.abs(candles[i].high - candles[i-1].close),
+      Math.abs(candles[i].low - candles[i-1].close)
+    ));
+  }
+  return tr.slice(-period).reduce((a,b)=>a+b,0) / period;
+}
+
+function aggregate10m(candles){
+  const output = [];
+  for(let i=0; i<candles.length-1; i+=2){
+    const a = candles[i], b = candles[i+1];
+    if(!b) break;
+    output.push({
+      open: a.open,
+      high: Math.max(a.high, b.high),
+      low: Math.min(a.low, b.low),
+      close: b.close,
+      volume: (Number(a.volume)||0) + (Number(b.volume)||0),
+      datetime: a.datetime
+    });
+  }
+  return output;
+}
+
+/* ========== STRUCTURE (IMPROVED) ========== */
+function swings(candles, lookback=3){
+  const result = [];
+  for(let i=lookback; i<candles.length-lookback; i++){
+    let high = true, low = true;
+    for(let j=i-lookback; j<=i+lookback; j++){
+      if(j===i) continue;
+      if(candles[i].high <= candles[j].high) high = false;
+      if(candles[i].low >= candles[j].low) low = false;
+    }
+    if(high) result.push({ type:"high", price:candles[i].high, index:i });
+    if(low)  result.push({ type:"low",  price:candles[i].low,  index:i });
+  }
+  return result;
+}
+
+function structureAnalysis(candles, atr){
+  const s = swings(candles, 3);
+  const highs = s.filter(x=>x.type==="high");
+  const lows  = s.filter(x=>x.type==="low");
+  if(highs.length < 2 || lows.length < 2) return { direction:"neutral", event:"Sin estructura" };
+
+  const h1 = highs[highs.length-2], h2 = highs[highs.length-1];
+  const l1 = lows[lows.length-2],   l2 = lows[lows.length-1];
+  const last = candles[candles.length-1];
+
+  // BOS con filtro de ATR mínimo
+  if(last.close > h2.price + atr*0.15) return { direction:"buy",  event:"BOS alcista", level:h2.price };
+  if(last.close < l2.price - atr*0.15) return { direction:"sell", event:"BOS bajista", level:l2.price };
+
+  if(h2.price > h1.price && l2.price > l1.price) return { direction:"buy",  event:"HH + HL alcista", level:l2.price };
+  if(h2.price < h1.price && l2.price < l1.price) return { direction:"sell", event:"LH + LL bajista", level:h2.price };
+
+  return { direction:"neutral", event:"Estructura mixta" };
+}
+
+function liquiditySweep(candles){
+  const s = swings(candles, 3);
+  const last = candles[candles.length-1];
+  const high = s.filter(x=>x.type==="high").pop();
+  const low  = s.filter(x=>x.type==="low").pop();
+
+  if(high && last.high > high.price && last.close < high.price) return { direction:"sell", text:"Sweep sobre máximos" };
+  if(low  && last.low  < low.price  && last.close > low.price)  return { direction:"buy",  text:"Sweep bajo mínimos" };
+  return { direction:"neutral", text:"Sin sweep reciente" };
+}
+
+function detectFVG(candles, atr){
+  for(let i=candles.length-1; i>=Math.max(2, candles.length-20); i--){
+    const a = candles[i-2], c = candles[i];
+    if(c.low > a.high + atr*0.1) return { direction:"buy",  text:"FVG alcista", low:a.high, high:c.low };
+    if(c.high < a.low - atr*0.1) return { direction:"sell", text:"FVG bajista", low:c.high, high:a.low };
+  }
+  return { direction:"neutral", text:"Sin FVG reciente" };
+}
+
+function detectOrderBlock(candles, structure, atr){
+  if(structure.direction==="neutral" || !atr) return { direction:"neutral", text:"No validado" };
+  const start = Math.max(1, candles.length-20);
+
+  if(structure.direction==="buy"){
+    for(let i=candles.length-2; i>=start; i--){
+      if(candles[i].close < candles[i].open && (candles[i].high-candles[i].low) > atr*0.4){
+        return { direction:"buy", text:"OB alcista", low:candles[i].low, high:Math.max(candles[i].open,candles[i].close) };
+      }
+    }
+  }
+  if(structure.direction==="sell"){
+    for(let i=candles.length-2; i>=start; i--){
+      if(candles[i].close > candles[i].open && (candles[i].high-candles[i].low) > atr*0.4){
+        return { direction:"sell", text:"OB bajista", low:Math.min(candles[i].open,candles[i].close), high:candles[i].high };
+      }
+    }
+  }
+  return { direction:"neutral", text:"No encontrado" };
+}
+
+/* RETEST MÁS ESTRICTO */
+function detectRetest(candles, structure, atr){
+  if(!structure.level || !atr) return { confirmed:false, text:"Sin nivel" };
+  const recent = candles.slice(-8);
+
+  for(const c of recent){
+    if(structure.direction==="buy"){
+      if(c.low <= structure.level + atr*0.25 && c.close > structure.level + atr*0.1 && c.close > c.open){
+        return { confirmed:true, text:"Retest alcista + rechazo" };
+      }
+    }
+    if(structure.direction==="sell"){
+      if(c.high >= structure.level - atr*0.25 && c.close < structure.level - atr*0.1 && c.close < c.open){
+        return { confirmed:true, text:"Retest bajista + rechazo" };
+      }
+    }
+  }
+  return { confirmed:false, text:"Esperando retest" };
+}
+
+function activityRatio(candles){
+  const recent = candles.slice(-21);
+  if(recent.length < 10) return 1;
+  const ranges = recent.slice(0,-1).map(c => c.high - c.low);
+  const avg = ranges.reduce((a,b)=>a+b,0) / ranges.length;
+  const last = recent[recent.length-1];
+  return avg ? (last.high - last.low) / avg : 1;
+}
+
+/* ========== MAIN ANALYSIS (OPTIMIZED) ========== */
+function analyze(candles){
+  const closes = candles.map(c => c.close);
+  const last = candles[candles.length-1];
+  const ema20 = EMA(closes,20);
+  const ema50 = EMA(closes,50);
+  const rsi = RSI(closes,14);
+  const macd = MACD(closes);
+  const atr = ATR(candles);
+  const structure = structureAnalysis(candles, atr);
+  const liquidity = liquiditySweep(candles);
+  const fvg = detectFVG(candles, atr);
+  const ob = detectOrderBlock(candles, structure, atr);
+  const retest = detectRetest(candles, structure, atr);
+  const activity = activityRatio(candles);
+
+  // Momentum más robusto (8-12 velas)
+  const look = Math.min(12, Math.floor(candles.length/8));
+  const prior = candles[Math.max(0, candles.length - look)];
+  const momentumATR = atr ? (last.close - prior.close) / atr : 0;
+
+  let bull = 0, bear = 0;
+  const reasons = [];
+
+  // EMA (peso alto)
+  if(last.close > ema20 && ema20 > ema50){ bull += 20; reasons.push("✓ Precio > EMA20 > EMA50"); }
+  if(last.close < ema20 && ema20 < ema50){ bear += 20; reasons.push("✓ Precio < EMA20 < EMA50"); }
+
+  // RSI (Wilder)
+  if(rsi >= 55 && rsi < 72){ bull += 12; reasons.push("✓ RSI momentum alcista"); }
+  if(rsi <= 45 && rsi > 28){ bear += 12; reasons.push("✓ RSI momentum bajista"); }
+  if(rsi >= 75) reasons.push("⚠ RSI sobrecomprado");
+  if(rsi <= 25) reasons.push("⚠ RSI sobrevendido");
+
+  // MACD
+  if(macd.histogram > 0){ bull += 10; reasons.push("✓ MACD alcista"); }
+  if(macd.histogram < 0){ bear += 10; reasons.push("✓ MACD bajista"); }
+
+  // Estructura
+  if(structure.direction === "buy"){ bull += 18; reasons.push("✓ " + structure.event); }
+  if(structure.direction === "sell"){ bear += 18; reasons.push("✓ " + structure.event); }
+
+  // Liquidez
+  if(liquidity.direction === "buy"){ bull += 12; reasons.push("✓ Sweep comprador"); }
+  if(liquidity.direction === "sell"){ bear += 12; reasons.push("✓ Sweep vendedor"); }
+
+  // OB + FVG (peso moderado)
+  if(ob.direction === "buy") bull += 8;
+  if(ob.direction === "sell") bear += 8;
+  if(fvg.direction === "buy") bull += 6;
+  if(fvg.direction === "sell") bear += 6;
+
+  // Retest (muy importante)
+  if(retest.confirmed){
+    if(structure.direction === "buy"){ bull += 16; reasons.push("✓ " + retest.text); }
+    if(structure.direction === "sell"){ bear += 16; reasons.push("✓ " + retest.text); }
+  }
+
+  // Momentum
+  if(momentumATR > 0.4){ bull += 10; reasons.push("✓ Impulso alcista fuerte"); }
+  if(momentumATR < -0.4){ bear += 10; reasons.push("✓ Impulso bajista fuerte"); }
+
+  // Actividad
+  if(activity >= 1.25){
+    if(momentumATR > 0) bull += 5;
+    if(momentumATR < 0) bear += 5;
+    reasons.push("✓ Expansión de rango");
+  }
+
+  bull = clamp(bull, 0, 100);
+  bear = clamp(bear, 0, 100);
+
+  const trendScore = Math.round(clamp(bull - bear, -100, 100));
+
+  let direction = "neutral";
+  if(trendScore >= 18) direction = "buy";
+  if(trendScore <= -18) direction = "sell";
+
+  // Oportunidad más estricta
+  let opportunity = Math.max(bull, bear);
+  opportunity -= Math.min(bull, bear) * 0.45;   // penalización fuerte por conflicto
+
+  if(retest.confirmed && structure.direction === direction) opportunity += 10;
+
+  // Bonus solo si EMA y estructura alineadas
+  if((direction === "buy" && ema20 > ema50) || (direction === "sell" && ema20 < ema50)){
+    opportunity += 6;
+  }
+
+  opportunity = Math.round(clamp(opportunity, 0, 100));
+
+  // DECISION más exigente
+  let decision = "ESPERAR";
+  if(direction === "buy" && opportunity >= 78) decision = "BUY";
+  if(direction === "sell" && opportunity >= 78) decision = "SELL";
+
+  if(direction === "buy" && opportunity >= 90 && structure.direction === "buy" && retest.confirmed && momentumATR > 0.25){
+    decision = "BUY FUERTE";
+  }
+  if(direction === "sell" && opportunity >= 90 && structure.direction === "sell" && retest.confirmed && momentumATR < -0.25){
+    decision = "SELL FUERTE";
+  }
+
+  // Ritmo
+  let rhythm = "LATERAL / LENTO";
+  if(Math.abs(momentumATR) >= 1.0) rhythm = momentumATR > 0 ? "ACELERANDO ↑" : "ACELERANDO ↓";
+  else if(Math.abs(momentumATR) >= 0.5) rhythm = momentumATR > 0 ? "ALCISTA ACTIVO" : "BAJISTA ACTIVO";
+  else if(Math.abs(momentumATR) >= 0.25) rhythm = momentumATR > 0 ? "ALCISTA MODERADO" : "BAJISTA MODERADO";
+
+  return {
+    price: last.close, ema20, ema50, rsi, macd, atr,
+    structure, liquidity, fvg, ob, retest,
+    activity, momentumATR, bull, bear,
+    trendScore, opportunity, direction, decision, rhythm, reasons
+  };
+}
+
+/* ========== FETCH ========== */
+async function fetchCandles(asset, timeframe, apiKey){
+  const tf = TIMEFRAMES[timeframe];
+  const outputSize = tf.synthetic ? 320 : 180;
+  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(tf.api)}&outputsize=${outputSize}&apikey=${encodeURIComponent(apiKey)}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if(data.status === "error" || !data.values) throw new Error(data.message || "Error de Twelve Data");
+
+  let candles = data.values.slice().reverse().map(c => ({
+    datetime: c.datetime,
+    open: Number(c.open), high: Number(c.high), low: Number(c.low), close: Number(c.close),
+    volume: c.volume !== undefined ? Number(c.volume) : null
+  })).filter(c => Number.isFinite(c.open) && Number.isFinite(c.high) && Number.isFinite(c.low) && Number.isFinite(c.close));
+
+  if(tf.synthetic) candles = aggregate10m(candles);
+  return candles;
+}
+
+function priceFormat(value){
+  if(value === null || value === undefined) return "--";
+  return value >= 1000 ? value.toFixed(2) : value.toFixed(5);
+}
+
+function setTrendGauge(score){
+  const angle = -90 + (clamp(score, -100, 100) * 0.9);
+  document.getElementById("trendNeedle").style.transform = `rotate(${angle}deg)`;
+  const value = document.getElementById("trendValue");
+  value.textContent = score > 0 ? "+" + score : score;
+  value.className = "text-3xl font-black mt-2 " + (score >= 18 ? "buy" : score <= -18 ? "sell" : "wait");
+
+  let text = "NEUTRAL";
+  if(score >= 70) text = "ALCISTA FUERTE";
+  else if(score >= 40) text = "ALCISTA";
+  else if(score >= 18) text = "ALCISTA DÉBIL";
+  else if(score <= -70) text = "BAJISTA FUERTE";
+  else if(score <= -40) text = "BAJISTA";
+  else if(score <= -18) text = "BAJISTA DÉBIL";
+  document.getElementById("trendText").textContent = text;
+}
+
+function setOpportunity(score){
+  document.getElementById("opportunityGauge").style.setProperty("--deg", (score * 3.6) + "deg");
+  document.getElementById("opportunityScore").textContent = score;
+
+  let text, desc, color;
+  if(score < 45){ text = "NO OPERAR"; desc = "Confluencia insuficiente"; color = "text-red-400"; }
+  else if(score < 65){ text = "OBSERVAR"; desc = "Todavía no hay ventaja clara"; color = "text-yellow-400"; }
+  else if(score < 78){ text = "PREPARAR"; desc = "Setup desarrollándose"; color = "text-yellow-300"; }
+  else if(score < 90){ text = "OPORTUNIDAD FUERTE"; desc = "Buena confluencia técnica"; color = "text-emerald-400"; }
+  else{ text = "SETUP MUY FUERTE"; desc = "Confluencia interna muy alta"; color = "text-emerald-300"; }
+
+  const el = document.getElementById("opportunityText");
+  el.textContent = text;
+  el.className = "font-bold mt-3 " + color;
+  document.getElementById("opportunityDescription").textContent = desc;
+}
+
+function updateUI(result, symbol, timeframe){
+  setTrendGauge(result.trendScore);
+  setOpportunity(result.opportunity);
+
+  const decision = document.getElementById("decision");
+  decision.textContent = result.decision;
+  decision.className = "text-5xl font-black mt-4 " + (result.decision.includes("BUY") ? "buy" : result.decision.includes("SELL") ? "sell" : "wait");
+
+  const box = document.getElementById("signalBox");
+  box.className = "card p-5 mb-5 " + (result.decision.includes("BUY") ? "signal-buy" : result.decision.includes("SELL") ? "signal-sell" : "signal-wait");
+
+  document.getElementById("symbolDisplay").textContent = symbol;
+  document.getElementById("tfDisplay").textContent = TIMEFRAMES[timeframe].label;
+  document.getElementById("price").textContent = priceFormat(result.price);
+  document.getElementById("rhythm").textContent = result.rhythm;
+  document.getElementById("momentum").textContent = result.momentumATR.toFixed(2) + " ATR";
+  document.getElementById("activity").textContent = result.activity.toFixed(2) + "x";
+  document.getElementById("structure").textContent = result.structure.event;
+  document.getElementById("ema20").textContent = priceFormat(result.ema20);
+  document.getElementById("ema50").textContent = priceFormat(result.ema50);
+  document.getElementById("rsi").textContent = result.rsi.toFixed(1);
+  document.getElementById("macd").textContent = result.macd.histogram > 0 ? "ALCISTA ↑" : result.macd.histogram < 0 ? "BAJISTA ↓" : "NEUTRAL";
+  document.getElementById("bos").textContent = result.structure.event;
+  document.getElementById("liquidity").textContent = result.liquidity.text;
+  document.getElementById("orderBlock").textContent = result.ob.text;
+  document.getElementById("fvg").textContent = result.fvg.text;
+
+  // Entry confirmation
+  document.getElementById("entryBreak").textContent = result.structure.direction !== "neutral" ? "✓ " + result.structure.event : "✕ Sin ruptura clara";
+  document.getElementById("entryRetest").textContent = result.retest.confirmed ? "✓ CONFIRMADO" : "Esperando";
+
+  const momentumOK = (result.direction === "buy" && result.momentumATR > 0.3) || (result.direction === "sell" && result.momentumATR < -0.3);
+  document.getElementById("entryMomentum").textContent = momentumOK ? "✓ CONFIRMA" : "Débil";
+
+  const trendOK = (result.direction === "buy" && result.ema20 > result.ema50) || (result.direction === "sell" && result.ema20 < result.ema50);
+  document.getElementById("entryTrend").textContent = trendOK ? "✓ ALINEADA" : "✕ NO ALINEADA";
+
+  const fullEntry = result.retest.confirmed && momentumOK && trendOK && result.structure.direction === result.direction;
+  const entryStatus = document.getElementById("entryStatus");
+  if(fullEntry){
+    entryStatus.textContent = result.direction === "buy" ? "🔥 SETUP BUY CONFIRMADO" : "🔥 SETUP SELL CONFIRMADO";
+    entryStatus.className = "small-pill text-emerald-300";
+  } else {
+    entryStatus.textContent = "ESPERANDO CONFIRMACIÓN";
+    entryStatus.className = "small-pill text-yellow-300";
+  }
+
+  document.getElementById("scoreReasons").innerHTML = result.reasons.length
+    ? result.reasons.map(r => `<div class="panel px-3 py-2">${r}</div>`).join("")
+    : `<div class="panel px-3 py-2">Sin confluencia suficiente.</div>`;
+
+  updateChart(symbol, timeframe);
+}
+
+function updateChart(symbol, timeframe){
+  const asset = ASSETS[symbol];
+  const tf = TIMEFRAMES[timeframe];
+  const url = `https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(asset.tv)}&interval=${encodeURIComponent(tf.tv)}&theme=dark&hide_side_toolbar=1&allow_symbol_change=0`;
+  document.getElementById("tvFrame").src = url;
+  document.getElementById("chartLabel").textContent = symbol + " · " + tf.label;
+}
+
+async function updateMarket(){
+  const apiKey = document.getElementById("apiKey").value.trim();
+  if(!apiKey){
+    document.getElementById("status").textContent = "⚠ Falta API Key de Twelve Data";
+    return;
+  }
+  saveKey();
+
+  const symbol = document.getElementById("symbol").value;
+  const timeframe = document.getElementById("timeframe").value;
+  const asset = ASSETS[symbol];
+
+  document.getElementById("status").textContent = `Analizando ${symbol} · ${TIMEFRAMES[timeframe].label}...`;
+
+  try{
+    const candles = await fetchCandles(asset, timeframe, apiKey);
+    if(candles.length < 80) throw new Error("No hay suficientes velas para un análisis fiable.");
+
+    const result = analyze(candles);
+    updateUI(result, symbol, timeframe);
+
+    document.getElementById("status").textContent = "✓ Análisis actualizado";
+    document.getElementById("lastUpdate").textContent = "Última actualización: " + new Date().toLocaleString("es-US");
+  } catch(error){
+    document.getElementById("status").textContent = "ERROR: " + error.message;
+  }
+}
+
+document.getElementById("symbol").addEventListener("change", () => { if(document.getElementById("apiKey").value.trim()) updateMarket(); });
+document.getElementById("timeframe").addEventListener("change", () => { if(document.getElementById("apiKey").value.trim()) updateMarket(); });
+document.getElementById("marketType").addEventListener("change", () => {
+  setTimeout(() => { if(document.getElementById("apiKey").value.trim()) updateMarket(); }, 50);
+});
+
+window.onload = () => {
+  loadKey();
+  changeMarketType();
+  updateChart("EUR/USD", "15m");
+  if(localStorage.getItem("marketApiKey")) updateMarket();
+};
+</script>
 </body>
-</h
+</html>
