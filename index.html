@@ -1,698 +1,1187 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>FJA TRADING AGENT PRO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FJA TRADING AGENT PRO · SEMÁFORO</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
-body{font-family:Inter,system-ui,sans-serif;background:#030712}
-*{box-sizing:border-box}
-.card{background:#111827;border:1px solid #1f2937;border-radius:22px}
-.panel{background:#0b1220;border:1px solid #1f2937;border-radius:18px}
-input,select{outline:none}
-.trend-meter{width:260px;height:135px;overflow:hidden;position:relative}
-.trend-arc{width:260px;height:260px;border-radius:50%;background:conic-gradient(from 270deg,#7f1d1d 0deg,#ef4444 55deg,#f97316 82deg,#374151 90deg,#22c55e 125deg,#00ff88 180deg,#111827 180deg,#111827 360deg);position:absolute;top:0;left:0}
-.trend-inner{width:190px;height:190px;border-radius:50%;background:#0b1220;position:absolute;top:35px;left:35px}
-.needle{position:absolute;width:95px;height:4px;background:white;left:130px;top:128px;transform-origin:0 50%;transform:rotate(-90deg);border-radius:4px;box-shadow:0 0 10px rgba(255,255,255,.8)}
-.needle-center{width:16px;height:16px;border-radius:50%;background:white;position:absolute;left:122px;top:121px}
-.opportunity{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:conic-gradient(#22c55e 0deg,#22c55e var(--deg),#1f2937 var(--deg),#1f2937 360deg)}
-.opportunity-inner{width:98px;height:98px;border-radius:50%;background:#0b1220;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.buy{color:#22ff88}.sell{color:#ff4d4d}.wait{color:#facc15}
-.signal-buy{border:1px solid rgba(34,255,136,.5);background:rgba(34,255,136,.08)}
-.signal-sell{border:1px solid rgba(239,68,68,.5);background:rgba(239,68,68,.08)}
-.signal-wait{border:1px solid rgba(250,204,21,.4);background:rgba(250,204,21,.06)}
-.tv{height:430px;border-radius:18px;overflow:hidden;border:1px solid #1f2937}
-.small-pill{padding:5px 10px;border-radius:999px;background:#1f2937;font-size:12px}
+body{
+  background:#030712;
+  color:#e5e7eb;
+  font-family:Inter,system-ui,sans-serif
+}
+.card{
+  background:#111827;
+  border:1px solid #263144;
+  border-radius:18px
+}
+.tile{
+  background:#0b1220;
+  border:1px solid #263144;
+  border-radius:14px;
+  padding:15px
+}
+.input{
+  width:100%;
+  background:#1f2937;
+  border:1px solid #334155;
+  border-radius:10px;
+  padding:11px;
+  color:white
+}
+button{cursor:pointer}
+.light{
+  width:126px;
+  height:126px;
+  border-radius:100%;
+  background:#ef4444;
+  box-shadow:0 0 30px #ef444455;
+  border:7px solid #2b1016;
+  transition:background .15s
+}
+.light.ready{
+  background:#22c55e;
+  box-shadow:0 0 38px #22c55e99;
+  border-color:#123a22
+}
+.good{color:#4ade80}
+.bad{color:#f87171}
+.warn{color:#fbbf24}
+.tv{height:410px}
+.big{font-size:clamp(24px,5vw,43px)}
 </style>
 </head>
-<body class="text-gray-100 min-h-screen">
-<div class="max-w-7xl mx-auto p-4 md:p-6">
+
+<body>
+<main class="max-w-7xl mx-auto p-4 md:p-7 space-y-5">
 
 <!-- HEADER -->
-<div class="card p-5 mb-5 border-amber-600">
-<div class="flex flex-col xl:flex-row gap-5 justify-between">
-<div>
-<div class="flex items-center gap-3">
-<i class="fa-solid fa-chart-line text-4xl text-emerald-400"></i>
-<div>
-<h1 class="text-3xl font-black text-emerald-400">FJA TRADING AGENT PRO</h1>
-<p class="text-gray-400 text-sm">SMC + Trend + Momentum + Retest Strategy (Optimized)</p>
-</div>
-</div>
-</div>
-<div class="grid md:grid-cols-2 gap-3 xl:w-[560px]">
-<div>
-<label class="text-xs text-gray-400">Twelve Data API Key</label>
-<input id="apiKey" type="password" placeholder="API Key" class="w-full bg-gray-800 rounded-xl px-4 py-3" onchange="saveKey()">
-</div>
-<div class="flex items-end">
-<button onclick="updateMarket()" class="w-full bg-amber-600 rounded-xl px-4 py-3 font-bold">
-<i class="fa-solid fa-rotate mr-2"></i> ANALIZAR AHORA
-</button>
-</div>
-</div>
-</div>
-<div class="mt-4 flex flex-wrap gap-3 items-center">
-<span id="status" class="text-amber-300 text-sm">Esperando actualización</span>
-<span class="text-gray-600">|</span>
-<span id="lastUpdate" class="text-gray-400 text-sm">Sin actualizar</span>
-</div>
-</div>
+<header class="card p-5 border-amber-700">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-black text-emerald-400">
+        FJA TRADING AGENT PRO
+      </h1>
+      <p class="text-gray-400">
+        SMC + Momentum + Ruptura → Retesteo → Rechazo
+      </p>
+      <p class="text-amber-400 font-bold">
+        SEMÁFORO INTELIGENTE DE ENTRADA
+      </p>
+    </div>
 
-<!-- SELECTORES -->
-<div class="card p-5 mb-5">
-<h2 class="font-bold text-xl mb-4"><i class="fa-solid fa-sliders mr-2 text-emerald-400"></i> Mercado</h2>
-<div class="grid md:grid-cols-3 gap-4">
-<div>
-<label class="text-sm text-gray-400">Tipo</label>
-<select id="marketType" onchange="changeMarketType()" class="w-full bg-gray-800 rounded-xl p-3 mt-1">
-<option value="Forex">Forex</option>
-<option value="Crypto">Bitcoin</option>
-</select>
-</div>
-<div>
-<label class="text-sm text-gray-400">Activo</label>
-<select id="symbol" class="w-full bg-gray-800 rounded-xl p-3 mt-1">
-<option value="EUR/USD">EUR/USD</option>
-<option value="GBP/USD">GBP/USD</option>
-</select>
-</div>
-<div>
-<label class="text-sm text-gray-400">Temporalidad</label>
-<select id="timeframe" class="w-full bg-gray-800 rounded-xl p-3 mt-1">
-<option value="10m">10 minutos</option>
-<option value="15m" selected>15 minutos</option>
-<option value="1H">1 hora</option>
-<option value="4H">4 horas</option>
-</select>
-</div>
-</div>
-</div>
+    <div class="flex flex-wrap gap-2">
+      <button id="analyzeBtn"
+        class="bg-amber-600 hover:bg-amber-500 font-bold px-5 py-3 rounded-xl">
+        ANALIZAR AHORA
+      </button>
+
+      <button id="autoBtn"
+        class="bg-gray-700 px-4 py-3 rounded-xl">
+        Auto: OFF
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-4 grid md:grid-cols-4 gap-3">
+    <label>
+      API Key Twelve Data
+      <input id="key" type="password"
+        class="input mt-1"
+        placeholder="Ingresa tu clave">
+    </label>
+
+    <label>
+      Mercado
+      <select id="market" class="input mt-1">
+        <option>Forex</option>
+        <option>Bitcoin</option>
+      </select>
+    </label>
+
+    <label>
+      Activo
+      <select id="symbol" class="input mt-1"></select>
+    </label>
+
+    <label>
+      Temporalidad
+      <select id="tf" class="input mt-1">
+        <option value="10m">10 minutos</option>
+        <option value="15m" selected>15 minutos</option>
+        <option value="1h">1 hora</option>
+        <option value="4h">4 horas</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="mt-3 flex flex-wrap gap-3 text-sm">
+    <span id="status" class="warn">Esperando análisis</span>
+    <span id="updated" class="text-gray-400">
+      Sin actualizar
+    </span>
+    <span class="text-gray-400">
+      Auto: revisión cada 60 segundos
+    </span>
+  </div>
+</header>
 
 <!-- MAIN SIGNAL -->
-<div id="signalBox" class="card signal-wait p-5 mb-5">
-<div class="grid lg:grid-cols-3 gap-6 items-center">
-<div class="text-center">
-<p class="text-gray-400 font-semibold mb-3">DIRECCIÓN DE TENDENCIA</p>
-<div class="flex justify-center">
-<div class="trend-meter">
-<div class="trend-arc"></div>
-<div class="trend-inner"></div>
-<div id="trendNeedle" class="needle"></div>
-<div class="needle-center"></div>
-</div>
-</div>
-<div class="flex justify-between max-w-[260px] mx-auto text-xs">
-<span class="text-red-400">-100 BAJISTA</span>
-<span class="text-green-400">+100 ALCISTA</span>
-</div>
-<p id="trendValue" class="text-3xl font-black mt-2 wait">0</p>
-<p id="trendText" class="font-bold text-gray-300">NEUTRAL</p>
-</div>
-<div class="text-center">
-<p class="text-gray-400 font-semibold mb-3">OPORTUNIDAD</p>
-<div class="flex justify-center">
-<div id="opportunityGauge" class="opportunity" style="--deg:0deg">
-<div class="opportunity-inner">
-<span id="opportunityScore" class="text-3xl font-black">0</span>
-<span class="text-xs text-gray-500">/100</span>
-</div>
-</div>
-</div>
-<p id="opportunityText" class="font-bold mt-3 text-red-400">NO OPERAR</p>
-<p id="opportunityDescription" class="text-xs text-gray-500 mt-1">Esperando datos</p>
-</div>
-<div class="text-center">
-<p class="text-gray-400 font-semibold">SEÑAL DEL AGENTE</p>
-<p id="decision" class="text-5xl font-black mt-4 wait">ESPERAR</p>
-<p id="symbolDisplay" class="text-2xl font-bold mt-3">EUR/USD</p>
-<p id="tfDisplay" class="text-gray-400">15 minutos</p>
-<div class="mt-4">
-<p class="text-gray-500 text-xs">Precio actual</p>
-<p id="price" class="text-3xl font-bold text-emerald-400">--</p>
-</div>
-</div>
-</div>
-</div>
+<section class="card p-5">
+  <div class="grid lg:grid-cols-3 gap-7 items-center">
 
-<!-- RITMO -->
-<div class="grid lg:grid-cols-4 gap-4 mb-5">
-<div class="panel p-4"><p class="text-gray-500 text-sm">Ritmo de mercado</p><p id="rhythm" class="text-xl font-bold mt-2">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-sm">Momentum</p><p id="momentum" class="text-xl font-bold mt-2">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-sm">Actividad / expansión</p><p id="activity" class="text-xl font-bold mt-2">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-sm">Estructura</p><p id="structure" class="text-xl font-bold mt-2">--</p></div>
-</div>
+    <div class="text-center">
+      <p class="text-gray-400 font-bold">TENDENCIA</p>
+      <p id="direction" class="big font-black mt-4">
+        NEUTRAL
+      </p>
+      <p id="trendNum" class="text-2xl mt-1 font-bold">0</p>
+
+      <div class="mt-3 h-3 bg-gray-700 rounded-full overflow-hidden">
+        <div id="bullbar" class="h-full bg-emerald-500"
+          style="width:50%"></div>
+      </div>
+      <p class="text-gray-500 text-xs mt-2">
+        Izquierda: SELL · Derecha: BUY
+      </p>
+    </div>
+
+    <div class="text-center">
+      <p class="text-gray-400 font-bold mb-3">
+        SEMÁFORO DE ENTRADA
+      </p>
+
+      <div class="light mx-auto" id="light"></div>
+
+      <p id="permission"
+        class="text-3xl font-black mt-3 bad">
+        NO ENTRAR
+      </p>
+
+      <p class="text-gray-400 text-sm mt-1"
+        id="permissionDetail">
+        Sin confirmación
+      </p>
+    </div>
+
+    <div class="text-center">
+      <p class="text-gray-400 font-bold">
+        ORDEN SUGERIDA
+      </p>
+
+      <p id="signal" class="big font-black warn mt-4">
+        ESPERAR
+      </p>
+
+      <p id="assetLabel" class="text-xl font-bold mt-2">
+        EUR/USD · 15 minutos
+      </p>
+
+      <p class="text-gray-400 mt-2">
+        Precio de última vela analizada
+      </p>
+
+      <p id="price"
+        class="text-3xl font-black text-emerald-400">
+        --
+      </p>
+
+      <p class="text-gray-400 mt-2">
+        Confluencia:
+        <b id="score">--</b> / 100
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIRMACIONES -->
+<section class="card p-5">
+  <h2 class="font-bold text-xl mb-3">
+    Confirmación secuencial de entrada
+  </h2>
+
+  <div id="checks"
+    class="grid md:grid-cols-5 gap-3">
+  </div>
+
+  <p class="text-gray-400 text-sm mt-4">
+    Todas las etapas deben estar confirmadas en la misma
+    dirección y en velas cerradas. Una nueva vela puede
+    desactivar la señal.
+  </p>
+</section>
 
 <!-- INDICADORES -->
-<div class="card p-5 mb-5">
-<h2 class="text-xl font-bold mb-4">Confirmaciones</h2>
-<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-<div class="panel p-4"><p class="text-gray-500 text-xs">EMA 20</p><p id="ema20" class="font-bold text-lg">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">EMA 50</p><p id="ema50" class="font-bold text-lg">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">RSI 14</p><p id="rsi" class="font-bold text-lg">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">MACD</p><p id="macd" class="font-bold text-lg">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">BOS / CHoCH</p><p id="bos" class="font-bold">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">Barrido de liquidez</p><p id="liquidity" class="font-bold">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">Order Block</p><p id="orderBlock" class="font-bold">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">Fair Value Gap</p><p id="fvg" class="font-bold">--</p></div>
-</div>
-</div>
+<section class="grid md:grid-cols-4 gap-3">
+  <div class="tile">
+    <p class="text-gray-400 text-sm">EMA 20 / 50</p>
+    <p id="emas" class="font-bold mt-1">--</p>
+  </div>
 
-<!-- TIKTOK STRATEGY -->
-<div class="card p-5 mb-5">
-<div class="flex items-center justify-between gap-4 flex-wrap">
-<div>
-<h2 class="text-xl font-bold">🎯 Confirmación de entrada</h2>
-<p class="text-gray-400 text-sm mt-1">Ruptura + retesteo + rechazo + momentum</p>
-</div>
-<div><span id="entryStatus" class="small-pill text-yellow-300">ESPERANDO SETUP</span></div>
-</div>
-<div class="grid md:grid-cols-4 gap-4 mt-5">
-<div class="panel p-4"><p class="text-gray-500 text-xs">Ruptura estructura</p><p id="entryBreak" class="font-bold mt-1">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">Retesteo</p><p id="entryRetest" class="font-bold mt-1">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">Momentum</p><p id="entryMomentum" class="font-bold mt-1">--</p></div>
-<div class="panel p-4"><p class="text-gray-500 text-xs">Filtro tendencia</p><p id="entryTrend" class="font-bold mt-1">--</p></div>
-</div>
-</div>
+  <div class="tile">
+    <p class="text-gray-400 text-sm">RSI 14</p>
+    <p id="rsi" class="font-bold mt-1">--</p>
+  </div>
 
-<!-- SCORE BREAKDOWN -->
-<div class="card p-5 mb-5">
-<h2 class="text-xl font-bold mb-4">¿Por qué da esta lectura?</h2>
-<div id="scoreReasons" class="space-y-2 text-sm text-gray-300">Esperando análisis.</div>
-</div>
+  <div class="tile">
+    <p class="text-gray-400 text-sm">MACD Hist.</p>
+    <p id="macd" class="font-bold mt-1">--</p>
+  </div>
 
-<!-- TRADINGVIEW -->
-<div class="card p-4">
-<div class="flex justify-between items-center mb-3">
-<h2 class="font-bold">Gráfico</h2>
-<span id="chartLabel" class="text-gray-400 text-sm">EUR/USD · 15m</span>
-</div>
-<div class="tv"><iframe id="tvFrame" width="100%" height="100%" frameborder="0"></iframe></div>
-</div>
-<p class="text-gray-600 text-xs mt-4 text-center">La puntuación 0–100 mide confluencia técnica interna. No representa una probabilidad garantizada de beneficio.</p>
-</div>
+  <div class="tile">
+    <p class="text-gray-400 text-sm">ATR / Impulso</p>
+    <p id="atr" class="font-bold mt-1">--</p>
+  </div>
+
+  <div class="tile">
+    <p class="text-gray-400 text-sm">Estructura</p>
+    <p id="structure" class="font-bold mt-1">--</p>
+  </div>
+
+  <div class="tile">
+    <p class="text-gray-400 text-sm">Ruptura</p>
+    <p id="breakout" class="font-bold mt-1">--</p>
+  </div>
+
+  <div class="tile">
+    <p class="text-gray-400 text-sm">Retesteo</p>
+    <p id="retest" class="font-bold mt-1">--</p>
+  </div>
+
+  <div class="tile">
+    <p class="text-gray-400 text-sm">Vela confirmada</p>
+    <p id="candleTime" class="font-bold mt-1">--</p>
+  </div>
+</section>
+
+<!-- MOTIVOS -->
+<section class="card p-5">
+  <h2 class="text-xl font-bold mb-3">
+    Por qué habilita o bloquea una entrada
+  </h2>
+
+  <div id="reasons" class="space-y-2 text-sm text-gray-300">
+    Esperando datos
+  </div>
+</section>
+
+<!-- GRAFICO -->
+<section class="card p-4">
+  <div class="flex flex-wrap justify-between gap-2 mb-3">
+    <h2 class="font-bold">Gráfico TradingView</h2>
+    <span id="chartLabel" class="text-gray-400"></span>
+  </div>
+
+  <iframe id="chart"
+    class="w-full tv rounded-xl border border-gray-700"
+    loading="lazy"
+    referrerpolicy="no-referrer">
+  </iframe>
+</section>
+
+<footer class="text-xs text-gray-500 text-center pb-4">
+  Señal técnica orientativa, no probabilidad de ganancia.
+  No envía órdenes reales. Datos sujetos a disponibilidad
+  y retrasos del proveedor.
+</footer>
+
+</main>
 
 <script>
+'use strict';
+
+/* CONFIGURACION */
+const $ = id => document.getElementById(id);
+const clamp = (x,a,b) => Math.min(b,Math.max(a,x));
+
 const ASSETS = {
-  "EUR/USD": { category:"Forex", api:"EUR/USD", tv:"FX:EURUSD" },
-  "GBP/USD": { category:"Forex", api:"GBP/USD", tv:"FX:GBPUSD" },
-  "BTC/USDT": { category:"Crypto", api:"BTC/USDT", tv:"BINANCE:BTCUSDT" }
+  'EUR/USD': {
+    api:'EUR/USD',
+    tv:'FX:EURUSD'
+  },
+  'GBP/USD': {
+    api:'GBP/USD',
+    tv:'FX:GBPUSD'
+  },
+  'BTC/USDT': {
+    api:'BTC/USDT',
+    tv:'BINANCE:BTCUSDT'
+  }
 };
 
-const TIMEFRAMES = {
-  "10m": { api:"5min", tv:"10", synthetic:true, label:"10 minutos" },
-  "15m": { api:"15min", tv:"15", synthetic:false, label:"15 minutos" },
-  "1H":  { api:"1h",   tv:"60", synthetic:false, label:"1 hora" },
-  "4H":  { api:"4h",   tv:"240",synthetic:false, label:"4 horas" }
+const TFS = {
+  '10m': {
+    api:'5min',tv:'10',mins:10,
+    synthetic:true,label:'10 minutos'
+  },
+  '15m': {
+    api:'15min',tv:'15',mins:15,
+    label:'15 minutos'
+  },
+  '1h': {
+    api:'1h',tv:'60',mins:60,
+    label:'1 hora'
+  },
+  '4h': {
+    api:'4h',tv:'240',mins:240,
+    label:'4 horas'
+  }
 };
 
-function clamp(v,min,max){ return Math.max(min, Math.min(max,v)); }
+let autoTimer = null;
+let requestId = 0;
+let lastAlert = '';
+let busy = false;
 
-function saveKey(){ localStorage.setItem("marketApiKey", document.getElementById("apiKey").value.trim()); }
-function loadKey(){ document.getElementById("apiKey").value = localStorage.getItem("marketApiKey") || ""; }
+/* FORMATO DE PRECIOS */
+const fmt = x =>
+  Number.isFinite(x)
+  ? (Math.abs(x)>=100 ? x.toFixed(2) : x.toFixed(5))
+  : '--';
 
-function changeMarketType(){
-  const type = document.getElementById("marketType").value;
-  const symbol = document.getElementById("symbol");
-  symbol.innerHTML = type === "Forex"
-    ? `<option value="EUR/USD">EUR/USD</option><option value="GBP/USD">GBP/USD</option>`
-    : `<option value="BTC/USDT">BTC/USDT</option>`;
-}
+/* EMA */
+function EMA(a,n){
+  if(a.length<n)return null;
 
-/* ========== INDICATORS (FIXED) ========== */
-function EMA(values, period){
-  if(values.length < period) return null;
-  const k = 2/(period+1);
-  let ema = values.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  for(let i=period; i<values.length; i++) ema = values[i]*k + ema*(1-k);
-  return ema;
-}
+  let v=a.slice(0,n).reduce((s,x)=>s+x,0)/n;
+  const k=2/(n+1);
 
-function EMASeries(values, period){
-  if(values.length < period) return [];
-  let output = new Array(values.length).fill(null);
-  let ema = values.slice(0,period).reduce((a,b)=>a+b,0)/period;
-  output[period-1] = ema;
-  const k = 2/(period+1);
-  for(let i=period; i<values.length; i++){
-    ema = values[i]*k + ema*(1-k);
-    output[i] = ema;
+  for(let i=n;i<a.length;i++){
+    v=a[i]*k+v*(1-k);
   }
-  return output;
+  return v;
 }
 
-/* RSI de Wilder (correcto) */
-function RSI(values, period=14){
-  if(values.length < period+1) return 50;
-  let gains = 0, losses = 0;
-  for(let i=1; i<=period; i++){
-    const diff = values[i] - values[i-1];
-    if(diff >= 0) gains += diff; else losses -= diff;
+function emaSeries(a,n){
+  const o=Array(a.length).fill(null);
+  if(a.length<n)return o;
+
+  let v=a.slice(0,n).reduce((s,x)=>s+x,0)/n;
+  const k=2/(n+1);
+  o[n-1]=v;
+
+  for(let i=n;i<a.length;i++){
+    v=a[i]*k+v*(1-k);
+    o[i]=v;
   }
-  let avgGain = gains / period;
-  let avgLoss = losses / period;
-  for(let i=period+1; i<values.length; i++){
-    const diff = values[i] - values[i-1];
-    const gain = diff > 0 ? diff : 0;
-    const loss = diff < 0 ? -diff : 0;
-    avgGain = (avgGain*(period-1) + gain) / period;
-    avgLoss = (avgLoss*(period-1) + loss) / period;
+  return o;
+}
+
+/* RSI WILDER */
+function rsi(a,n=14){
+  if(a.length<n+1)return null;
+
+  let g=0,l=0;
+
+  for(let i=1;i<=n;i++){
+    const d=a[i]-a[i-1];
+    g+=Math.max(d,0);
+    l+=Math.max(-d,0);
   }
-  if(avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
-}
 
-function MACD(values){
-  const e12 = EMASeries(values,12);
-  const e26 = EMASeries(values,26);
-  const macd = [];
-  for(let i=0; i<values.length; i++){
-    if(e12[i] !== null && e26[i] !== null) macd.push(e12[i]-e26[i]);
+  g/=n;
+  l/=n;
+
+  for(let i=n+1;i<a.length;i++){
+    const d=a[i]-a[i-1];
+    g=(g*(n-1)+Math.max(d,0))/n;
+    l=(l*(n-1)+Math.max(-d,0))/n;
   }
-  if(macd.length < 10) return { line:0, signal:0, histogram:0 };
-  const signal = EMA(macd,9);
-  const line = macd[macd.length-1];
-  return { line, signal, histogram: line - signal };
+
+  return l===0
+    ? (g===0?50:100)
+    : 100-100/(1+g/l);
 }
 
-function ATR(candles, period=14){
-  if(candles.length < period+1) return 0;
-  const tr = [];
-  for(let i=1; i<candles.length; i++){
-    tr.push(Math.max(
-      candles[i].high - candles[i].low,
-      Math.abs(candles[i].high - candles[i-1].close),
-      Math.abs(candles[i].low - candles[i-1].close)
-    ));
-  }
-  return tr.slice(-period).reduce((a,b)=>a+b,0) / period;
-}
+/* MACD */
+function macd(a){
+  const x=emaSeries(a,12);
+  const y=emaSeries(a,26);
+  const series=[];
 
-function aggregate10m(candles){
-  const output = [];
-  for(let i=0; i<candles.length-1; i+=2){
-    const a = candles[i], b = candles[i+1];
-    if(!b) break;
-    output.push({
-      open: a.open,
-      high: Math.max(a.high, b.high),
-      low: Math.min(a.low, b.low),
-      close: b.close,
-      volume: (Number(a.volume)||0) + (Number(b.volume)||0),
-      datetime: a.datetime
-    });
-  }
-  return output;
-}
-
-/* ========== STRUCTURE (IMPROVED) ========== */
-function swings(candles, lookback=3){
-  const result = [];
-  for(let i=lookback; i<candles.length-lookback; i++){
-    let high = true, low = true;
-    for(let j=i-lookback; j<=i+lookback; j++){
-      if(j===i) continue;
-      if(candles[i].high <= candles[j].high) high = false;
-      if(candles[i].low >= candles[j].low) low = false;
-    }
-    if(high) result.push({ type:"high", price:candles[i].high, index:i });
-    if(low)  result.push({ type:"low",  price:candles[i].low,  index:i });
-  }
-  return result;
-}
-
-function structureAnalysis(candles, atr){
-  const s = swings(candles, 3);
-  const highs = s.filter(x=>x.type==="high");
-  const lows  = s.filter(x=>x.type==="low");
-  if(highs.length < 2 || lows.length < 2) return { direction:"neutral", event:"Sin estructura" };
-
-  const h1 = highs[highs.length-2], h2 = highs[highs.length-1];
-  const l1 = lows[lows.length-2],   l2 = lows[lows.length-1];
-  const last = candles[candles.length-1];
-
-  // BOS con filtro de ATR mínimo
-  if(last.close > h2.price + atr*0.15) return { direction:"buy",  event:"BOS alcista", level:h2.price };
-  if(last.close < l2.price - atr*0.15) return { direction:"sell", event:"BOS bajista", level:l2.price };
-
-  if(h2.price > h1.price && l2.price > l1.price) return { direction:"buy",  event:"HH + HL alcista", level:l2.price };
-  if(h2.price < h1.price && l2.price < l1.price) return { direction:"sell", event:"LH + LL bajista", level:h2.price };
-
-  return { direction:"neutral", event:"Estructura mixta" };
-}
-
-function liquiditySweep(candles){
-  const s = swings(candles, 3);
-  const last = candles[candles.length-1];
-  const high = s.filter(x=>x.type==="high").pop();
-  const low  = s.filter(x=>x.type==="low").pop();
-
-  if(high && last.high > high.price && last.close < high.price) return { direction:"sell", text:"Sweep sobre máximos" };
-  if(low  && last.low  < low.price  && last.close > low.price)  return { direction:"buy",  text:"Sweep bajo mínimos" };
-  return { direction:"neutral", text:"Sin sweep reciente" };
-}
-
-function detectFVG(candles, atr){
-  for(let i=candles.length-1; i>=Math.max(2, candles.length-20); i--){
-    const a = candles[i-2], c = candles[i];
-    if(c.low > a.high + atr*0.1) return { direction:"buy",  text:"FVG alcista", low:a.high, high:c.low };
-    if(c.high < a.low - atr*0.1) return { direction:"sell", text:"FVG bajista", low:c.high, high:a.low };
-  }
-  return { direction:"neutral", text:"Sin FVG reciente" };
-}
-
-function detectOrderBlock(candles, structure, atr){
-  if(structure.direction==="neutral" || !atr) return { direction:"neutral", text:"No validado" };
-  const start = Math.max(1, candles.length-20);
-
-  if(structure.direction==="buy"){
-    for(let i=candles.length-2; i>=start; i--){
-      if(candles[i].close < candles[i].open && (candles[i].high-candles[i].low) > atr*0.4){
-        return { direction:"buy", text:"OB alcista", low:candles[i].low, high:Math.max(candles[i].open,candles[i].close) };
-      }
+  for(let i=0;i<a.length;i++){
+    if(x[i]!==null&&y[i]!==null){
+      series.push(x[i]-y[i]);
     }
   }
-  if(structure.direction==="sell"){
-    for(let i=candles.length-2; i>=start; i--){
-      if(candles[i].close > candles[i].open && (candles[i].high-candles[i].low) > atr*0.4){
-        return { direction:"sell", text:"OB bajista", low:Math.min(candles[i].open,candles[i].close), high:candles[i].high };
-      }
-    }
-  }
-  return { direction:"neutral", text:"No encontrado" };
-}
 
-/* RETEST MÁS ESTRICTO */
-function detectRetest(candles, structure, atr){
-  if(!structure.level || !atr) return { confirmed:false, text:"Sin nivel" };
-  const recent = candles.slice(-8);
-
-  for(const c of recent){
-    if(structure.direction==="buy"){
-      if(c.low <= structure.level + atr*0.25 && c.close > structure.level + atr*0.1 && c.close > c.open){
-        return { confirmed:true, text:"Retest alcista + rechazo" };
-      }
-    }
-    if(structure.direction==="sell"){
-      if(c.high >= structure.level - atr*0.25 && c.close < structure.level - atr*0.1 && c.close < c.open){
-        return { confirmed:true, text:"Retest bajista + rechazo" };
-      }
-    }
-  }
-  return { confirmed:false, text:"Esperando retest" };
-}
-
-function activityRatio(candles){
-  const recent = candles.slice(-21);
-  if(recent.length < 10) return 1;
-  const ranges = recent.slice(0,-1).map(c => c.high - c.low);
-  const avg = ranges.reduce((a,b)=>a+b,0) / ranges.length;
-  const last = recent[recent.length-1];
-  return avg ? (last.high - last.low) / avg : 1;
-}
-
-/* ========== MAIN ANALYSIS (OPTIMIZED) ========== */
-function analyze(candles){
-  const closes = candles.map(c => c.close);
-  const last = candles[candles.length-1];
-  const ema20 = EMA(closes,20);
-  const ema50 = EMA(closes,50);
-  const rsi = RSI(closes,14);
-  const macd = MACD(closes);
-  const atr = ATR(candles);
-  const structure = structureAnalysis(candles, atr);
-  const liquidity = liquiditySweep(candles);
-  const fvg = detectFVG(candles, atr);
-  const ob = detectOrderBlock(candles, structure, atr);
-  const retest = detectRetest(candles, structure, atr);
-  const activity = activityRatio(candles);
-
-  // Momentum más robusto (8-12 velas)
-  const look = Math.min(12, Math.floor(candles.length/8));
-  const prior = candles[Math.max(0, candles.length - look)];
-  const momentumATR = atr ? (last.close - prior.close) / atr : 0;
-
-  let bull = 0, bear = 0;
-  const reasons = [];
-
-  // EMA (peso alto)
-  if(last.close > ema20 && ema20 > ema50){ bull += 20; reasons.push("✓ Precio > EMA20 > EMA50"); }
-  if(last.close < ema20 && ema20 < ema50){ bear += 20; reasons.push("✓ Precio < EMA20 < EMA50"); }
-
-  // RSI (Wilder)
-  if(rsi >= 55 && rsi < 72){ bull += 12; reasons.push("✓ RSI momentum alcista"); }
-  if(rsi <= 45 && rsi > 28){ bear += 12; reasons.push("✓ RSI momentum bajista"); }
-  if(rsi >= 75) reasons.push("⚠ RSI sobrecomprado");
-  if(rsi <= 25) reasons.push("⚠ RSI sobrevendido");
-
-  // MACD
-  if(macd.histogram > 0){ bull += 10; reasons.push("✓ MACD alcista"); }
-  if(macd.histogram < 0){ bear += 10; reasons.push("✓ MACD bajista"); }
-
-  // Estructura
-  if(structure.direction === "buy"){ bull += 18; reasons.push("✓ " + structure.event); }
-  if(structure.direction === "sell"){ bear += 18; reasons.push("✓ " + structure.event); }
-
-  // Liquidez
-  if(liquidity.direction === "buy"){ bull += 12; reasons.push("✓ Sweep comprador"); }
-  if(liquidity.direction === "sell"){ bear += 12; reasons.push("✓ Sweep vendedor"); }
-
-  // OB + FVG (peso moderado)
-  if(ob.direction === "buy") bull += 8;
-  if(ob.direction === "sell") bear += 8;
-  if(fvg.direction === "buy") bull += 6;
-  if(fvg.direction === "sell") bear += 6;
-
-  // Retest (muy importante)
-  if(retest.confirmed){
-    if(structure.direction === "buy"){ bull += 16; reasons.push("✓ " + retest.text); }
-    if(structure.direction === "sell"){ bear += 16; reasons.push("✓ " + retest.text); }
-  }
-
-  // Momentum
-  if(momentumATR > 0.4){ bull += 10; reasons.push("✓ Impulso alcista fuerte"); }
-  if(momentumATR < -0.4){ bear += 10; reasons.push("✓ Impulso bajista fuerte"); }
-
-  // Actividad
-  if(activity >= 1.25){
-    if(momentumATR > 0) bull += 5;
-    if(momentumATR < 0) bear += 5;
-    reasons.push("✓ Expansión de rango");
-  }
-
-  bull = clamp(bull, 0, 100);
-  bear = clamp(bear, 0, 100);
-
-  const trendScore = Math.round(clamp(bull - bear, -100, 100));
-
-  let direction = "neutral";
-  if(trendScore >= 18) direction = "buy";
-  if(trendScore <= -18) direction = "sell";
-
-  // Oportunidad más estricta
-  let opportunity = Math.max(bull, bear);
-  opportunity -= Math.min(bull, bear) * 0.45;   // penalización fuerte por conflicto
-
-  if(retest.confirmed && structure.direction === direction) opportunity += 10;
-
-  // Bonus solo si EMA y estructura alineadas
-  if((direction === "buy" && ema20 > ema50) || (direction === "sell" && ema20 < ema50)){
-    opportunity += 6;
-  }
-
-  opportunity = Math.round(clamp(opportunity, 0, 100));
-
-  // DECISION más exigente
-  let decision = "ESPERAR";
-  if(direction === "buy" && opportunity >= 78) decision = "BUY";
-  if(direction === "sell" && opportunity >= 78) decision = "SELL";
-
-  if(direction === "buy" && opportunity >= 90 && structure.direction === "buy" && retest.confirmed && momentumATR > 0.25){
-    decision = "BUY FUERTE";
-  }
-  if(direction === "sell" && opportunity >= 90 && structure.direction === "sell" && retest.confirmed && momentumATR < -0.25){
-    decision = "SELL FUERTE";
-  }
-
-  // Ritmo
-  let rhythm = "LATERAL / LENTO";
-  if(Math.abs(momentumATR) >= 1.0) rhythm = momentumATR > 0 ? "ACELERANDO ↑" : "ACELERANDO ↓";
-  else if(Math.abs(momentumATR) >= 0.5) rhythm = momentumATR > 0 ? "ALCISTA ACTIVO" : "BAJISTA ACTIVO";
-  else if(Math.abs(momentumATR) >= 0.25) rhythm = momentumATR > 0 ? "ALCISTA MODERADO" : "BAJISTA MODERADO";
+  if(series.length<35)return null;
 
   return {
-    price: last.close, ema20, ema50, rsi, macd, atr,
-    structure, liquidity, fvg, ob, retest,
-    activity, momentumATR, bull, bear,
-    trendScore, opportunity, direction, decision, rhythm, reasons
+    hist:series.at(-1)-EMA(series,9)
   };
 }
 
-/* ========== FETCH ========== */
-async function fetchCandles(asset, timeframe, apiKey){
-  const tf = TIMEFRAMES[timeframe];
-  const outputSize = tf.synthetic ? 320 : 180;
-  const url = `https://api.twelvedata.com/time_series?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(tf.api)}&outputsize=${outputSize}&apikey=${encodeURIComponent(apiKey)}`;
+/* ATR WILDER */
+function atr(c,n=14){
+  if(c.length<n+1)return null;
 
-  const response = await fetch(url);
-  const data = await response.json();
+  const a=[];
 
-  if(data.status === "error" || !data.values) throw new Error(data.message || "Error de Twelve Data");
-
-  let candles = data.values.slice().reverse().map(c => ({
-    datetime: c.datetime,
-    open: Number(c.open), high: Number(c.high), low: Number(c.low), close: Number(c.close),
-    volume: c.volume !== undefined ? Number(c.volume) : null
-  })).filter(c => Number.isFinite(c.open) && Number.isFinite(c.high) && Number.isFinite(c.low) && Number.isFinite(c.close));
-
-  if(tf.synthetic) candles = aggregate10m(candles);
-  return candles;
-}
-
-function priceFormat(value){
-  if(value === null || value === undefined) return "--";
-  return value >= 1000 ? value.toFixed(2) : value.toFixed(5);
-}
-
-function setTrendGauge(score){
-  const angle = -90 + (clamp(score, -100, 100) * 0.9);
-  document.getElementById("trendNeedle").style.transform = `rotate(${angle}deg)`;
-  const value = document.getElementById("trendValue");
-  value.textContent = score > 0 ? "+" + score : score;
-  value.className = "text-3xl font-black mt-2 " + (score >= 18 ? "buy" : score <= -18 ? "sell" : "wait");
-
-  let text = "NEUTRAL";
-  if(score >= 70) text = "ALCISTA FUERTE";
-  else if(score >= 40) text = "ALCISTA";
-  else if(score >= 18) text = "ALCISTA DÉBIL";
-  else if(score <= -70) text = "BAJISTA FUERTE";
-  else if(score <= -40) text = "BAJISTA";
-  else if(score <= -18) text = "BAJISTA DÉBIL";
-  document.getElementById("trendText").textContent = text;
-}
-
-function setOpportunity(score){
-  document.getElementById("opportunityGauge").style.setProperty("--deg", (score * 3.6) + "deg");
-  document.getElementById("opportunityScore").textContent = score;
-
-  let text, desc, color;
-  if(score < 45){ text = "NO OPERAR"; desc = "Confluencia insuficiente"; color = "text-red-400"; }
-  else if(score < 65){ text = "OBSERVAR"; desc = "Todavía no hay ventaja clara"; color = "text-yellow-400"; }
-  else if(score < 78){ text = "PREPARAR"; desc = "Setup desarrollándose"; color = "text-yellow-300"; }
-  else if(score < 90){ text = "OPORTUNIDAD FUERTE"; desc = "Buena confluencia técnica"; color = "text-emerald-400"; }
-  else{ text = "SETUP MUY FUERTE"; desc = "Confluencia interna muy alta"; color = "text-emerald-300"; }
-
-  const el = document.getElementById("opportunityText");
-  el.textContent = text;
-  el.className = "font-bold mt-3 " + color;
-  document.getElementById("opportunityDescription").textContent = desc;
-}
-
-function updateUI(result, symbol, timeframe){
-  setTrendGauge(result.trendScore);
-  setOpportunity(result.opportunity);
-
-  const decision = document.getElementById("decision");
-  decision.textContent = result.decision;
-  decision.className = "text-5xl font-black mt-4 " + (result.decision.includes("BUY") ? "buy" : result.decision.includes("SELL") ? "sell" : "wait");
-
-  const box = document.getElementById("signalBox");
-  box.className = "card p-5 mb-5 " + (result.decision.includes("BUY") ? "signal-buy" : result.decision.includes("SELL") ? "signal-sell" : "signal-wait");
-
-  document.getElementById("symbolDisplay").textContent = symbol;
-  document.getElementById("tfDisplay").textContent = TIMEFRAMES[timeframe].label;
-  document.getElementById("price").textContent = priceFormat(result.price);
-  document.getElementById("rhythm").textContent = result.rhythm;
-  document.getElementById("momentum").textContent = result.momentumATR.toFixed(2) + " ATR";
-  document.getElementById("activity").textContent = result.activity.toFixed(2) + "x";
-  document.getElementById("structure").textContent = result.structure.event;
-  document.getElementById("ema20").textContent = priceFormat(result.ema20);
-  document.getElementById("ema50").textContent = priceFormat(result.ema50);
-  document.getElementById("rsi").textContent = result.rsi.toFixed(1);
-  document.getElementById("macd").textContent = result.macd.histogram > 0 ? "ALCISTA ↑" : result.macd.histogram < 0 ? "BAJISTA ↓" : "NEUTRAL";
-  document.getElementById("bos").textContent = result.structure.event;
-  document.getElementById("liquidity").textContent = result.liquidity.text;
-  document.getElementById("orderBlock").textContent = result.ob.text;
-  document.getElementById("fvg").textContent = result.fvg.text;
-
-  // Entry confirmation
-  document.getElementById("entryBreak").textContent = result.structure.direction !== "neutral" ? "✓ " + result.structure.event : "✕ Sin ruptura clara";
-  document.getElementById("entryRetest").textContent = result.retest.confirmed ? "✓ CONFIRMADO" : "Esperando";
-
-  const momentumOK = (result.direction === "buy" && result.momentumATR > 0.3) || (result.direction === "sell" && result.momentumATR < -0.3);
-  document.getElementById("entryMomentum").textContent = momentumOK ? "✓ CONFIRMA" : "Débil";
-
-  const trendOK = (result.direction === "buy" && result.ema20 > result.ema50) || (result.direction === "sell" && result.ema20 < result.ema50);
-  document.getElementById("entryTrend").textContent = trendOK ? "✓ ALINEADA" : "✕ NO ALINEADA";
-
-  const fullEntry = result.retest.confirmed && momentumOK && trendOK && result.structure.direction === result.direction;
-  const entryStatus = document.getElementById("entryStatus");
-  if(fullEntry){
-    entryStatus.textContent = result.direction === "buy" ? "🔥 SETUP BUY CONFIRMADO" : "🔥 SETUP SELL CONFIRMADO";
-    entryStatus.className = "small-pill text-emerald-300";
-  } else {
-    entryStatus.textContent = "ESPERANDO CONFIRMACIÓN";
-    entryStatus.className = "small-pill text-yellow-300";
+  for(let i=1;i<c.length;i++){
+    a.push(Math.max(
+      c[i].h-c[i].l,
+      Math.abs(c[i].h-c[i-1].c),
+      Math.abs(c[i].l-c[i-1].c)
+    ));
   }
 
-  document.getElementById("scoreReasons").innerHTML = result.reasons.length
-    ? result.reasons.map(r => `<div class="panel px-3 py-2">${r}</div>`).join("")
-    : `<div class="panel px-3 py-2">Sin confluencia suficiente.</div>`;
+  let v=a.slice(0,n).reduce((s,x)=>s+x,0)/n;
 
-  updateChart(symbol, timeframe);
+  for(let i=n;i<a.length;i++){
+    v=(v*(n-1)+a[i])/n;
+  }
+  return v;
 }
 
-function updateChart(symbol, timeframe){
-  const asset = ASSETS[symbol];
-  const tf = TIMEFRAMES[timeframe];
-  const url = `https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(asset.tv)}&interval=${encodeURIComponent(tf.tv)}&theme=dark&hide_side_toolbar=1&allow_symbol_change=0`;
-  document.getElementById("tvFrame").src = url;
-  document.getElementById("chartLabel").textContent = symbol + " · " + tf.label;
+/* SWING HIGHS / LOWS */
+function pivots(c,k=3,end=c.length){
+  const hs=[],ls=[];
+
+  for(let i=k;i<end-k;i++){
+    let high=true,low=true;
+
+    for(let j=i-k;j<=i+k;j++){
+      if(i===j)continue;
+
+      if(c[j].h>=c[i].h)high=false;
+      if(c[j].l<=c[i].l)low=false;
+    }
+
+    if(high)hs.push({i,p:c[i].h});
+    if(low)ls.push({i,p:c[i].l});
+  }
+
+  return {hs,ls};
 }
 
-async function updateMarket(){
-  const apiKey = document.getElementById("apiKey").value.trim();
-  if(!apiKey){
-    document.getElementById("status").textContent = "⚠ Falta API Key de Twelve Data";
+/* ESTRUCTURA */
+function structure(c){
+  const {hs,ls}=pivots(c);
+
+  if(hs.length<2||ls.length<2){
+    return 'Estructura insuficiente';
+  }
+
+  const h1=hs.at(-2),h2=hs.at(-1);
+  const l1=ls.at(-2),l2=ls.at(-1);
+
+  if(h2.p>h1.p&&l2.p>l1.p){
+    return 'HH + HL';
+  }
+
+  if(h2.p<h1.p&&l2.p<l1.p){
+    return 'LH + LL';
+  }
+
+  return 'Mixta';
+}
+
+/* BUSCAR RUPTURA REAL
+   El nivel debe existir antes de la ruptura. */
+function findBreakout(c,vol){
+  const start=Math.max(20,c.length-16);
+  const events=[];
+
+  for(let i=start;i<c.length;i++){
+    const p=pivots(c,3,i);
+    const h=p.hs.at(-1);
+    const l=p.ls.at(-1);
+    const prev=c[i-1];
+    const now=c[i];
+
+    if(
+      h &&
+      prev.c<=h.p+vol*.12 &&
+      now.c>h.p+vol*.18
+    ){
+      events.push({
+        dir:'buy',
+        i,
+        level:h.p
+      });
+    }
+
+    if(
+      l &&
+      prev.c>=l.p-vol*.12 &&
+      now.c<l.p-vol*.18
+    ){
+      events.push({
+        dir:'sell',
+        i,
+        level:l.p
+      });
+    }
+  }
+
+  return events.at(-1)||null;
+}
+
+/* RETEST ESTRICTO
+   La ruptura debe ser anterior al retest.
+   La última vela cerrada debe rechazar el nivel. */
+function checkRetest(c,b,v){
+  if(!b){
+    return {
+      ok:false,
+      reason:'Sin ruptura reciente'
+    };
+  }
+
+  const last=c.length-1;
+
+  if(last<=b.i){
+    return {
+      ok:false,
+      reason:'Esperando vela posterior a ruptura'
+    };
+  }
+
+  if(last-b.i>8){
+    return {
+      ok:false,
+      reason:'Ruptura demasiado antigua'
+    };
+  }
+
+  const level=b.level;
+  const z=c[last];
+  const tol=v*.30;
+
+  if(b.dir==='buy'){
+    const touched=
+      z.l<=level+tol &&
+      z.l>=level-v*.65;
+
+    const reject=
+      z.c>level+v*.12 &&
+      z.c>z.o &&
+      z.c>z.l+(z.h-z.l)*.55;
+
+    const valid=c.slice(b.i+1,last+1)
+      .every(x=>x.c>=level-v*.20);
+
+    return {
+      ok:touched&&reject&&valid,
+      reason:!valid
+        ? 'Ruptura invalidada'
+        : !touched
+          ? 'Falta toque al nivel'
+          : !reject
+            ? 'Falta rechazo alcista'
+            : 'Retest + rechazo alcista',
+      touched,
+      reject
+    };
+  }
+
+  const touched=
+    z.h>=level-tol &&
+    z.h<=level+v*.65;
+
+  const reject=
+    z.c<level-v*.12 &&
+    z.c<z.o &&
+    z.c<z.h-(z.h-z.l)*.55;
+
+  const valid=c.slice(b.i+1,last+1)
+    .every(x=>x.c<=level+v*.20);
+
+  return {
+    ok:touched&&reject&&valid,
+    reason:!valid
+      ? 'Ruptura invalidada'
+      : !touched
+        ? 'Falta toque al nivel'
+        : !reject
+          ? 'Falta rechazo bajista'
+          : 'Retest + rechazo bajista',
+    touched,
+    reject
+  };
+}
+
+/* ANALISIS PRINCIPAL */
+function analyze(c){
+  if(c.length<90){
+    throw Error(
+      'Se necesitan al menos 90 velas cerradas.'
+    );
+  }
+
+  const a=c.map(x=>x.c);
+  const z=c.at(-1);
+
+  const e20=EMA(a,20);
+  const e50=EMA(a,50);
+  const r=rsi(a);
+  const m=macd(a);
+  const v=atr(c);
+
+  if(!v||!m){
+    throw Error('Indicadores sin datos suficientes.');
+  }
+
+  const impulse=(z.c-c.at(-4).c)/v;
+
+  const bull=
+    (z.c>e20?12:0)+
+    (e20>e50?18:0)+
+    (r>=52&&r<75?15:0)+
+    (m.hist>0?15:0)+
+    (impulse>.2?15:0)+
+    (structure(c)==='HH + HL'?25:0);
+
+  const bear=
+    (z.c<e20?12:0)+
+    (e20<e50?18:0)+
+    (r<=48&&r>25?15:0)+
+    (m.hist<0?15:0)+
+    (impulse<-.2?15:0)+
+    (structure(c)==='LH + LL'?25:0);
+
+  const trend=clamp(bull-bear,-100,100);
+
+  const dir=
+    trend>=20?'buy':
+    trend<=-20?'sell':'neutral';
+
+  const b=findBreakout(c,v);
+  const retest=checkRetest(c,b,v);
+
+  const aligned=b&&b.dir===dir;
+
+  const trendOK=
+    dir==='buy'
+      ? z.c>e20&&e20>e50
+      : dir==='sell'
+        ? z.c<e20&&e20<e50
+        : false;
+
+  const momentumOK=
+    dir==='buy'
+      ? r>=52&&r<75&&m.hist>0&&impulse>.2
+      : dir==='sell'
+        ? r<=48&&r>25&&m.hist<0&&impulse<-.2
+        : false;
+
+  const breakoutOK=!!b&&aligned;
+  const retestOK=!!retest.ok&&breakoutOK;
+
+  const score=clamp(
+    Math.round(
+      Math.max(bull,bear)-
+      Math.min(bull,bear)*.35
+    ),
+    0,100
+  );
+
+  /* REGLA PRINCIPAL:
+     PUNTUACION ALTA NO HABILITA ENTRADA
+     SIN CONFIRMACIONES COMPLETAS */
+
+  const ready=!!(
+    dir!=='neutral' &&
+    trendOK &&
+    momentumOK &&
+    breakoutOK &&
+    retestOK &&
+    score>=65
+  );
+
+  const checks=[
+    [
+      'Dirección definida',
+      dir!=='neutral',
+      dir.toUpperCase()
+    ],
+    [
+      'EMA alineadas',
+      trendOK,
+      'EMA20 / EMA50'
+    ],
+    [
+      'Ruptura confirmada',
+      breakoutOK,
+      b
+        ? b.dir.toUpperCase()+' · '+fmt(b.level)
+        : 'Sin BOS reciente'
+    ],
+    [
+      'Retest + rechazo',
+      retestOK,
+      retest.reason
+    ],
+    [
+      'Momentum + calidad',
+      momentumOK&&score>=65,
+      'RSI · MACD · Impulso · score '+score
+    ]
+  ];
+
+  return {
+    price:z.c,
+    datetime:z.datetime,
+    trend,
+    dir,
+    score,
+    ready,
+    checks,
+    b,
+    retest,
+    e20,
+    e50,
+    r,
+    m,
+    v,
+    impulse,
+    structure:structure(c)
+  };
+}
+
+/* FECHAS */
+function parseDate(s){
+  const x=String(s).replace(' ','T');
+  const d=new Date(
+    x.endsWith('Z')?x:x+'Z'
+  );
+
+  return Number.isNaN(d.getTime())?null:d;
+}
+
+/* CREAR VELAS DE 10 MINUTOS */
+function aggregate10(c){
+  const out=[];
+
+  for(let i=0;i<c.length;){
+    const d=parseDate(c[i].datetime);
+
+    if(!d){
+      i++;
+      continue;
+    }
+
+    const t=d.getTime();
+    const minute=d.getUTCMinutes();
+
+    if(minute%10!==0){
+      i++;
+      continue;
+    }
+
+    const next=c[i+1];
+
+    if(!next)break;
+
+    const dn=parseDate(next.datetime);
+
+    if(
+      !dn ||
+      dn.getTime()-t!==300000
+    ){
+      i++;
+      continue;
+    }
+
+    out.push({
+      o:c[i].o,
+      h:Math.max(c[i].h,next.h),
+      l:Math.min(c[i].l,next.l),
+      c:next.c,
+      datetime:c[i].datetime
+    });
+
+    i+=2;
+  }
+
+  return out;
+}
+
+/* DATOS TWELVE DATA */
+async function fetchCandles(symbol,tf,key){
+  const cfg=TFS[tf];
+  const size=cfg.synthetic?400:220;
+
+  const url=
+    `https://api.twelvedata.com/time_series`+
+    `?symbol=${encodeURIComponent(symbol)}`+
+    `&interval=${encodeURIComponent(cfg.api)}`+
+    `&outputsize=${size}`+
+    `&apikey=${encodeURIComponent(key)}`;
+
+  const resp=await fetch(url,{
+    cache:'no-store'
+  });
+
+  if(!resp.ok){
+    throw Error('Servicio HTTP '+resp.status);
+  }
+
+  const data=await resp.json();
+
+  if(
+    data.status==='error' ||
+    !Array.isArray(data.values)
+  ){
+    throw Error(
+      data.message||'Twelve Data sin datos'
+    );
+  }
+
+  let c=data.values
+    .slice()
+    .reverse()
+    .map(x=>({
+      datetime:x.datetime,
+      o:+x.open,
+      h:+x.high,
+      l:+x.low,
+      c:+x.close
+    }))
+    .filter(x=>
+      [x.o,x.h,x.l,x.c].every(Number.isFinite) &&
+      x.h>=x.l &&
+      x.h>=Math.max(x.o,x.c) &&
+      x.l<=Math.min(x.o,x.c)
+    );
+
+  if(cfg.synthetic){
+    c=aggregate10(c);
+  }
+
+  /* EXCLUIR LA VELA FINAL POR PRECAUCION:
+     NO UTILIZAR UNA VELA AUN ABIERTA */
+  c.pop();
+
+  return c;
+}
+
+/* SEMAFORO ROJO POR DEFECTO */
+function clear(){
+  $('light').className='light';
+
+  $('permission').textContent='NO ENTRAR';
+  $('permission').className=
+    'text-3xl font-black mt-3 bad';
+
+  $('permissionDetail').textContent=
+    'Esperando datos recientes';
+
+  $('signal').textContent='ESPERAR';
+  $('signal').className=
+    'big font-black warn mt-4';
+}
+
+/* MOSTRAR RESULTADOS */
+function render(r,s,t){
+  $('direction').textContent=
+    r.dir==='buy'?'BUY / ALCISTA':
+    r.dir==='sell'?'SELL / BAJISTA':
+    'NEUTRAL';
+
+  $('direction').className=
+    'big font-black mt-4 '+
+    (r.dir==='buy'?'good':
+     r.dir==='sell'?'bad':'warn');
+
+  $('trendNum').textContent=
+    (r.trend>0?'+':'')+r.trend;
+
+  $('bullbar').style.width=
+    ((r.trend+100)/2)+'%';
+
+  $('price').textContent=fmt(r.price);
+  $('score').textContent=r.score;
+
+  $('emas').textContent=
+    fmt(r.e20)+' / '+fmt(r.e50);
+
+  $('rsi').textContent=r.r.toFixed(1);
+
+  $('macd').textContent=
+    r.m.hist.toFixed(
+      s.startsWith('BTC')?3:6
+    );
+
+  $('atr').textContent=
+    fmt(r.v)+' / '+
+    r.impulse.toFixed(2)+' ATR';
+
+  $('structure').textContent=r.structure;
+
+  $('breakout').textContent=
+    r.b
+      ? r.b.dir.toUpperCase()+
+        ' en '+fmt(r.b.level)
+      : 'Sin ruptura';
+
+  $('retest').textContent=r.retest.reason;
+
+  $('candleTime').textContent=r.datetime;
+
+  /* CINCO CONFIRMACIONES */
+  $('checks').replaceChildren(
+    ...r.checks.map(([label,ok,detail])=>{
+      const el=document.createElement('div');
+      el.className='tile';
+
+      const h=document.createElement('div');
+      h.className='font-bold '+(ok?'good':'bad');
+      h.textContent=(ok?'✓ ':'✕ ')+label;
+
+      const p=document.createElement('p');
+      p.className='text-sm text-gray-400 mt-2';
+      p.textContent=detail;
+
+      el.append(h,p);
+      return el;
+    })
+  );
+
+  /* RAZONES PARA NO ENTRAR */
+  $('reasons').replaceChildren(
+    ...r.checks.filter(x=>!x[1]).map(x=>{
+      const d=document.createElement('div');
+      d.className='tile';
+      d.textContent=
+        'Pendiente: '+x[0]+' — '+x[2];
+      return d;
+    })
+  );
+
+  /* ACTIVACION DEL SEMAFORO */
+  if(r.ready){
+    $('light').className='light ready';
+
+    $('permission').textContent=
+      'ENTRADA CONFIRMADA';
+
+    $('permission').className=
+      'text-3xl font-black mt-3 good';
+
+    $('permissionDetail').textContent=
+      'Todas las condiciones de la última vela cerrada';
+
+    $('signal').textContent=
+      r.dir.toUpperCase();
+
+    $('signal').className=
+      'big font-black good mt-4';
+
+  }else{
+    $('light').className='light';
+
+    $('permission').textContent='NO ENTRAR';
+
+    $('permission').className=
+      'text-3xl font-black mt-3 bad';
+
+    $('permissionDetail').textContent=
+      r.dir==='neutral'
+        ? 'Sin tendencia definida'
+        : 'Tendencia '+
+          r.dir.toUpperCase()+
+          ' · faltan confirmaciones';
+
+    $('signal').textContent='ESPERAR';
+
+    $('signal').className=
+      'big font-black warn mt-4';
+  }
+
+  $('assetLabel').textContent=
+    s+' · '+TFS[t].label;
+
+  /* ALERTA SONORA AL CONFIRMAR */
+  if(r.ready){
+    const id=s+'|'+t+'|'+r.datetime+'|'+r.dir;
+
+    if(lastAlert!==id){
+      lastAlert=id;
+
+      try{
+        const sound=new AudioContext();
+        const osc=sound.createOscillator();
+        const g=sound.createGain();
+
+        osc.connect(g);
+        g.connect(sound.destination);
+
+        osc.frequency.value=780;
+        g.gain.value=.04;
+
+        osc.start();
+        osc.stop(sound.currentTime+.15);
+
+        osc.onended=()=>sound.close();
+      }catch(e){}
+    }
+  }
+}
+
+/* TRADINGVIEW */
+function renderChart(){
+  const s=$('symbol').value;
+  const t=$('tf').value;
+
+  if(!s)return;
+
+  $('chartLabel').textContent=
+    s+' · '+TFS[t].label;
+
+  $('chart').src=
+    `https://www.tradingview.com/widgetembed/`+
+    `?symbol=${encodeURIComponent(ASSETS[s].tv)}`+
+    `&interval=${TFS[t].tv}`+
+    `&theme=dark`+
+    `&hide_side_toolbar=1`+
+    `&allow_symbol_change=0`;
+}
+
+/* CAMBIO MERCADO */
+function changeMarket(){
+  const old=$('symbol').value;
+
+  const opts=$('market').value==='Forex'
+    ? ['EUR/USD','GBP/USD']
+    : ['BTC/USDT'];
+
+  $('symbol').replaceChildren(
+    ...opts.map(x=>new Option(x,x))
+  );
+
+  if(opts.includes(old)){
+    $('symbol').value=old;
+  }
+
+  renderChart();
+  clear();
+}
+
+/* ACTUALIZAR ANALISIS */
+async function update(){
+  const id=++requestId;
+  const k=$('key').value.trim();
+  const s=$('symbol').value;
+  const t=$('tf').value;
+
+  if(!k){
+    clear();
+    $('status').textContent=
+      '⚠ Ingresa tu API Key';
     return;
   }
-  saveKey();
 
-  const symbol = document.getElementById("symbol").value;
-  const timeframe = document.getElementById("timeframe").value;
-  const asset = ASSETS[symbol];
+  if(busy)return;
 
-  document.getElementById("status").textContent = `Analizando ${symbol} · ${TIMEFRAMES[timeframe].label}...`;
+  busy=true;
+  $('analyzeBtn').disabled=true;
+
+  $('status').textContent=
+    'Analizando '+s+' · '+TFS[t].label+'...';
 
   try{
-    const candles = await fetchCandles(asset, timeframe, apiKey);
-    if(candles.length < 80) throw new Error("No hay suficientes velas para un análisis fiable.");
+    const c=await fetchCandles(s,t,k);
 
-    const result = analyze(candles);
-    updateUI(result, symbol, timeframe);
+    if(id!==requestId)return;
 
-    document.getElementById("status").textContent = "✓ Análisis actualizado";
-    document.getElementById("lastUpdate").textContent = "Última actualización: " + new Date().toLocaleString("es-US");
-  } catch(error){
-    document.getElementById("status").textContent = "ERROR: " + error.message;
+    const r=analyze(c);
+    render(r,s,t);
+
+    $('status').textContent=
+      '✓ Lectura actualizada (última vela excluida por precaución)';
+
+    $('updated').textContent=
+      'Actualizado: '+
+      new Date().toLocaleString('es-US');
+
+  }catch(e){
+    clear();
+
+    $('status').textContent=
+      'ERROR: '+e.message;
+
+  }finally{
+    busy=false;
+    $('analyzeBtn').disabled=false;
   }
 }
 
-document.getElementById("symbol").addEventListener("change", () => { if(document.getElementById("apiKey").value.trim()) updateMarket(); });
-document.getElementById("timeframe").addEventListener("change", () => { if(document.getElementById("apiKey").value.trim()) updateMarket(); });
-document.getElementById("marketType").addEventListener("change", () => {
-  setTimeout(() => { if(document.getElementById("apiKey").value.trim()) updateMarket(); }, 50);
+/* ACTUALIZACION AUTOMATICA */
+function toggleAuto(){
+  if(autoTimer){
+    clearInterval(autoTimer);
+    autoTimer=null;
+
+    $('autoBtn').textContent='Auto: OFF';
+    $('autoBtn').className=
+      'bg-gray-700 px-4 py-3 rounded-xl';
+
+    return;
+  }
+
+  autoTimer=setInterval(()=>{
+    if(!document.hidden){
+      update();
+    }
+  },60000);
+
+  $('autoBtn').textContent='Auto: ON';
+
+  $('autoBtn').className=
+    'bg-emerald-700 px-4 py-3 rounded-xl';
+
+  update();
+}
+
+/* EVENTOS */
+$('market').addEventListener('change',()=>{
+  changeMarket();
+
+  if($('key').value){
+    update();
+  }
 });
 
-window.onload = () => {
-  loadKey();
-  changeMarketType();
-  updateChart("EUR/USD", "15m");
-  if(localStorage.getItem("marketApiKey")) updateMarket();
-};
+for(const id of ['symbol','tf']){
+  $(id).addEventListener('change',()=>{
+    renderChart();
+    clear();
+
+    if($('key').value){
+      update();
+    }
+  });
+}
+
+$('analyzeBtn').addEventListener(
+  'click',update
+);
+
+$('autoBtn').addEventListener(
+  'click',toggleAuto
+);
+
+$('key').addEventListener('change',()=>{
+  sessionStorage.setItem(
+    'fja_api_key',
+    $('key').value.trim()
+  );
+});
+
+/* INICIO */
+$('key').value=
+  sessionStorage.getItem('fja_api_key')||'';
+
+changeMarket();
+
+if($('key').value){
+  update();
+}
 </script>
+
 </body>
 </html>
